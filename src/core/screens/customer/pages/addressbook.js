@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Container, Toast } from 'native-base';
-import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import { addresses, address_book_mode, address_detail_mode, checkout_mode } from "@helper/constants";
 import NavigationManager from '@helper/NavigationManager';
 import SimiPageComponent from '@base/components/SimiPageComponent';
 import Identify from '@helper/Identify';
 import variable from '@theme/variables/material';
+import material from "@theme/variables/material";
 
 class AddressBookPage extends SimiPageComponent {
 
@@ -38,21 +39,21 @@ class AddressBookPage extends SimiPageComponent {
     }
 
     getListAddresses() {
-        Connection.restData();
-        Connection.setGetData({
-            limit: 100,
-            offset: 0,
-            dir: 'desc'
-        });
-        Connection.connect(addresses, this, 'GET');
+        new NewConnection()
+            .init(addresses, 'get_address_data', this)
+            .addGetData({
+                limit: 100,
+                offset: 0,
+                dir: 'desc'
+            })
+            .connect();
     }
 
-    setData(data) {
-        if (this.deleteAddressID != '') {
+    setData(data, requestID) {
+        if (requestID == 'delete_address') {
             Toast.show({
                 text: Identify.__('Delete address successful'),
-                textStyle: { color: "yellow" },
-                buttonText: "Okay",
+                textStyle: { color: "yellow", fontFamily: material.fontFamily },
                 duration: 3000
             });
             for (let i = 0; i < this.addressData.addresses.length; i++) {
@@ -83,8 +84,9 @@ class AddressBookPage extends SimiPageComponent {
     deleteAddress(addressID) {
         this.deleteAddressID = addressID;
         this.props.storeData('showLoading', { type: 'dialog' });
-        Connection.restData();
-        Connection.connect(addresses + '/' + addressID, this, 'DELETE');
+        new NewConnection()
+            .init(addresses + '/' + addressID, 'delete_address', this, 'DELETE')
+            .connect();
     }
 
     addNewAddress() {
@@ -161,7 +163,7 @@ class AddressBookPage extends SimiPageComponent {
             return (null);
         }
         return (
-            <Container style={{backgroundColor: variable.appBackground}}>
+            <Container style={{ backgroundColor: variable.appBackground }}>
                 {this.renderLayoutFromConfig('addressbook_layout', 'container')}
             </Container>
         );

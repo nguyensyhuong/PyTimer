@@ -123,17 +123,19 @@ class Option extends React.Component {
           break;
       }
 
-      return (
-        <Card style={{
-          marginTop: 10,
-          marginLeft: 10,
-          marginRight: 10,
-          marginBottom: 0,
-          paddingBottom: 10
-        }}>
-          {option}
-        </Card>
-      );
+      if (this.props.showCard) {
+        return (
+          <Card style={this.props.cardStyles}>
+            {option}
+          </Card>
+        );
+      } else {
+        return (
+          <View style={this.props.cardStyles}>
+            {option}
+          </View>
+        );
+      }
     }
     return null;
   }
@@ -163,6 +165,17 @@ class Option extends React.Component {
     }
   }
 
+}
+
+Option.defaultProps = {
+  showCard: true,
+  cardStyles: {
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 0,
+    paddingBottom: 10
+  }
 }
 
 export default Option;

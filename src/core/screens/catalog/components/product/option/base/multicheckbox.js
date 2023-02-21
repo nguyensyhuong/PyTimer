@@ -46,7 +46,11 @@ class MultiCheckbox extends Abstract {
           // if (Identify.magentoPlatform() === 2) {
           //     price = item.prices.finalPrice.amount;
           // }
-          let label  = this.parent.renderLabelOption(item.name, price, item.qty);
+          let app_tier_prices = null;
+          if (item.app_tier_prices && item.app_tier_prices.length > 0){
+            app_tier_prices = item.app_tier_prices[0];
+          }
+          let label  = this.parent.renderLabelOption(item.name, price, item.qty, app_tier_prices);
           let element = (<Checkbox key={i}
                                   label={label}
                                   selected={selected}

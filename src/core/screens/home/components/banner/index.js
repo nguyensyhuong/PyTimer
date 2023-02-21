@@ -1,11 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity, Linking } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { StackActions } from 'react-navigation';
 import NavigationManager from '../../../../helper/NavigationManager';
 import styles from './styles';
 import Events from '@helper/config/events';
+import Identify from "../../../../helper/Identify";
+import Device from '@helper/device';
+
 
 class Banner extends React.Component {
 
@@ -53,35 +56,75 @@ class Banner extends React.Component {
                 break;
         }
         Events.dispatchEventAction(data, this);
-        NavigationManager.openRootPage(this.props.navigation, routeName, params);
+        if (routeName === 'WebViewPage' && Identify.getMerchantConfig().storeview.base.open_url_in_app && Identify.getMerchantConfig().storeview.base.open_url_in_app != '1') {
+            Linking.openURL(params.uri);
+        }else{
+            NavigationManager.openPage(this.props.navigation, routeName, params);
+        }    
     }
-    renderBanner(banner) {
+    renderBanner(banner, urlBanner) {
         return (
             <TouchableOpacity key={banner.banner_id} onPress={() => {
                 this.onSelectBanner(banner);
             }}>
                 <View>
-                    <Image source={{ uri: banner.banner_name }} style={styles.banner} />
+                    <Image source={{ uri: urlBanner }} style={styles.banner} />
                 </View>
             </TouchableOpacity>
         )
     }
+    getCustomHome = (keyParent) => {
+        let custom = Events.events.customize_home;
+        for (let i = 0; i < custom.length; i++) {
+            let customProps = custom[i];
+            for (let key in customProps) {
+                if (key == keyParent) {
+                    return customProps[keyParent]
+                }
+            }
+        }
+    }
 
     render() {
         let banners = [];
-        for (let i in this.props.data) {
+
+        let bannersData = this.props.data;
+        bannersData.sort(function(a, b){
+            var keyA = a.sort_order,
+                keyB = b.sort_order;
+            if(keyA < keyB) return -1;
+            if(keyA > keyB) return 1;
+            return 0;
+        });
+
+        for (let i in bannersData) {
             let banner = this.props.data[i];
-            banners.push(
-                this.renderBanner(banner)
-            );
+            if (!Device.isTablet()) {
+                if (banner.banner_name && banner.banner_name != null) {
+                    banners.push(
+                        this.renderBanner(banner, banner.banner_name)
+                    );
+                }
+            } else {
+                if (banner.banner_name_tablet && banner.banner_name_tablet != null) {
+                    banners.push(
+                        this.renderBanner(banner, banner.banner_name_tablet)
+                    );
+                }
+            }
         }
-        return (
-            <View style={styles.banner}>
-                <Swiper height={200} horizontal={true} autoplay autoplayTimeout={5}>
-                    {banners}
-                </Swiper>
-            </View>
-        );
+
+        if (banners.length > 0) {
+            return (
+                <View style={styles.banner}>
+                    <Swiper height={200} horizontal={true} autoplay autoplayTimeout={5} {...this.getCustomHome('banner')}>
+                        {banners}
+                    </Swiper>
+                </View>
+            );
+        } else {
+            return null;
+        }
     }
 }
 

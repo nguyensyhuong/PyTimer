@@ -26,7 +26,7 @@ class Options extends Abstract {
         //this.updateSelected(this.key,val);
     };
 
-    renderOptions = (data) => {
+    renderOptions(data) {
         let values = data.options;
         let canValues = this.parent.can_select[this.attribute_id];
         // if (this.parent.can_select.length > 0) {
@@ -99,7 +99,7 @@ class Options extends Abstract {
         return items;
     };
 
-    render = () => {
+    render() {
         let { data } = this.props;
         let items = null;
         items = this.renderOptions(data);

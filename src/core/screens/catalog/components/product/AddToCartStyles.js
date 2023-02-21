@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native"
+import material from "../../../../../../native-base-theme/variables/material";
 
 export default StyleSheet.create({
   addToCart: {
     position: 'absolute',
-    bottom: 0,
+    bottom: material.isIphoneX ? 15 : 0,
     width: '100%',
     height: 50,
     flexDirection: 'row',

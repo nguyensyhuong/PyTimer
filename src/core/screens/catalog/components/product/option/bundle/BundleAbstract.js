@@ -15,20 +15,34 @@ class BundleAbstract extends OptionAbstract {
         this.options = {};
     }
 
-    renderOptions = () => {
-        let attributes = this.data.bundle_options.options;
-        let objOptions = [];
-        this.selected = this.data.bundle_options.selected;
-        let selected = this.props.selected ? this.props.selected : null;;
+    sortAttributes(attributes) {
+        let list = [];
         for (let i in attributes) {
             let obj = attributes[i];
+            obj['key'] = i;
+            list.push(obj);
+        }
+        list.sort(function (a, b) {
+            return a.position - b.position;
+        });
+        return list;
+    }
+
+    renderOptions = () => {
+        let attributes = this.data.bundle_options.options;
+        let sortedAttributes = this.sortAttributes(attributes);
+
+        let objOptions = [];
+        this.selected = this.data.bundle_options.selected;
+        let selected = this.props.selected ? this.props.selected : null;
+        sortedAttributes.forEach(obj => {
             let labelRequried = this.renderLabelRequired(parseInt(obj.isRequired, 10));
             if (obj.isRequired === "1") {
                 labelRequried = "*";
-                this.required.push(i);
+                this.required.push(obj.key);
             }
             if (selected) {
-                let values = selected[i];
+                let values = selected[obj.key];
                 if (values && values.length) {
                     obj.values = values;
                 }
@@ -40,9 +54,9 @@ class BundleAbstract extends OptionAbstract {
             // if(Identify.connectorVersion()){
             //     type = obj.type ? obj.type : type;
             // }
-            let element = this.renderAttribute(type, obj, i, labelRequried);
+            let element = this.renderAttribute(type, obj, obj.key, labelRequried);
             objOptions.push(element);
-        }
+        });
         return (
             <View>
                 {objOptions}
@@ -77,14 +91,14 @@ class BundleAbstract extends OptionAbstract {
         }
     };
 
-    renderLabelOption = (title, price, qty) => {
+    renderLabelOption = (title, price, qty, app_tier_prices = null) => {
         let symbol = price > 0 ? <Text style={{ marginLeft: 5 }}>+</Text> : null;
         price = price > 0 ? this.renderOptionPrice(price) : null;
-        let label = <View style={{ flexDirection: 'row', marginLeft: 10 }}>
-            <Text>{qty} x {title}</Text>
-            {symbol}
-            {price}
-        </View>;
+        let label =
+            <View>
+                <Text style={{ marginLeft: 10 }}>{qty} x {title} {symbol} {price}</Text>
+                {app_tier_prices ? <Text style={{ marginLeft: 10, marginTop: 4 }}>{app_tier_prices}</Text> : null}
+            </View>
         return label;
     };
 
@@ -133,9 +147,10 @@ class BundleAbstract extends OptionAbstract {
                     if (values instanceof Array) {
                         element = selections[values[j]];
                     }
-                    let qty = element.qty;
 
                     if (element) {
+                        let qty = element.qty;
+
                         if (element.tierPrice.length > 0) {
                             for (let t in element.tierPrice) {
                                 let item = element.tierPrice[t];

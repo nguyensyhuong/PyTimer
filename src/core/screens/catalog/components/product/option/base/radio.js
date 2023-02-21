@@ -1,7 +1,7 @@
 import React from 'react';
 import Abstract from "./Abstract";
 import { View, Text } from 'native-base';
-import {RadioButton, RadioGroup} from 'react-native-flexi-radio-button';
+import { RadioButton, RadioGroup } from 'react-native-flexi-radio-button';
 import Identify from "../../../../../../helper/Identify";
 
 class RadioField extends Abstract {
@@ -14,15 +14,15 @@ class RadioField extends Abstract {
     }
 
     getValues() {
-      return this.state.selected;
+        return this.state.selected;
     }
 
-    onSelect = (index, value)=> {
+    onSelect = (index, value) => {
         this.state.selected = value;
         this.parent.updatePrices();
     };
 
-    renderWithBundle = (data)=>{
+    renderWithBundle = (data) => {
         let options = data.selections;
         let values = data.values;
         let items = [];
@@ -43,10 +43,14 @@ class RadioField extends Abstract {
             // if (Identify.magentoPlatform() === 2) {
             //     price = item.prices.finalPrice.amount;
             // }
-            if(item.tierPrice && item.tierPrice.length > 0){
+            if (item.tierPrice && item.tierPrice.length > 0) {
                 this.showTier = true;
             }
-            let label  = this.parent.renderLabelOption(item.name, price, item.qty);
+            let app_tier_prices = null;
+            if (item.app_tier_prices && item.app_tier_prices.length > 0) {
+                app_tier_prices = item.app_tier_prices[0];
+            }
+            let label = this.parent.renderLabelOption(item.name, price, item.qty, app_tier_prices);
             let element = (
                 <RadioButton
                     key={Identify.makeid()}
@@ -60,7 +64,7 @@ class RadioField extends Abstract {
         return items;
     };
 
-    renderWithCustom = (data)=>{
+    renderWithCustom = (data) => {
         let values = data.values;
         let items = values.map(item => {
             let prices = 0;
@@ -74,7 +78,7 @@ class RadioField extends Abstract {
                     key={Identify.makeid()}
                     value={item.id}
                     color='#039BE5'>
-                    {this.renderLableItem(item.title,prices)}
+                    {this.renderLableItem(item.title, prices)}
                 </RadioButton>
             )
         })
@@ -82,22 +86,22 @@ class RadioField extends Abstract {
     };
 
     render = () => {
-        let {data} = this.props;
+        let { data } = this.props;
         let type_id = this.props.parent.getProductType();
         let items = null;
-        if(type_id === 'bundle'){
+        if (type_id === 'bundle') {
             items = this.renderWithBundle(data);
         }
-        else{
+        else {
             items = this.renderWithCustom(data);
         }
         return (
             <View>
-                <RadioGroup style={{marginLeft: 10}}
-                            color='#039BE5'
-                            thickness={2}
-                            ref={(radio)=>this.Radio = radio}
-                            onSelect = {(index, value) => this.onSelect(index, value)}>
+                <RadioGroup style={{ marginLeft: 10, marginRight: 10 }}
+                    color='#039BE5'
+                    thickness={2}
+                    ref={(radio) => this.Radio = radio}
+                    onSelect={(index, value) => this.onSelect(index, value)}>
                     {items}
                 </RadioGroup>
             </View>
@@ -106,6 +110,6 @@ class RadioField extends Abstract {
     }
 }
 RadioField.defaultProps = {
-    type : 1
+    type: 1
 };
 export default RadioField;

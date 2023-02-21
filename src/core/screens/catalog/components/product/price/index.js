@@ -3,13 +3,17 @@ import { View } from 'native-base';
 import Simple from './simple';
 import Bundle from './bundle';
 import Grouped from './grouped';
+import TierPrice from './tier';
 import PropTypes from 'prop-types';
-import material from '../../../../../../../native-base-theme/variables/material';
+import material from '@theme/variables/material';
+import Identify from "@helper/Identify";
+import Events from '@helper/config/events';
 
 class Price extends React.Component {
     constructor(props) {
         super(props);
         this.isUpdatePrice = false;
+        this.storeConfig = Identify.getMerchantConfig().storeview.base;
         this.state = {
             prices: {}
         };
@@ -39,15 +43,51 @@ class Price extends React.Component {
         }
     }
 
+    renderTierPrice() {
+        return (
+            <TierPrice tierPrice={this.props.tierPrice} />
+        );
+    }
+
     render() {
         if (!this.isUpdatePrice) {
             this.initPrices();
         } else {
             this.isUpdatePrice = false;
         }
-        return (
-            <View>{this.renderView()}</View>
-        );
+        let priceView = this.dispatchReplacePrice();
+        if (priceView) {
+            return priceView;
+        } else {
+            if (this.storeConfig && this.storeConfig.hasOwnProperty('is_show_price_for_guest') &&
+                this.storeConfig.is_show_price_for_guest == '0' && !Identify.getCustomerData()) {
+                return null;
+            } else {
+                return (
+                    <View>
+                        {this.renderView()}
+                        {this.renderTierPrice()}
+                    </View>
+                );
+            }
+        }
+    }
+
+    dispatchReplacePrice() {
+        if (Events.events.price_view) {
+            let priceView = null;
+            let priority = -1;
+            for (let i = 0; i < Events.events.price_view.length; i++) {
+                let node = Events.events.price_view[i];
+                if (node.active === true && node.priority >= priority) {
+                    priority = node.priority;
+                    let Content = node.content;
+                    priceView = <Content parent={this} />
+                }
+            }
+            return (priceView);
+        }
+        return null;
     }
 
     updatePrices(newPrices) {
@@ -62,9 +102,9 @@ class Price extends React.Component {
         this.state.prices = this.props.prices;
         this.style = {
             styleLabel: this.props.styleLabel ? this.props.styleLabel : { fontSize: material.textSizeSmall },
-            stylePrice: this.props.stylePrice ? this.props.stylePrice : { fontSize: material.textSizeSmall, color: material.priceColor },
-            stylePriceLine: this.props.stylePriceLine ? this.props.stylePriceLine : { fontSize: material.textSizeSmall, textDecorationLine: 'line-through', color: material.priceColor },
-            styleSpecialPrice: this.props.styleSpecialPrice ? this.props.styleSpecialPrice : { fontSize: material.textSizeSmall, color: material.secpicalPriceColor },
+            stylePrice: this.props.stylePrice ? this.props.stylePrice : { fontSize: material.textSizeSmall, color: material.priceColor, marginRight: 5, marginLeft: 5 },
+            stylePriceLine: this.props.stylePriceLine ? this.props.stylePriceLine : { fontSize: material.textSizeSmall, textDecorationLine: 'line-through', color: material.priceColor, marginRight: 5, marginLeft: 5 },
+            styleSpecialPrice: this.props.styleSpecialPrice ? this.props.styleSpecialPrice : { fontSize: material.textSizeSmall, color: material.secpicalPriceColor, marginRight: 5, marginLeft: 5 },
             //one row.
             styleOneRowPrice: this.props.styleOneRowPrice ? this.props.styleOneRowPrice : { flexWrap: 'wrap', flexDirection: 'row' },
             styleTwoRowPrice: this.props.styleTwoRowPrice ? this.props.styleTwoRowPrice : { flexWrap: 'wrap', flexDirection: 'column' },

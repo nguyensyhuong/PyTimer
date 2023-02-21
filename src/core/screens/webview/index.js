@@ -1,9 +1,10 @@
 import React from 'react';
-import { WebView, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import { Container } from 'native-base';
 import Identify from '../../helper/Identify';
 import SimiPageComponent from "../../base/components/SimiPageComponent";
 import variable from '@theme/variables/material';
+import { WebView } from 'react-native-webview';
 
 class WebViewPage extends SimiPageComponent {
     constructor(props) {
@@ -33,8 +34,9 @@ class WebViewPage extends SimiPageComponent {
 
     renderPhoneLayout() {
         return (
-            <Container style={{backgroundColor: variable.appBackground}}>
+            <Container style={{ backgroundColor: variable.appBackground, overflow: 'hidden' }}>
                 <WebView
+                    javaScriptEnabled={true}
                     originWhitelist={['*']}
                     source={this.createSource()}
                     style={{ flex: 1 }}
@@ -51,7 +53,7 @@ class WebViewPage extends SimiPageComponent {
         let url = webViewState.url;
         if (this.props.navigation.getParam("stoptask", null)) {
             let stopUrl = this.props.navigation.getParam("stopUrl");
-            if(url == stopUrl){
+            if (url == stopUrl) {
                 this.props.navigation.goBack(null);
             }
         }
@@ -63,7 +65,7 @@ class WebViewPage extends SimiPageComponent {
             source['uri'] = this.props.navigation.getParam("uri");
             // source['headers'] = {Authorization: 'Bearer ' + Identify.getSimiCartConfig()['']};
         } else {
-            source['html'] = this.props.navigation.getParam("html");
+            source['html'] = this.props.navigation.getParam("html")
             source['baseUrl'] = Identify.getSimiCartConfig()['merchant_url'];
         }
         return source;

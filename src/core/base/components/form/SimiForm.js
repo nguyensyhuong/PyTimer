@@ -1,15 +1,22 @@
 import React from 'react';
-import { Form } from 'native-base';
+import { Form , Toast} from 'native-base';
+import Identify from "@helper/Identify";
+import material from "@theme/variables/material";
 
 export default class SimiForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.object = {};
         this.validateStatus = {};
+        this.listRefs = {};
         this.formSize = 0;
+        this.address_option = Identify.getMerchantConfig().storeview.customer.address_option;
     }
-
+    componentWillMount(){
+        if(JSON.stringify(this.props.parent.state) !== JSON.stringify(this.props.initData)){
+            this.props.parent.setState({...this.props.parent.state, ...this.props.initData})
+        }
+    }
     componentDidMount() {
         if (this.props.onRef) {
             this.props.onRef(this)
@@ -21,8 +28,8 @@ export default class SimiForm extends React.Component {
         }
     }
 
-    updateFormData(key, value, validated) {
-        this.object[key] = value;
+    updateFormData(key, value , validated) {
+        this.props.parent.state[key] = value
         this.validateStatus[key] = validated
         this.checkButtonStatus();
     }
@@ -51,7 +58,7 @@ export default class SimiForm extends React.Component {
             let field = fields[i];
             if(Object.keys(this.validateStatus).length < this.formSize) {
                 let validated = false;
-                if(!field.props.required || (field.props.required && field.props.inputValue)) {
+                if(!field.props.required || (field.props.required && field.props.inputValue)|| (field.props.required && this.props.parent.state && this.props.parent.state[field.props.inputKey])) {
                     validated = true;
                 }
                 this.validateStatus[field.props.inputKey] = validated;
@@ -62,9 +69,7 @@ export default class SimiForm extends React.Component {
     }
 
     render() {
-        if(Object.keys(this.object).length == 0) {
-            this.object = this.props.initData ? this.props.initData : {};
-        }
+        this.validateStatus = {};
         return (
             <Form>
                 {this.initFields()}
@@ -73,10 +78,10 @@ export default class SimiForm extends React.Component {
     }
 
     getFormData() {
-        return this.object;
+        return this.props.parent.state;
     }
 
     setFormData(data) {
-        this.object = data;
+        this.props.parent.state = data;
     }
 }

@@ -23,7 +23,7 @@ export default class LoginForm extends SimiComponent {
         if (!this.props.navigation.getParam('email')) {
             AppStorage.getCustomerRemebermeLoginInfo().then((rememberInfo) => {
                 if (rememberInfo && rememberInfo.email) {
-                    this.setState({ email: rememberInfo.email, password: rememberInfo.password });
+                    this.fillLoginData(rememberInfo);
                     this.props.parent.setState({ rememberMeEnable: true, enableSignIn: true });
                 }
             });
@@ -42,37 +42,30 @@ export default class LoginForm extends SimiComponent {
 
     fillLoginData(loginData) {
         this.setState(loginData);
-        this.form.setFormData(loginData);
+        for (let key in loginData){
+            this.form.updateFormData(key, loginData[key], true)
+        }
     }
+    
     createFields() {
         let fields = [];
-
-        fields.push(
-            <BorderedInput key={'email'}
-                           inputKey={'email'}
-                           inputTitle={'Email'}
-                           inputType={'email'}
-                           iconName={'person'}
-                           inputValue={this.state.email}
-                           required={true}
-                           needWarning={true}
-            />
-        );
-
-        fields.push(
-            <BorderedInput key={'password'}
-                           inputKey={'password'}
-                           inputTitle={'Password'}
-                           inputType={'password'}
-                           iconName={'lock'}
-                           inputValue={this.state.password}
-                           required={true}
-                           needWarning={false}
-                           passwordExtraIcon={true}
-            />
-        );
-
+        fields.push(this.createInput('email', 'email', Identify.__('Email'), 'email', 'person', this.state.email, true, true));
+        fields.push(this.createInput('password', 'password', Identify.__('Password'), 'password', 'lock', this.state.password, true, false));
         return fields;
+    }
+
+    createInput(key, inputKey, inputTitle, inputType, iconName, inputValue, required, needWarning) {
+        return(
+            <BorderedInput key={key}
+                           inputKey={inputKey}
+                           inputTitle={inputTitle}
+                           inputType={inputType}
+                           iconName={iconName}
+                           inputValue={inputValue}
+                           required={required}
+                           needWarning={needWarning}
+                           extraIcon={undefined} />
+        );
     }
 
     renderPhoneLayout() {

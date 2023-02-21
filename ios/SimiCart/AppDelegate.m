@@ -5,39 +5,45 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#import <RNCPushNotificationIOS.h>
 #import "AppDelegate.h"
-#import "NativeEvent.h"
 
+#import <React/RCTBridge.h>
+#import <Firebase/Firebase.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <Firebase/Firebase.h>
+#import "RNFirebaseLinks.h"
+#import <React/RCTLinkingManager.h>
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
-#import <GoogleMaps/GoogleMaps.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
-#import "RNFirebaseLinks.h"
-#import "RCTLinkingManager.h"
+#import "RNSplashScreen.h"
+
+
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  //Max add fabric
-  [Fabric with:@[[Crashlytics class]]];
-  [[FBSDKApplicationDelegate sharedInstance] application:application
-                           didFinishLaunchingWithOptions:launchOptions];
-  [FIROptions defaultOptions].deepLinkURLScheme = @"comsimicart";
+    [[FBSDKApplicationDelegate sharedInstance] application:application
+                             didFinishLaunchingWithOptions:launchOptions];
   [FIRApp configure];
   NSURL *jsCodeLocation;
-  //Max add
-  [GMSServices provideAPIKey:@"AIzaSyAmBe73HHr9CU1lYU96CFg6PTwG2i6NDwU"];
-  //end Max
-  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+    
+    
+  [Fabric with:@[[Crashlytics class]]];
+  // jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+//  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 
-  RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
-                                                      moduleName:@"SimiCart"
-                                               initialProperties:nil
-                                                   launchOptions:launchOptions];
+  // RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
+  //                                                     moduleName:@"SimiCart"
+  //                                              initialProperties:nil
+  //                                                  launchOptions:launchOptions];
+
+  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+                                                   moduleName:@"SimiCart"
+                                            initialProperties:nil];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -48,38 +54,53 @@
   
   [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
   
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber: 0];
+
   [[UIApplication sharedApplication] registerForRemoteNotifications];
-  
+
+  if (@available(iOS 13, *)) {
+    self.window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+  }
+
+  [RNSplashScreen show];
+
   return YES;
+}
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+#else
+    return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+#endif
 }
 
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
   
-//  BOOL handled = [[FBSDKApplicationDelegate sharedInstance] application:application
-//                                                                openURL:url
-//                                                      sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
-//                                                             annotation:options[UIApplicationOpenURLOptionsAnnotationKey]
-//                  ];
+  BOOL handleRCT = [RCTLinkingManager application:application openURL:url options:options];
+    
+//    return [[RNFirebaseLinks instance] application:application openURL:url options:options] || [[Twitter sharedInstance] application:application openURL:url options:options];
   
-  return [[RNFirebaseLinks instance] application:application openURL:url options:options];
-  // Add any custom logic here.
-//  return handled;
+  return [[RNFirebaseLinks instance] application:application openURL:url options:options] || [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url options:options] || handleRCT;
 }
 
-- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken{
-  NSLog(@"get Token");
-  NSString *token = deviceToken.description;
-  token = [token stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
-  token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
-  
-  NSString *savedToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"deviceToken"];
-  if(savedToken == nil) {
-    [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"deviceToken"];
-    NativeEvent* nativeMethod = [NativeEvent allocWithZone: nil];
-    [nativeMethod sendEventWithName:@"TokenReceived" body:@{@"token": token}];
-  }
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
+{
+      [RNCPushNotificationIOS didRegisterUserNotificationSettings:notificationSettings];
+}
+// Required for the register event.
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+      [RNCPushNotificationIOS didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+}
+// Required for the notification event. You must call the completion handler after handling the remote notification.
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+      [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo{
@@ -88,24 +109,26 @@
   });
 }
   
-- (BOOL)application:(UIApplication *)application
-continueUserActivity:(NSUserActivity *)userActivity
- restorationHandler:(void (^)(NSArray *))restorationHandler {
-  return [[RNFirebaseLinks instance] application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler
+{
+  return [RCTLinkingManager application:application
+                   continueUserActivity:userActivity
+                     restorationHandler:restorationHandler];
 }
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
-  sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-  
-  BOOL handledFB = [[FBSDKApplicationDelegate sharedInstance] application:application
-                                                                  openURL:url
-                                                        sourceApplication:sourceApplication
-                                                               annotation:annotation
-                    ];
-  
-  BOOL handledRCT = [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
-  
-  return handledFB || handledRCT;
-}
+ - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
+   sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    
+     BOOL handledFB = [[FBSDKApplicationDelegate sharedInstance] application:application
+                                                                     openURL:url
+                                                           sourceApplication:sourceApplication
+                                                                  annotation:annotation
+                       ];
+    
+     BOOL handledRCT = [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+    
+     return handledFB || handledRCT;
+ }
 
 @end

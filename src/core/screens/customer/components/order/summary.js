@@ -3,43 +3,44 @@ import SimiComponent from '@base/components/SimiComponent';
 import { Card, CardItem, Text } from 'native-base';
 import Identify from '@helper/Identify';
 import styles from './detailStyles';
+import material from '@theme/variables/material';
 
-export default class OrderSummary extends SimiComponent {
+const OrderSummary = (props) => {
 
-    renderOrderNumber() {
+    function renderOrderNumber() {
         return (
             <CardItem>
-                <Text style={styles.title}>{Identify.__('Order #')}</Text>
-                <Text>{this.props.order.increment_id}</Text>
+                <Text style={[styles.title, {fontFamily: material.fontBold}]}>{Identify.__('Order #')}</Text>
+                <Text>{props.order.increment_id}</Text>
             </CardItem>
         );
     }
 
-    renderDate() {
+    function renderDate() {
         return (
             <CardItem>
-                <Text style={styles.title}>{Identify.__('Date')}</Text>
-                <Text>{this.props.order.updated_at}</Text>
+                <Text style={[styles.title, {fontFamily: material.fontBold}]}>{Identify.__('Date')}</Text>
+                <Text>{props.order.updated_at}</Text>
             </CardItem>
         );
     }
 
-    renderOrderTotal() {
+    function renderOrderTotal() {
         return (
             <CardItem>
-                <Text style={styles.title}>{Identify.__('Order Total')}</Text>
-                <Text>{Identify.formatPriceWithCurrency(this.props.order.total.grand_total_incl_tax, this.props.order.total.currency_symbol)}</Text>
+                <Text style={[styles.title, {fontFamily: material.fontBold}]}>{Identify.__('Order Total')}</Text>
+                <Text>{Identify.formatPriceWithCurrency(props.order.total.grand_total_incl_tax, props.order.total.currency_symbol)}</Text>
             </CardItem>
         );
     }
 
-    renderPhoneLayout() {
-        return (
-            <Card style={{ flex: 1 }} key={'base'}>
-                {this.renderOrderNumber()}
-                {this.renderDate()}
-                {this.renderOrderTotal()}
-            </Card>
-        );
-    }
+    return (
+        <Card style={{ flex: 1 }} key={'base'}>
+            { renderOrderNumber()}
+            { renderDate()}
+            { renderOrderTotal()}
+        </Card>
+    );
 }
+
+export default OrderSummary;

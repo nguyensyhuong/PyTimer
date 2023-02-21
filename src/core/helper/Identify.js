@@ -1,8 +1,12 @@
 import React from 'react';
 import md5 from 'md5';
-import Language from '../base/components/language';
-import Connection from '../base/network/Connection';
 import SimiCart from './simicart';
+import AppStorage from './storage';
+
+const maxLength = 14;
+const minLength = 4;
+const template = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const Buffer = require("buffer").Buffer;
 
 class Identify {
     static language = null;
@@ -11,6 +15,15 @@ class Identify {
     static locale_identifier = null;
     static store_id = "default";
     static plugins = [];
+    static location = {};
+    static customerParams = null;
+    static customerData = null;
+    static creditCardData = null;
+    static initialNotificationOpened = false;
+    static isOpenShareFB = false;
+    static isRunInitDeepLink = false;
+    static merchantConfig = null;
+    static appTrackingEnabled = false;
 
     static setAppConfig(config) {
         this.language = config.language || null;
@@ -18,6 +31,7 @@ class Identify {
         this.appConfig = config;
         this.plugins = config['site_plugins'] || [];
     }
+
     static getSimiCartConfig() {
         return {
             merchant_url: SimiCart.merchant_url,
@@ -27,8 +41,30 @@ class Identify {
         };
     }
 
+    static setMerchantConfig(config) {
+        this.merchantConfig = config;
+    }
+
     static getMerchantConfig() {
-        return Connection.getMerchantConfig();
+        return this.merchantConfig;
+    }
+
+    static TRUE(data) {
+        if (data) {
+            data = data.toString();
+            data = data.toLowerCase();
+
+            if (data === '0') {
+                return false;
+            }
+            if (data === 'false') {
+                return false;
+            }
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     static isEmpty(obj) {
@@ -64,6 +100,15 @@ class Identify {
             is_rtl = parseInt(configs.storeview.base.is_rtl) === 1;
         }
         return is_rtl;
+    }
+
+    static upperCaseFirstLetterInString(string){
+        let word = string.split(' ');
+        let StringAfter = []
+        word.forEach(w => {
+            StringAfter.push(w.charAt(0).toUpperCase() + w.slice(1))
+        })
+        return StringAfter.join(' ')
     }
 
     static formatPrice(price, type = 0) {
@@ -158,6 +203,61 @@ class Identify {
         return this.pluginsStatus[sku];
     }
 
+    static hexToRgb = (hex, opacity = 1) => {
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        let rgb = result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+        if(rgb){
+            return 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + opacity + ')'
+        }
+        return hex;
+    };
+
+    static randomNumber(max, min) {
+        return Math.round(min + Math.random() * (max - min));
+    }
+
+    static getCheckoutParams(redirectUrl, quoteId) {
+        let email = '';
+        let password = '';
+        quoteId = new Buffer(quoteId).toString("base64");
+        let secretKey = md5(SimiCart.merchant_authorization);
+    
+        let customerParams = Identify.getCustomerParams();
+        if (customerParams) {
+            email = customerParams.email;
+            password = customerParams.password;
+        }
+    
+        let salt = '';
+        let randLength = this.randomNumber(maxLength, minLength);
+        for (let i = 0; i < randLength; i++) {
+            salt += template.charAt(this.randomNumber(template.length, 0));
+        }
+    
+        let token = '';
+        let customerData = {
+            email: email,
+            password: password,
+            quote_id: quoteId,
+            redirect_url: new Buffer(redirectUrl).toString("base64")
+        };
+    
+        let encodedCustomerData = new Buffer(JSON.stringify(customerData)).toString("base64");
+    
+        secretKey = secretKey.slice(0, salt.length) + salt + secretKey.slice(salt.length, secretKey.length);
+        token = encodedCustomerData.slice(0, salt.length) + secretKey + encodedCustomerData.slice(salt.length, encodedCustomerData.length);
+        token = new Buffer(token).toString("base64");
+
+        return {
+            token: token,
+            salt: salt
+        };
+    }
+
     static isMagento2() {
         let merchant_config = this.getMerchantConfig();
         if (merchant_config !== null && merchant_config.storeview.base.magento_version && merchant_config.storeview.base.magento_version == '2') {
@@ -165,6 +265,65 @@ class Identify {
         }
         return false;
     }
+
+    static setLocation(lat, lng) {
+        this.location = {lat: lat, lng: lng};
+    }
+
+    static getLocation() {
+        return this.location;
+    }
+
+    static setCustomerData(data) {
+        this.customerData = data;
+    }
+
+    static getCustomerData() {
+        return this.customerData;
+    }
+
+    static setCustomerParams(params) {
+        this.customerParams = params;
+    }
+
+    static getCustomerParams() {
+        return this.customerParams;
+    }
+
+    static initCreditCardData() {
+        AppStorage.getData('credit_card').then((data) => {
+            this.creditCardData = data ? JSON.parse(data) : null;
+        }) 
+    }
+
+    static saveCreditCardData(data) {
+        this.creditCardData = data;
+    }
+
+    static getCreditCardData() {
+        return this.creditCardData;
+    }
+
+    static saveInitNotiOpened(isOpen) {
+        this.initialNotificationOpened = isOpen;
+    }
+
+    static isInitNotiOpened() {
+        return this.initialNotificationOpened;
+    }
+
+    static saveIsOpenShareFB(isOpenShareFB) {
+        return this.isOpenShareFB = isOpenShareFB;
+    }
+
+    static enableAppTracking() {
+        this.appTrackingEnabled = true;
+    }
+
+    static isAppTrackingEnable() {
+        return this.appTrackingEnabled;
+    }
+
 }
 
 export default Identify;

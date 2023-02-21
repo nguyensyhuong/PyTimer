@@ -17,6 +17,7 @@ import Orders from '@etc/layout/core/orders';
 import OrderDetail from '@etc/layout/core/order';
 import Setting from '@etc/layout/core/setting';
 import NotificationHistory from '@etc/layout/core/notificationhistory';
+import Search from '@etc/layout/core/search';
 import HeaderLayout from '@etc/layout/core/header';
 
 export default class Layout {
@@ -26,7 +27,7 @@ export default class Layout {
     static initAppLayout() {
         this.createPageLayout('product_layout', 'product', ProductLayout);
         this.createPageLayout('products_layout', 'products', ProductsLayout);
-        this.createPageLayout('catalog_layout', 'categories', CatalogLayout);
+        this.createPageLayout('catalog_layout', 'category', CatalogLayout);
         this.createPageLayout('standard_layout', 'standard', StandardLayout);
         this.createPageLayout('matrix_layout', 'matrix', MatrixLayout);
         this.createPageLayout('zara_layout', 'zara', ZaraLayout);
@@ -43,6 +44,7 @@ export default class Layout {
         this.createPageLayout('setting_layout','setting', Setting);
         this.createPageLayout('notification_history_layout','notification_history', NotificationHistory);
         this.createPageLayout('header_layout','header', HeaderLayout);
+        this.createPageLayout('search_layout','search', Search);
     }
 
     static createPageLayout(keyForSave, keyConfig, coreLayout) {

@@ -7,10 +7,19 @@ export default StyleSheet.create({
         marginTop: 10,
         marginBottom: 0,
         marginLeft: 10,
-        marginRight: 0
+        marginRight: 0,
+        overflow: 'hidden'
     },
     bannerImage: {
         flex: 1
+    },
+    outOfStock: {
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: 'red',
+        color: 'white',
+        padding: 5,
+        fontWeight: "bold"
     },
     card: {
         flex: 1,

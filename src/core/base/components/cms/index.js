@@ -23,11 +23,12 @@ class Cms extends React.Component {
     render() {
         let color = variable.menuLeftTextColor;
         if (Identify.isEmpty(this.props.data) ||
+            Identify.isEmpty(this.props.data.storeview) ||
             Identify.isEmpty(this.props.data.storeview.cms)
         ) {
             return null;
         }
-        let cmsList = this.props.data.storeview.cms.cmspages
+        let cmsList = this.props.data.storeview.cms.cmspages;
         return <List style={{ borderTopColor: variable.listBorderColor, borderTopWidth: 1 / PixelRatio.getPixelSizeForLayoutSize(1), paddingBottom: 100 }}
             dataArray={cmsList}
             renderRow={data => {
@@ -40,7 +41,7 @@ class Cms extends React.Component {
                             params['action'] = 'clicked_menu_item';
                             params['menu_item_name'] = 'cms';
                             Events.dispatchEventAction(params);
-                            NavigationManager.openRootPage(this.props.navigation, 'WebViewPage', {
+                            NavigationManager.openPage(this.props.navigation, 'WebViewPage', {
                                 html: data.cms_content,
                             });
                         }}>

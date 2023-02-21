@@ -1,81 +1,79 @@
 import React from 'react';
 import variable from '@theme/variables/material';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Icon, Text, ListItem, Thumbnail, Right } from 'native-base';
 import Language from '../language/index';
 import Events from '@helper/config/events';
 import NavigationManager from '@helper/NavigationManager';
 import Identify from '@helper/Identify';
+import material from '../../../../../native-base-theme/variables/material';
 
-export default class MenuLeftItem extends React.Component {
-    getConfigData(keyBase){
+const MenuLeftItem = (props) => {
+    function getConfigData(keyBase) {
         let config = Identify.getMerchantConfig().storeview.base;
         return config[keyBase]
     }
-    tracking() {
+    function tracking() {
         let params = {};
         params['event'] = 'menu_action';
         params['action'] = 'clicked_menu_item';
-        params['menu_item_name'] = this.props.data.key;
+        params['menu_item_name'] = props.data.key;
         Events.dispatchEventAction(params);
     }
 
-    onSelectItem() {
-        this.tracking();
-        if (this.props.data.hasOwnProperty('onClick')) {
-            this.props.data.onClick();
+    function onSelectItem() {
+        tracking();
+        if (props.data.hasOwnProperty('onClick')) {
+            props.data.onClick();
         } else {
-            if (this.props.data.key == 'item_home') {
-                NavigationManager.backToRootPage(this.props.navigation);
+            if (props.data.key == 'item_home') {
+                NavigationManager.openRootPage(props.navigation, 'Home');
             } else {
-                NavigationManager.openRootPage(this.props.navigation, this.props.data.route_name, this.props.data.params ? this.props.data.params : {});
+                NavigationManager.openPage(props.navigation, props.data.route_name, props.data.params ? props.data.params : {});
             }
         }
     }
 
-    renderItem() {
+    function renderItem() {
         const textColor = variable.menuLeftTextColor;
         return (
-            <ListItem last
-                      button
-                      onPress={() => { this.onSelectItem() }}
-                      style={{ borderBottomColor: variable.menuLeftLineColor }}>
-                <View style={{ flex: 1, flexDirection: 'row' }}>
-                    {this.props.data.icon && <Icon name={this.props.data.icon} style={{ color: variable.menuLeftIconColor, fontSize: 30, width: 30 }} />}
-                    {this.props.data.hasOwnProperty('image') && <Thumbnail
+            <TouchableOpacity
+                onPress={() => { onSelectItem() }}
+                style={{ borderBottomColor: variable.menuLeftLineColor, borderBottomWidth: 0.5, flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                <View style={{ flex: 1, flexDirection: 'row', marginRight: 30, alignItems: 'center' }}>
+                    {props.data.icon && <Icon name={props.data.icon} style={{ color: variable.menuLeftIconColor, fontSize: 22, width: 22 }} />}
+                    {props.data.hasOwnProperty('image') && <Thumbnail
                         square
-                        source={this.props.data.image != '' ? { uri: this.props.data.image } : {}}
-                        style={{ width: 30, height: 30 }} />}
-                    <Text style={{ marginLeft: 15, color: textColor }}>{this.props.data.label}{this.props.data.hasDescrible && <Text style={{color: textColor }}>: {this.getConfigData(this.props.data.keyConfig)}</Text>}</Text>
+                        source={props.data.image}
+                        style={{ width: 22, height: 22 }} />}
+                    <Text style={{ marginLeft: 15, color: textColor, paddingBottom: 0 }}>{Identify.__(props.data.label)}{props.data.hasDescrible && <Text style={{ color: textColor }}>: {getConfigData(props.data.keyConfig)}</Text>}</Text>
                 </View>
-                {this.props.data.is_extend && <Right>
-                    <Icon style={{ color: variable.menuLeftTextColor, fontSize: 20 }} name={Identify.isRtl() ? 'ios-arrow-back-outline' : "ios-arrow-forward-outline"} />
-                </Right>}
-            </ListItem>
+                {props.data.is_extend && <Icon style={{ color: variable.menuLeftTextColor, fontSize: 14, position: 'absolute', right: 10 }} name={Identify.isRtl() ? 'ios-arrow-back' : "ios-arrow-forward"} />}
+            </TouchableOpacity>
         );
     }
 
-    renderMore() {
+    function renderMore() {
         return (
-            <View style={{ backgroundColor: variable.listBorderColor, height: 50 }}>
-                <Language text="MORE" style={{ fontSize: variable.textSizeSmall, padding: 10, paddingTop: 15, textAlign: 'left' }} />
+            <View style={{ backgroundColor: variable.listBorderColor }}>
+                <Language text="More" style={{ fontSize: variable.textSizeSmall, padding: 10, textAlign: 'left' }} />
             </View>
         );
     }
 
-    render() {
-        if (this.props.data.hasOwnProperty('is_separator') && this.props.data.is_separator) {
-            return (
-                <View>
-                    {this.renderMore()}
-                </View>
-            );
-        } else {
-            return (
-                <View>
-                    {this.renderItem()}
-                </View>
-            );
-        }
+    if (props.data.hasOwnProperty('is_separator') && props.data.is_separator) {
+        return (
+            <View>
+                {renderMore()}
+            </View>
+        );
+    } else {
+        return (
+            <View>
+                {renderItem()}
+            </View>
+        );
     }
 }
+
+export default MenuLeftItem;

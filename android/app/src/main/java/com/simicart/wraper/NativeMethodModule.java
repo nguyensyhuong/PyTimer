@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -24,13 +23,16 @@ import com.google.firebase.appindexing.builders.Actions;
 import com.google.firebase.appindexing.builders.Indexables;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+// import me.leolin.shortcutbadger.ShortcutBadger;
 
 import java.io.IOException;
 
 public class NativeMethodModule extends ReactContextBaseJavaModule {
+	ReactApplicationContext reactContext;
 
     public NativeMethodModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        this.reactContext = reactContext;
     }
 
     @Override
@@ -43,6 +45,11 @@ public class NativeMethodModule extends ReactContextBaseJavaModule {
         new DeviceTokenAsync(senderID, promise).execute();
     }
 
+    // @ReactMethod
+    // void setBadge(int count) {
+    //     ShortcutBadger.applyCount(this.reactContext, count);
+    // }
+
     @ReactMethod
     void openSetting() {
         final Intent i = new Intent();
@@ -53,6 +60,11 @@ public class NativeMethodModule extends ReactContextBaseJavaModule {
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         getReactApplicationContext().startActivity(i);
+    }
+
+    @ReactMethod
+    void getDeviceID(Promise p) {
+        p.resolve(Settings.Secure.getString(this.reactContext.getContentResolver(), Settings.Secure.ANDROID_ID));
     }
 
     @ReactMethod
@@ -117,7 +129,7 @@ public class NativeMethodModule extends ReactContextBaseJavaModule {
 
             task.addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onFailure(@NonNull Exception exception) {
+                public void onFailure(Exception exception) {
                     Log.e("SimiAppIndexing", "App Indexing failed to add " +
                             exception.getMessage());
                 }

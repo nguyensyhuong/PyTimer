@@ -6,6 +6,7 @@ export const category = 'simiconnector/rest/v2/categories';
 export const products = 'simiconnector/rest/v2/products';
 export const customer_login = 'simiconnector/rest/v2/customers/login';
 export const customer_logout = 'simiconnector/rest/v2/customers/logout';
+export const customer_deactivate = 'simiconnector/rest/v2/customers/deactivate';
 export const customers = 'simiconnector/rest/v2/customers';
 export const quoteitems = 'simiconnector/rest/v2/quoteitems';
 export const order_history = 'simiconnector/rest/v2/orders';
@@ -18,6 +19,7 @@ export const notifications_history = 'simiconnector/rest/v2/notifications';
 export const customizepayments = 'simiconnector/rest/v2/customizepayments';
 
 export const forgotpassword = 'simiconnector/rest/v2/customers/forgetpassword';
+export const customer_social_login = 'simiconnector/rest/v2/customers/sociallogin';
 
 export const autologin_info = 'autologin_info';
 export const rememberme_info = 'rememberme_info';
@@ -65,3 +67,18 @@ export const checkout_mode = {
   new_customer: 'checkout_as_new_customer',
   guest: 'checkout_as_guest',
 }
+
+export const month = [
+  {value: '01', label: 'January'},
+  {value: '02', label: 'February'},
+  {value: '03', label: 'March'},
+  {value: '04', label: 'April'},
+  {value: '05', label: 'May'},
+  {value: '06', label: 'June'},
+  {value: '07', label: 'July'},
+  {value: '08', label: 'August'},
+  {value: '09', label: 'September'},
+  {value: '10', label: 'October'},
+  {value: '11', label: 'November'},
+  {value: '12', label: 'December'},
+]

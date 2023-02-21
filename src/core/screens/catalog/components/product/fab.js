@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import Events from '@helper/config/events';
 import md5 from 'md5';
 import Identify from '@helper/Identify';
+import material from '../../../../../../native-base-theme/variables/material';
 
 export default class FabProduct extends SimiComponent {
 
@@ -37,6 +38,9 @@ export default class FabProduct extends SimiComponent {
     render() {
         let buttons = this.dispatchAddButtons();
 
+        if (!this.props.parent.product) {
+            return (null);
+        }
         return (
             <View>
                 {buttons.length > 0 && <Fab
@@ -44,7 +48,7 @@ export default class FabProduct extends SimiComponent {
                     direction="up"
                     containerStyle={{}}
                     position="bottomRight"
-                    style={{ backgroundColor: Identify.theme.button_background, marginBottom: 40 }}
+                    style={{ backgroundColor: Identify.theme.button_background, marginBottom: material.isIphoneX ? 50: 40 }}
                     onPress={() => this.setState({ active: !this.state.active })}>
                     <Icon name="ios-add" />
                     {buttons}

@@ -16,13 +16,13 @@ class Zara extends SimiComponent {
             return null;
         }
         return (
-            <Container style={{backgroundColor: variable.appBackground}}>
-              <Content>
-                <ScrollView ref={ (c) => {this.scrollView = c} }>
-                    {this.renderLayoutFromConfig('zara_layout','content')}
-                </ScrollView>
-              </Content>
-                {this.renderLayoutFromConfig('zara_layout','container')}
+            <Container style={{ backgroundColor: variable.appBackground }}>
+                {this.renderLayoutFromConfig('zara_layout', 'container')}
+                <Content>
+                    <ScrollView ref={(c) => { this.scrollView = c }}>
+                        {this.renderLayoutFromConfig('zara_layout', 'content')}
+                    </ScrollView>
+                </Content>
             </Container>
         );
     }

@@ -1,5 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Keyboard } from 'react-native';
+import Identify from "@helper/Identify";
+import SimiContext from '@base/components/SimiContext'
 
 export default class BaseInput extends React.Component {
 
@@ -11,23 +13,39 @@ export default class BaseInput extends React.Component {
             error: false,
             value: ''
         };
-        this.initData();
     }
 
     createInputLayout() {
         return null;
     }
 
+    submitEditing() {
+        let indexRef = Object.keys(this.props.parent.listRefs).indexOf(this.inputKey);
+        let nextRefContent = Object.values(this.props.parent.listRefs)[indexRef + 1];
+        if (indexRef + 1 === Object.keys(this.props.parent.listRefs).length) {
+            Keyboard.dismiss();
+        } else {
+            if(nextRefContent && nextRefContent._root) {
+                nextRefContent._root.focus();
+            } else {
+                nextRefContent.focus();
+            }
+
+        }
+    }
+
     initData() {
         this.inputKey = this.props.inputKey;
         this.inputTitle = this.props.inputTitle;
         if (this.props.required === true) {
-            this.inputTitle = this.inputTitle + '*';
+            this.inputTitle = this.inputTitle + ' *';
+        } else {
+            this.inputTitle = this.inputTitle + ' (' + Identify.__('optional') + ')'
         }
         this.inputType = this.props.inputType;
         this.disabled = this.props.disabled;
         this.parent = this.props.parent;
-        if (this.props.inputValue !== undefined) {
+        if (this.props.inputValue !== undefined && this.state.value == '') {
             this.state.value = this.props.inputValue;
         }
         if (this.inputType === 'email') {
@@ -38,6 +56,7 @@ export default class BaseInput extends React.Component {
     }
 
     render() {
+        this.initData();
         return (
             <View>
                 {this.createInputLayout()}
@@ -48,10 +67,10 @@ export default class BaseInput extends React.Component {
     validateInputValue = (text) => {
         if (this.inputType === 'email') {
             return this.validateEmail(text);
-        } else if (this.inputType === 'password' && this.props.required === true) {
+        } else if (this.inputType === 'password') {
             return this.validatePassword(text);
         } else if (this.props.required === true) {
-            if (text.length > 0)
+            if (text && text.trim().length > 0)
                 return true;
             else
                 return false;
@@ -60,7 +79,8 @@ export default class BaseInput extends React.Component {
     }
 
     validateEmail = (email) => {
-        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        // let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,100})+$/;
+        let reg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (reg.test(email) === false)
             return false;
         else
@@ -68,7 +88,7 @@ export default class BaseInput extends React.Component {
     }
 
     validatePassword = (password) => {
-        if (password.length >= 6) {
+        if (password && password.length >= 6) {
             return true;
         }
         return false;

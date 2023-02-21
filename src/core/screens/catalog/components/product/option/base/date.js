@@ -7,7 +7,7 @@ class DateField extends Abstract {
 
     constructor(props) {
         super(props);
-        this.state = { chosenDate: undefined };
+        this.state = { chosenDate: new Date() };
 
         this.setDate = this.setDate.bind(this);
     }
@@ -18,7 +18,7 @@ class DateField extends Abstract {
     }
 
     setDate(newDate) {
-        this.state.chosenDate = newDate;
+        this.setState({chosenDate: newDate});
         this.parent.updatePrices();
     }
 
@@ -64,7 +64,7 @@ class DateField extends Abstract {
                         this.setDate(date);
                     }
                 } catch ({ code, message }) {
-                    console.warn('Cannot open date picker', message);
+                    console.log('Cannot open date picker', message);
                 }
             }}>
                 <Text style={{ marginLeft: 10, marginRight: 10, marginTop: 5, marginBottom: 5 }}>Select date: {dateText}</Text>

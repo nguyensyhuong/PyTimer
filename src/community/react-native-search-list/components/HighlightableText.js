@@ -7,6 +7,7 @@ import {
   Text
 } from 'react-native'
 import PropTypes from 'prop-types'
+import material from "../../../../native-base-theme/variables/material";
 
 export default class HighlightableText extends Component {
   static propTypes = {
@@ -31,7 +32,7 @@ export default class HighlightableText extends Component {
     const {text = '', matcher: {matches = []} = {}} = this.props
 
     for (let match of matches) {
-      if (match && match.start > startIndex) {
+      if (match && match.start > startIndex && text) {
         let endIndex = match.end > text.length ? text.length : match.end
         // 当前位置和匹配起始位置之间的文字
         let str = text.slice(startIndex, match.start)
@@ -48,7 +49,7 @@ export default class HighlightableText extends Component {
         }}>{selStr}</Text>)
 
         startIndex = endIndex
-      } else if (match) {
+      } else if (match && text) {
         let endIndex = match.end > text.length ? text.length : match.end
         // 被选中的文字
         let selStr = text.slice(startIndex, endIndex)
@@ -61,7 +62,7 @@ export default class HighlightableText extends Component {
       }
     }
     // 剩余的文字
-    if (startIndex < text.length) {
+    if (text && startIndex < text.length) {
       let str = text.slice(startIndex, text.length)
       titleContents.push(<Text key={key + startIndex} style={{
         fontSize: 15,
@@ -70,7 +71,7 @@ export default class HighlightableText extends Component {
     }
 
     return (
-      <Text style={{flexDirection: 'row'}}>
+      <Text style={{flexDirection: 'row', fontFamily: material.fontBold}}>
         {titleContents}
       </Text>
     )

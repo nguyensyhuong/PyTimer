@@ -5,6 +5,7 @@ import material from '@theme/variables/material';
 export default StyleSheet.create({
     title: {
         margin: scale(15),
+        width: '70%'
     },
     list: {
         marginLeft: scale(15),

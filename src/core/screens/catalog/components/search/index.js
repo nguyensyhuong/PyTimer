@@ -6,48 +6,42 @@ import Identify from '../../../../helper/Identify';
 import styles from './styles';
 import { products_mode } from '../../../../helper/constants';
 
-class Search extends React.Component {
+const Search = (props) => {
 
-    openSearchPage() {
-        if (this.props.navigation.getParam("query")) {
-            NavigationManager.backToPreviousPage(this.props.navigation);
+    function openSearchPage() {
+        if (props.navigation.getParam("query")) {
+            NavigationManager.backToPreviousPage(props.navigation);
         } else {
-            let mode = this.props.navigation.getParam("mode");
+            let mode = props.navigation.getParam("mode");
             if (mode && mode === products_mode.spot) {
                 routeName = 'SearchProducts';
                 params = {
-                    spotId: this.props.navigation.getParam("spotId"),
+                    spotId: props.navigation.getParam("spotId"),
                     mode: mode,
                 };
             } else {
                 routeName = 'SearchProducts';
                 params = {
-                    categoryId: this.props.navigation.getParam("categoryId"),
-                    categoryName: this.props.navigation.getParam("categoryName"),
+                    categoryId: props.navigation.getParam("categoryId"),
+                    categoryName: props.navigation.getParam("categoryName"),
                 };
             }
-            if(this.props.isHome) {
-                NavigationManager.openRootPage(this.props.navigation, routeName, params);
-            } else {
-                NavigationManager.openPage(this.props.navigation, routeName, params);
-            }
+            NavigationManager.openPage(props.navigation, routeName, params);
         }
     }
 
-    render() {
-        let text = this.props.navigation.getParam("query") ? this.props.navigation.getParam("query") : Identify.__('Search');
-        return (
-            <TouchableOpacity style={styles.container} onPress={() => {
-                this.openSearchPage();
-            }}>
-                <View style={styles.search}>
-                    <View style={styles.center}>
-                        <Icon style={styles.icon} name='search' />
-                        <Text style={styles.text}>{text}</Text>
-                    </View>
+    let text = props.navigation.getParam("query") ? props.navigation.getParam("query") : Identify.__('Search');
+    return (
+        <TouchableOpacity style={styles.container} onPress={() => {
+            openSearchPage();
+        }}>
+            <View style={styles.search}>
+                <View style={styles.center}>
+                    <Icon style={styles.icon} name='search' />
+                    <Text style={styles.text}>{text}</Text>
                 </View>
-            </TouchableOpacity>
-        );
-    }
+            </View>
+        </TouchableOpacity>
+    );
 }
 export default Search;

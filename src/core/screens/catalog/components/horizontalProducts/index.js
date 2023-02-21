@@ -1,12 +1,13 @@
 import React from 'react';
-import SimiComponent from "../../../../base/components/SimiComponent";
+import SimiComponent from "@base/components/SimiComponent";
 import { Card, Spinner, H3 } from 'native-base';
-import Connection from '../../../../base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import { FlatList, ScrollView } from 'react-native';
 import HorizontalItem from './horizontal_item'
 import { connect } from 'react-redux';
 import styles from './styles'
-import Identify from "../../../../helper/Identify";
+import Identify from "@helper/Identify";
+import material from '@theme/variables/material';
 
 class HorizontalProduct extends SimiComponent {
     constructor(props) {
@@ -19,11 +20,13 @@ class HorizontalProduct extends SimiComponent {
         this.parent = this.props.parent;
     }
 
-    // componentWillMount() {
-    //     this.props.storeData('showLoading', { type: 'full' });
-    // }
-
     componentDidMount() {
+        if (!this.props.title || this.props.title !== 'Related Products') {
+            this.requestRelatedProduct();
+        }
+    }
+
+    requestRelatedProduct() {
         if (!this.props.hasData && !this.checkExistData()) {
             this.requestData(this.createParam(), this.generateUrl(this.props.type.name));
         } else {
@@ -47,9 +50,10 @@ class HorizontalProduct extends SimiComponent {
     }
 
     requestData(params, url) {
-        Connection.restData();
-        Connection.setGetData(params);
-        Connection.connect(url, this, 'GET');
+        new NewConnection()
+            .init(url, 'get_products_data', this)
+            .addGetData(params)
+            .connect();
     }
 
     createParam() {
@@ -96,10 +100,12 @@ class HorizontalProduct extends SimiComponent {
                 style={styles.list}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
-                showVerticalScrollIndicator={false}>
+                showVerticalScrollIndicator={false}
+            >
                 <FlatList
-                    contentContainerStyle={{flex: 1, flexDirection: 'row'}}
+                    contentContainerStyle={{ flex: 1, flexDirection: 'row' }}
                     data={data}
+                    scrollEnabled={false}
                     keyExtractor={(item) => item.entity_id}
                     renderItem={({ item }) =>
                         <HorizontalItem item={item} fromHome={this.props.fromHome} navigation={this.props.navigation} />
@@ -109,8 +115,13 @@ class HorizontalProduct extends SimiComponent {
     }
 
     render() {
+        if (this.parent && this.parent.state.reRender && this.props.title && this.props.title === 'Related Products' && !this.state.data) {
+            this.requestRelatedProduct();
+        }
         if (!this.state.loaded) {
-            return <Spinner color={Identify.theme.key_color} />;
+            if (this.props.showSpinner) {
+                return <Spinner color={Identify.theme.loading_color} />;
+            } else return null
         }
         let data = this.props.hasData ? this.props.products.slice(0, 9) : this.state.data.products;
         if (data.length == 0) {
@@ -119,13 +130,16 @@ class HorizontalProduct extends SimiComponent {
         if (this.props.show_as_card) {
             return (
                 <Card style={styles.card}>
-                    {this.props.title && <H3 style={{marginStart: 12, marginBottom: 20,...styles.title}}>{this.props.title}</H3>}
+                    {this.props.title && <H3 style={{ marginStart: 12, marginBottom: 20, ...styles.title, fontFamily: material.fontBold }}>{Identify.__(this.props.title)}</H3>}
                     {this.renderListProducts(data)}
                 </Card>
             )
         }
         return this.renderListProducts(data);
     }
+}
+HorizontalProduct.defaultProps = {
+    showSpinner: false
 }
 const mapStateToProps = (state) => {
     return { data: state.redux_data };

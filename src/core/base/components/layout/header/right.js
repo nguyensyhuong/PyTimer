@@ -1,64 +1,70 @@
 import React from 'react';
-import { Button, Right, Icon, Badge, Text } from 'native-base';
+import { Icon, Badge, Text } from 'native-base';
 import variable from "@theme/variables/material";
 import { StyleSheet, Platform, TouchableHighlight, View } from 'react-native';
 import NavigationManager from '@helper/NavigationManager';
 import Device from '@helper/device';
 import { products_mode } from "@helper/constants";
+import Events from '@helper/config/events';
+import md5 from 'md5';
+import Identify from '@helper/Identify';
 
-class RightHeader extends React.Component {
+const RightHeader = (props) => {
 
-    renderQty() {
-        let qtyStyle = { position: 'absolute', right: -8, top: 0, height: 20, paddingBottom: 2 }
-        let textQtyStyle = Platform.OS === "ios" ? { fontSize: 8, lineHeight: 0 } : { fontSize: 9 };
-        let qty = this.props.parent.props.data.cart_total ? (
+    function renderQty() {
+        let qtyStyle = { position: 'absolute', right: -5, top: 0, height: 20, paddingBottom: 2 }
+        let textQtyStyle = Platform.OS === "ios" ? { fontSize: 7, lineHeight: 0 } : { fontSize: 8 };
+        let qty = props.parent.props.data.cart_total ? (
             <TouchableHighlight style={qtyStyle}
-                onPress={() => { NavigationManager.openRootPage(this.props.navigation, 'Cart', {}); }}>
+                onPress={() => { NavigationManager.openPage(props.navigation, 'Cart', {}); }}>
                 <Badge style={{ height: 20, alignItems: "center", justifyContent: 'center' }}>
-                    <Text style={textQtyStyle}>{this.props.parent.props.data.cart_total}</Text>
+                    <Text style={textQtyStyle}>{props.parent.props.data.cart_total}</Text>
                 </Badge>
             </TouchableHighlight>
         ) : null;
-        return (qty); 
+        return (qty);
     }
 
-    renderCart() {
+    function renderCart() {
         return (
             <Icon name="cart"
-                style={{ color: variable.toolbarBtnColor, fontSize: 23, padding: 7 }}
+                style={{ color: variable.toolbarBtnColor, fontSize: 23, padding: 7, paddingLeft: 10, paddingRight: 10, transform: [{ scaleX: Identify.isRtl() ? -1 : 1 }] }}
                 onPress={() => {
-                    NavigationManager.openRootPage(this.props.navigation, 'Cart', {});
+                    NavigationManager.openPage(props.navigation, 'Cart', {});
                 }} />
         );
     }
 
-    renderSearch() {
-        let search = this.props.parent.props.showSearch ? <Icon name='search'
-            style={{ fontSize: 23, color: variable.toolbarBtnColor, marginRight: Device.isTablet() ? 5 : 0, padding: 7 }}
+    function renderSearch() {
+        let search = props.parent.props.showSearch ? <Icon name='search'
+            style={{ fontSize: 23, color: variable.toolbarBtnColor, marginRight: Device.isTablet() ? 5 : 0, padding: 7, paddingLeft: 10, paddingRight: 10 }}
             onPress={() => {
-                this.openSearchPage();
+                openSearchPage();
             }} /> : null;
         return (search);
     }
 
-    render() {
-        if (this.props.parent.props.show_right == false) {
-            return <Right style={styles.bothLeftRight} />;
-        }
-        return (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {this.renderSearch()}
-                {this.renderCart()}
-                {this.renderQty()}
-            </View>
-        )
-    }
 
-    openSearchPage() {
-        if (this.props.navigation.getParam("query")) {
-            NavigationManager.backToPreviousPage(this.props.navigation);
+    if (props.parent.props.show_right == false) {
+        return (
+            <View style={{ width: 30, height: 40 }} />
+        );
+    }
+    let plugins = dispatchEventAddItems();
+    return (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {plugins}
+            {renderSearch()}
+            {renderCart()}
+            {renderQty()}
+        </View>
+    )
+
+    function openSearchPage() {
+        if (props.navigation.getParam("query")) {
+            NavigationManager.backToPreviousPage(props.navigation);
         } else {
-            let mode = this.props.navigation.getParam("mode");
+            let mode = props.navigation.getParam("mode");
             if (mode && mode === products_mode.spot) {
                 routeName = 'SearchProducts';
                 params = {
@@ -67,16 +73,29 @@ class RightHeader extends React.Component {
             } else {
                 routeName = 'SearchProducts';
                 params = {
-                    categoryId: this.props.navigation.getParam("categoryId"),
-                    categoryName: this.props.navigation.getParam("categoryName"),
+                    categoryId: props.navigation.getParam("categoryId"),
+                    categoryName: props.navigation.getParam("categoryName"),
                 };
             }
-            if (this.props.isHome) {
-                NavigationManager.openRootPage(this.props.navigation, routeName, params);
-            } else {
-                NavigationManager.openPage(this.props.navigation, routeName, params);
+            NavigationManager.openPage(props.navigation, routeName, params);
+        }
+    }
+
+    function dispatchEventAddItems() {
+        let events = Events.events.header_items_right;
+
+        let items = [];
+        if (events) {
+            for (let i = 0; i < events.length; i++) {
+                let item = events[i];
+                if (item.active == true) {
+                    let key = md5("header_right" + i);
+                    let Content = item.content;
+                    items.push(<Content obj={this} navigation={props.navigation} key={key} />);
+                }
             }
         }
+        return items;
     }
 }
 

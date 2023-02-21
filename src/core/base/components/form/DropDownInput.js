@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseInput from './BaseInput';
-import { View, StyleSheet, Platform } from 'react-native';
-import { Picker, Icon, Label, Item } from 'native-base';
+import { View, StyleSheet, Platform, Picker } from 'react-native';
+import { Icon, Label, Item, Header, Title, Body, Left, Right, Button, Text } from 'native-base';
 import Identify from '@helper/Identify';
 import material from '../../../../../native-base-theme/variables/material';
 
@@ -9,6 +9,9 @@ export default class DropDownInput extends BaseInput {
 
     constructor(props) {
         super(props);
+        this.toolbarHeight = material.toolbarHeight;
+        this.paddingTop = Platform.OS === 'ios' ? 18 : 0;
+        this.initData();
     }
 
     initData() {
@@ -17,16 +20,16 @@ export default class DropDownInput extends BaseInput {
         this.keyForSave = this.props.keyForSave;
         this.keyForDisplay = this.props.keyForDisplay;
 
-        if(Platform.OS === 'android') {
+        if (Platform.OS === 'android') {
             this.dataSource.unshift({
-                value: undefined,
-                label: '-- Please Select --'
+                value: '00',
+                label: '-- ' + Identify.__('Please Select') + ' --'
             });
         }
 
     }
 
-    onValueChange(value: string) {
+    onValueChange(value) {
         this.setState({ value: value });
         let validated = false;
         if (this.props.required && value || !this.props.required) {
@@ -42,8 +45,9 @@ export default class DropDownInput extends BaseInput {
         for (let index in dataSource) {
             let item = dataSource[index];
             items.push(
-                <Picker.Item key={Identify.makeid()} value={item[this.keyForSave]}
-                    label={item[this.keyForDisplay]} />
+                <Picker.Item style={{ fontFamily: material.fontFamily }} key={Identify.makeid()} value={item[this.keyForSave].toString()}
+                    label={Identify.__(item[this.keyForDisplay])}
+                    color={material.textColor} />
             );
         }
 
@@ -53,16 +57,45 @@ export default class DropDownInput extends BaseInput {
     createInputLayout() {
         return (
             <View>
-                <Item error={this.state.error} success={this.state.success} picker style={styles.item} inlineLabel>
-                    <Label>{this.inputTitle}</Label>
+                {/* <Item error={this.state.error} success={this.state.success} picker style={styles.item} inlineLabel> */}
+                <View style={styles.item}>
+                    <Text>{this.inputTitle}</Text>
                     <Picker
+                        renderHeader={backAction =>
+                            <Header style={{
+                                backgroundColor: Identify.theme.app_background,
+                                elevation: 0,
+                                height: this.toolbarHeight,
+                                paddingTop: this.paddingTop
+                            }}>
+                                <Left>
+                                    <Button transparent onPress={backAction}>
+                                        <Icon name={"md-close"} style={{ color: Identify.theme.button_background }} />
+                                    </Button>
+                                </Left>
+                                <Body style={{ flex: 3, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Title style={{ color: Identify.theme.content_color }}>{this.inputTitle}</Title>
+                                </Body>
+                                <Right />
+                            </Header>}
                         mode="dropdown"
-                        iosIcon={<Icon name="ios-arrow-down-outline" />}
+                        iosIcon={<Icon name="ios-arrow-down" />}
                         selectedValue={this.state.value}
-                        onValueChange={this.onValueChange.bind(this)}>
+                        onValueChange={(value) => { this.onValueChange(value) }}
+                        itemTextStyle={{ color: material.textColor }}
+                        textStyle={{ color: material.textColor }}>
                         {this.renderItems()}
                     </Picker>
-                </Item>
+                </View>
+                {/* </Item> */}
+            </View>
+        );
+    }
+
+    render() {
+        return (
+            <View>
+                {this.createInputLayout()}
             </View>
         );
     }
@@ -75,8 +108,7 @@ const styles = StyleSheet.create({
         paddingLeft: 0,
         paddingBottom: 0,
         flex: 1,
-        height: 40,
-        marginTop: 30
+        marginBottom: 20
     },
     placeholder: {
         fontSize: material.textSizeBigger,

@@ -16,21 +16,31 @@ export default class ProductNamePriceComponent extends SimiComponent {
             this.props.onRef(undefined)
         }
     }
+
+    checkTypeIdAndPrice() {
+        if (this.props.product.type_id === 'configurable' && this.props.product.app_prices && this.props.product.app_prices.price == 0) {
+            return false;
+        }
+        return true;
+    }
+
     renderPrice() {
-        if (this.props.product.type_id !== 'grouped') {
+        if (this.props.product.type_id !== 'grouped' && this.checkTypeIdAndPrice()) {
             return <Price type={this.props.product.type_id}
-                          prices={this.props.product.app_prices}
-                          styleDiscount={styles.price}
-                          onRef={ref => (this.prices = ref)}/>
+                prices={this.props.product.app_prices}
+                tierPrice={this.props.product.app_tier_prices}
+                styleDiscount={styles.price}
+                onRef={ref => (this.prices = ref)}
+                navigation={this.props.navigation} />
         }
     }
     renderPhoneLayout() {
-        if(this.props.product == null) {
+        if (this.props.product == null) {
             return (null);
         }
         return (
             <Card style={styles.card}>
-                <H3 style={{textAlign: 'left'}}>{this.props.product.name}</H3>
+                <H3 style={{ textAlign: 'left' }}>{this.props.product.name}</H3>
                 {this.renderPrice()}
             </Card>
         );

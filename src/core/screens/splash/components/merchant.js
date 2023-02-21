@@ -1,11 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import { storeviews, devices, quoteitems, customer_login } from '@helper/constants';
 import Identify from '@helper/Identify';
 import { NativeModules, Platform } from 'react-native';
 import AppStorage from '@helper/storage';
 import firebase from 'react-native-firebase';
+import simicart from '@helper/simicart';
+import { I18nManager } from 'react-native';
+import RNRestart from 'react-native-restart';
+import Device from '@helper/device';
 
 const nativeMethod = Platform.OS === 'ios' ? null : NativeModules.NativeMethodModule;
 
@@ -14,7 +19,6 @@ class Settings extends React.Component {
         super(props);
     }
     componentDidMount() {
-        Connection.restData();
         let api = storeviews;
         AppStorage.getData('store_id').then((storeID) => {
             if (storeID) {
@@ -24,24 +28,43 @@ class Settings extends React.Component {
             }
 
             AppStorage.getData('currency_code').then((currencyCode) => {
+                let params = {};
                 if (currencyCode) {
-                    let params = {
+                    params = {
                         currency: currencyCode
                     };
-                    Connection.setGetData(params);
                 }
-                Connection.connect(api, this, 'GET');
+                new NewConnection()
+                    .init(api, 'get_merchant_config', this)
+                    .addGetData(params)
+                    .connect();
             });
         });
     }
-    setData(data) {
-        if (data.hasOwnProperty('storeview')) {
+    setData(data, requestID) {
+        if (requestID == 'get_merchant_config') {
             this.storeViewData = data;
             if (data.storeview.hasOwnProperty('base') && data.storeview.base.hasOwnProperty('locale_identifier')) {
                 Identify.locale_identifier = data.storeview.base.locale_identifier;
             }
-            Connection.setMerchantConfig(data)
-            // this.props.storeData(data);
+            AppStorage.getData('appIsRtl').then(res => {
+                if (res === undefined && data.storeview.hasOwnProperty('base')) {
+                    let isRTL = '';
+                    if (data.storeview.base.is_rtl == 1) {
+                        isRTL = 'yes';
+                    } else {
+                        isRTL = 'no';
+                    }
+                    AppStorage.saveData('appIsRtl', isRTL).then(() => {
+                        if (isRTL == 'yes') {
+                            I18nManager.forceRTL(true)
+                            RNRestart.Restart()
+                        }
+                    })
+                }
+            })
+            Connection.setMerchantConfig(data);  // For old customization
+            Identify.setMerchantConfig(data);
 
             AppStorage.saveData('store_id', data.storeview.base.store_id);
             AppStorage.saveData('currency_code', data.storeview.base.currency_code);
@@ -49,21 +72,19 @@ class Settings extends React.Component {
             if (Platform.OS !== 'ios' && data.storeview.base.android_sender) {
                 this.registerToken(data.storeview.base.android_sender);
             }
-            this.autoLogin();
-        } else if (data.hasOwnProperty('customer')) {
-            Connection.setCustomer({ email: this.email, password: this.password });
-            this.customer = data.customer;
-            this.props.storeData('actions', [
-                { type: 'customer_data', data: this.customer },
-                { type: 'merchant_configs', data: this.storeViewData }
-            ]);
-            this.getQuoteItems();
-        } else if (data.hasOwnProperty('quoteitems')) {
-            this.props.storeData('quoteitems', data);
+            this.props.storeData('merchant_configs', data);
         } else {
             AppStorage.saveData('notification_token', data.device.device_token);
         }
     }
+
+    handleWhenRequestFail(url, requestID) {
+        if (url == customer_login) {
+            AppStorage.removeAutologinInfo();
+            this.props.storeData('merchant_configs', this.storeViewData);
+        }
+    }
+
     registerToken(senderID) {
         firebase.messaging().hasPermission()
             .then(enabled => {
@@ -82,61 +103,40 @@ class Settings extends React.Component {
             });
     }
 
-    autoLogin() {
-        AppStorage.getCustomerAutoLoginInfo().then((customerInfo) => {
-            if (customerInfo !== null) {
-                if (customerInfo.email !== undefined) {
-                    this.email = customerInfo.email;
-                }
-                if (customerInfo.password !== undefined) {
-                    this.password = customerInfo.password;
-                }
-                if (this.email !== '' && this.password !== '') {
-                    try {
-                        Connection.setCustomer(null);
-                        Connection.restData();
-                        let params = [];
-                        params['email'] = this.email;
-                        params['password'] = this.password;
-                        Connection.setGetData(params);
-                        Connection.connect(customer_login, this, 'GET', false);
-                    } catch (e) {
-                        console.log(e.message);
-                    }
-                } else {
-                    this.props.storeData('merchant_configs', this.storeViewData);
-                }
-            } else {
-                this.props.storeData('merchant_configs', this.storeViewData);
-            }
-            //this callback is executed when your Promise is resolved
-        }).catch((error) => {
-            //this callback is executed when your Promise is rejected
-            console.log('Promise is rejected with error: ' + error);
-            this.props.storeData('merchant_configs', this.storeViewData);
-        });
-    }
-
-    getQuoteItems() {
-        Connection.restData();
-        Connection.connect(quoteitems, this, 'GET');
-    }
-
     async requestRegisterDevice(senderID) {
         if (Platform.OS !== 'ios') {
+            let platformID = undefined;
+            let locationParams = {};
+            if (Platform.OS === 'ios') {
+                if (Device.isTablet()) {
+                    platformID = '2';
+                } else {
+                    platformID = '1';
+                }
+            } else {
+                platformID = '3';
+            }
+            let location = Identify.getLocation();
+            if (location) {
+                locationParams = {
+                    latitude: location.lat,
+                    longitude: location.lng
+                }
+            }
             let token = await nativeMethod.createNotificationToken(senderID);
-
             AppStorage.getData('notification_token').then((savedToken) => {
                 if (!savedToken || (savedToken && token !== savedToken)) {
-                    Connection.restData();
-                    Connection.setBodyData({
-                        device_token: token,
-                        is_demo: '1',
-                        plaform_id: Platform.OS === 'ios' ? '1' : '3',
-                        app_id: 'com.simicart',
-                        build_version: '1'
-                    });
-                    Connection.connect(devices, this, 'POST');
+                    new NewConnection()
+                        .init(devices, 'register_device', this, 'POST')
+                        .addBodyData({
+                            device_token: token,
+                            is_demo: simicart.isDemo,
+                            plaform_id: platformID,
+                            app_id: simicart.appID,
+                            build_version: simicart.appVersion,
+                            ...locationParams
+                        })
+                        .connect();
                 }
             });
         }

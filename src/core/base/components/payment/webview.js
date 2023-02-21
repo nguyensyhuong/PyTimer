@@ -1,11 +1,15 @@
 import React from 'react';
 import { Container, Toast } from 'native-base';
-import { WebView, BackHandler, Alert } from 'react-native';
-import { order_history } from '../../../helper/constants';
-import Connection from '../../network/Connection';
+import { BackHandler, Alert, Platform } from 'react-native';
+import { order_history } from '@helper/constants';
+import NewConnection from '../../network/NewConnection';
 import Identify from '../../../helper/Identify';
 import { connect } from 'react-redux';
-
+import material from "@theme/variables/material";
+import AppStorage from '@helper/storage';
+import { WebView } from 'react-native-webview';
+import NavigationManager from '@helper/NavigationManager';
+import Events from '@helper/config/events';
 class WebViewPayment extends React.Component {
 
     constructor(props) {
@@ -22,50 +26,63 @@ class WebViewPayment extends React.Component {
         Toast.show({
             text: Identify.__('Your order has been canceled'),
             type: 'success',
-            buttonText: "Okay",
-            duration: 3000
+            duration: 3000,
+            textStyle: { fontFamily: material.fontFamily }
         });
-        this.props.navigation.goBack(null);
+        NavigationManager.backToRootPage(this.props.navigation);
     }
 
     onBackPress = () => {
         if (this.webView.canGoBack && this.webView.ref) {
             this.webView.ref.goBack();
-        } else {
+        } else if(this.props.enableCancelOrder) {
             Alert.alert(
-                'Warning',
-                'Are you sure you want to cancel this order?',
+                Identify.__('Warning'),
+                Identify.__('Are you sure you want to cancel this order?'),
                 [
-                    { text: 'Cancel', onPress: () => {style: 'cancel'} },
+                    { text: Identify.__('Cancel'), onPress: () => { style: 'cancel' } },
                     {
-                        text: 'OK', onPress: () => {
+                        text: Identify.__('OK'), onPress: () => {
                             if (this.props.orderID) {
                                 this.cancelOrder();
                             } else {
-                                this.props.navigation.goBack(null);
+                                NavigationManager.backToRootPage(this.props.navigation);
                             }
                         }
                     },
                 ],
                 { cancelable: true }
             );
+        } else {
+            NavigationManager.backToRootPage(this.props.navigation);
         }
         return true;
     }
 
     cancelOrder() {
         this.props.storeData('showLoading', { type: 'dialog' });
-        Connection.restData();
-        Connection.setBodyData({ status: 'cancel' });
-        Connection.connect(order_history + '/' + this.props.orderID, this, 'PUT');
+        new NewConnection()
+            .init(order_history + '/' + this.props.orderID, 'cancel_order', this, 'PUT')
+            .addBodyData({ status: 'cancel' })
+            .connect();
     }
 
     componentWillMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+        if (this.props.hasOwnProperty('onRef')) {
+            this.props.onRef(this);
+        }
+        if (Platform.OS === 'android') {
+            BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+        }
     }
 
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
+        if (this.props.hasOwnProperty('onRef')) {
+            this.props.onRef(undefined);
+        }
+        if (Platform.OS === 'android') {
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
+        }
     }
 
     navigateResults(message, type) {
@@ -73,42 +90,64 @@ class WebViewPayment extends React.Component {
             Toast.show({
                 text: message,
                 type: type,
-                buttonText: "Okay",
-                duration: 3000
+                duration: 3000, textStyle: { fontFamily: material.fontFamily }
             });
         }
-        this.props.navigation.goBack(null);
+        if (type === 'success' && this.props.orderID) {
+            let data = {};
+            data['event'] = 'checkout_action';
+            data['action'] = 'place_order_successful';
+            data['total'] = this.props.totals;
+            data['order_id'] = this.props.order;
+            Events.dispatchEventAction(data, this);
+
+            NavigationManager.clearStackAndOpenPage(this.props.navigation, 'Thankyou', {
+                invoice: this.props.orderID,
+                mode: this.props.mode,
+            });
+        } else {
+            NavigationManager.backToRootPage(this.props.navigation);
+        }
     }
 
     processUrl(url) {
         if (this.props.keySuccess && url.includes(this.props.keySuccess)) {
             console.log('onSuccess');
-            if(!this.props.parent.onSuccess()) {
-                this.navigateResults(this.props.messageSuccess, 'success');
+            this.webView.ref.stopLoading();
+            AppStorage.saveData('quote_id', '');
+            if (!Identify.isEmpty(this.props.notification)) {
+                this.props.storeData('actions', [
+                    { type: 'showNotification', data: { show: true, data: this.props.notification } },
+                    { type: 'quoteitems', data: {} }
+                ]);
             } else {
-                this.webView.ref.stopLoading();
+                this.props.storeData('quoteitems', {});
+            }
+            if (!this.props.parent.onSuccess()) {
+                this.navigateResults(this.props.messageSuccess, 'success');
             }
         } else if (this.props.keyFail && url.includes(this.props.keyFail)) {
             console.log('onFail');
-            if(!this.props.parent.onFail()) {
+            this.webView.ref.stopLoading();
+            if (!this.props.parent.onFail()) {
                 this.navigateResults(this.props.messageFail, 'warning');
-            } else {
-                this.webView.ref.stopLoading();
             }
         } else if (this.props.keyError && url.includes(this.props.keyError)) {
             console.log('onError');
-            if(!this.props.parent.onError()) {
+            this.webView.ref.stopLoading();
+            if (!this.props.parent.onError()) {
                 this.navigateResults(this.props.messageError, 'danger');
-            } else {
-                this.webView.ref.stopLoading();
             }
         } else if (this.props.keyReview && url.includes(this.props.keyReview)) {
             console.log('onReview');
-            if(!this.props.parent.onReview()) {
+            this.webView.ref.stopLoading();
+            if (!this.props.parent.onReview()) {
                 this.navigateResults(this.props.messageReview, '');
-            } else {
-                this.webView.ref.stopLoading();
             }
+        } else if (this.props.customCondition && this.props.customCondition(url)) {
+            console.log('onCustom');
+            this.webView.ref.stopLoading();
+            this.props.customAction();
         }
     }
 
@@ -125,15 +164,21 @@ class WebViewPayment extends React.Component {
         return (
             <Container>
                 <WebView
+                    javaScriptEnabled={true}
                     originWhitelist={['*']}
                     source={{ uri: this.props.url }}
                     style={{ flex: 1 }}
-                    startInLoadingState={true}
+                    startInLoadingState={this.props.showLoading ?? true}
                     ref={(webView) => { this.webView.ref = webView; }}
-                    onNavigationStateChange={this._onNavigationStateChange.bind(this)} />
+                    onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+                    injectedJavaScript={this.props.injectedJavaScript} />
             </Container>
         );
     }
+}
+
+WebViewPayment.defaultProps = {
+    enableCancelOrder: true
 }
 
 const mapDispatchToProps = (dispatch) => {

@@ -2,7 +2,11 @@ import Identify from '@helper/Identify';
 
 export default {
     container: {
-        
+        default_delete_button: {
+            active: true,
+            sort_order: 1000,
+            content: require('../../../core/screens/customer/components/customer/deletebutton').default
+        },
     },
     content: {
         default_profile: {
@@ -11,8 +15,8 @@ export default {
             content: require('@base/components/menu/BaseMenuItem').default,
             data: {
                 keyItem: 'myaccount_profile',
-                iconName: 'md-contact',
-                label: Identify.__('Profile'),
+                iconName: 'person',
+                label: 'Profile',
                 extendable: true
             }
         },
@@ -23,7 +27,7 @@ export default {
             data: {
                 keyItem: 'myaccount_address',
                 iconName: 'md-book',
-                label: Identify.__('Address Book'),
+                label: 'Address Book',
                 extendable: true
             }
         },
@@ -33,8 +37,8 @@ export default {
             content: require('@base/components/menu/BaseMenuItem').default,
             data: {
                 keyItem: 'myaccount_orders',
-                iconName: 'md-paper',
-                label: Identify.__('Order History'),
+                iconName: 'receipt',
+                label: 'Order History',
                 extendable: true
             }
         },
@@ -45,7 +49,7 @@ export default {
             data: {
                 keyItem: 'myaccount_logout',
                 iconName: 'md-log-out',
-                label: Identify.__('Logout'),
+                label: 'Sign Out',
                 extendable: false
             }
         },

@@ -22,6 +22,7 @@ export default class DateInput extends BaseInput {
         let year = newDate.getFullYear();
         let date = month + '/' + day + '/' + year;
         this.setState({ value: date });
+        this.state.value = date;
         this.parent.updateFormData(this.inputKey, date, true);
     }
 
@@ -49,6 +50,7 @@ export default class DateInput extends BaseInput {
                 <View>
                     <DatePickerIOS
                         mode='date'
+                        initialDate={currentDate}
                         date={currentDate}
                         minimumDate={new Date(1900, 0, 1)}
                         onDateChange={(newDate) => this.updateNewDate(newDate)} />

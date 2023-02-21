@@ -22,13 +22,13 @@ export default {
         default_shipping: {
             active: true,
             sort_order: 3000,
-            title_content: 'Shipping Methods',
+            title_content: 'Shipping Method',
             content: require('@screens/checkout/components/checkout/shipping').default
         },
         default_payment: {
             active: true,
             sort_order: 4000,
-            title_content: 'Payment Methods',
+            title_content: 'Payment Method',
             content: require('@screens/checkout/components/checkout/payment').default
         },
         default_list: {

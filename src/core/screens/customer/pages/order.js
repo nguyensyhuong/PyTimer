@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import SimiPageComponent from '@base/components/SimiPageComponent';
 import { View } from 'react-native';
 import { Container, Content } from 'native-base';
-import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import { order_history, quoteitems } from '@helper/constants';
 import variable from '@theme/variables/material';
 
@@ -21,15 +21,17 @@ class OrderPage extends SimiPageComponent {
     }
 
     componentDidMount() {
-        if (this.orderId) {
+        super.componentDidMount();
+        if (!this.state.order) {
             this.getOrder();
         }
     }
 
     getOrder = () => {
         this.props.storeData('showLoading', { type: 'full' });
-        Connection.restData();
-        Connection.connect(order_history + '/' + this.orderId, this, 'GET');
+        new NewConnection()
+            .init(order_history + '/' + this.orderId, 'get_order_detail', this)
+            .connect();
     }
 
     setData(data) {
@@ -52,15 +54,17 @@ class OrderPage extends SimiPageComponent {
 
     onReorder() {
         this.props.storeData('showLoading', { type: 'dialog' });
-        Connection.restData();
-        Connection.setGetData({ reorder: '1' });
-        Connection.connect(order_history + '/' + this.orderId, this, 'GET');
+        new NewConnection()
+            .init(order_history + '/' + this.state.order.entity_id, 'request_reorder', this)
+            .addGetData({ reorder: '1' })
+            .connect();
         this.isReorder = true;
     }
 
     requestUpdateCart() {
-        Connection.restData();
-        Connection.connect(quoteitems, this, 'GET');
+        new NewConnection()
+            .init(quoteitems, 'get_quoteitems', this)
+            .connect();
         this.isUpdateCart = true;
     }
 
@@ -79,7 +83,7 @@ class OrderPage extends SimiPageComponent {
 
     renderPhoneLayout() {
         return (
-            <Container style={{backgroundColor: variable.appBackground}}>
+            <Container style={{ backgroundColor: variable.appBackground }}>
                 <Content>
                     <View style={{ flex: 1, paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 60 }}>
                         {this.renderLayoutFromConfig('order_detail_layout', 'content')}

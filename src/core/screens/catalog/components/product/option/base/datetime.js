@@ -8,7 +8,7 @@ class DateTime extends Abstract {
 
     constructor(props) {
         super(props);
-        this.state = { chosenDate: undefined };
+        this.state = { chosenDate: new Date() };
 
         this.setDate = this.setDate.bind(this);
     }
@@ -19,7 +19,7 @@ class DateTime extends Abstract {
     }
 
     setDate(newDate) {
-        this.state.chosenDate = newDate;
+        this.setState({chosenDate: newDate});
         this.parent.updatePrices();
     }
 

@@ -2,22 +2,38 @@ import React from 'react';
 import NavigationManager from '@helper/NavigationManager';
 import { Linking } from 'react-native';
 import Events from '@helper/config/events';
-import Connection from '@base/network/Connection';
+import Identify from '@helper/Identify';
 import firebase from 'react-native-firebase';
 import { View } from 'react-native';
 import md5 from 'md5';
+import SplashScreen from 'react-native-splash-screen'
+import SimiCart from '@helper/simicart';
+import NewConnection from '@base/network/NewConnection';
 
 export default class Redirect extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.isWebApp = (Identify.appConfig.app_settings && Identify.appConfig.app_settings.web_app && Identify.appConfig.app_settings.web_app == '1') ? true : false;
+        this.isProcessingLink = false;
+    }
+
     requestGetDataFromURL(url) {
-        Connection.restData();
-        Connection.setGetData({
-            url: url
-        });
-        Connection.connect('simiconnector/rest/v2/deeplinks', this, 'GET');
+        if (this.isWebApp) {
+            this.openHome(url);
+        } else {
+            this.isProcessingLink = true;
+            new NewConnection()
+                .init('simiconnector/rest/v2/deeplinks', 'get_deeplink_data', this)
+                .addGetData({
+                    url: url
+                })
+                .connect();
+        }
     }
 
     setData(data) {
+        this.isProcessingLink = false;
         if (data) {
             let type = data.deeplink.type;
             switch (type) {
@@ -28,12 +44,13 @@ export default class Redirect extends React.Component {
                     this.processOpenProduct(data.deeplink);
                     break;
                 default:
-                    NavigationManager.openRootPage(this.props.navigation, 'Home');
                     break;
             }
-        } else {
-            NavigationManager.openRootPage(this.props.navigation, 'Home');
         }
+    }
+
+    handleWhenRequestFail(url) {
+        this.isProcessingLink = false;
     }
 
     processOpenCategory(data) {
@@ -41,59 +58,64 @@ export default class Redirect extends React.Component {
             routeName = 'Category';
             params = {
                 categoryId: data.id,
-                categoryName: data.name,
+                categoryName: data.name
             };
         } else {
             routeName = 'Products';
             params = {
                 categoryId: data.id,
-                categoryName: data.name,
+                categoryName: data.name
             };
         }
-        NavigationManager.openRootPage(this.props.navigation, routeName, params);
+        NavigationManager.openPage(this.props.navigation, routeName, params);
+        setTimeout(() => {
+            SplashScreen.hide();
+        }, 1000);
     }
 
     processOpenProduct(data) {
-        NavigationManager.openRootPage(navigation, 'ProductDetail', {
-            productId: data.id,
+        NavigationManager.openPage(this.props.navigation, 'ProductDetail', {
+            productId: data.id
         });
+        setTimeout(() => {
+            SplashScreen.hide();
+        }, 1000);
     }
 
     componentWillMount() {
-        Linking.getInitialURL().then((url) => {
-            if (url) {
-                if (!this.dispatchProcessAppLink(url, this.props.navigation)) {
-                    let parts = url.split('?');
-                    let params = parts[1].split('&');
-                    let link = params[0].split('=')[1];
-                    this.requestGetDataFromURL(link);
-                }
-            } else {
-                firebase.links()
-                    .getInitialLink()
-                    .then((url) => {
-                        if (url) {
-                            this.requestGetDataFromURL(url);
-                        } else {
-                            NavigationManager.openRootPage(this.props.navigation, 'Home');
-                        }
-                    });
+        if (!Identify.isRunInitDeepLink) {
+            Identify.isRunInitDeepLink = true;
+            Linking.getInitialURL().then((url) => {
+                this.processAppLinkUrl(url);
+            }).catch(err => {
+                console.log('App link error occurred: ' + err);
+            });
+        }
+    }
+
+    processAppLinkUrl(url) {
+        if (url && url.startsWith('http') && !url.includes('page.link')) {
+            if (!this.dispatchProcessAppLink(url, this.props.navigation)) {
+                this.requestGetDataFromURL(url);
             }
-        }).catch(err => {
-            console.log('App link error occurred: ' + err);
-            NavigationManager.openRootPage(this.props.navigation, 'Home');
-        });
+        } else {
+            firebase.links()
+                .getInitialLink()
+                .then((url) => {
+                    if (url) {
+                        this.requestGetDataFromURL(url);
+                    }
+                });
+        }
     }
 
     dispatchProcessAppLink(link, navigation) {
-        let processed = true;
+        let processed = false;
         for (let i = 0; i < Events.events.app_link.length; i++) {
             let node = Events.events.app_link[i];
             if (node.active === true) {
                 let action = node.action;
-                if (!action.processAppLink(link, navigation)) {
-                    processed = false;
-                }
+                processed = action.processAppLink(link, navigation);
             }
         }
         return processed;
@@ -110,6 +132,35 @@ export default class Redirect extends React.Component {
             }
         }
         return plugins;
+    }
+
+    openHome(url = SimiCart.merchant_url) {
+        if (Identify.appConfig.app_settings && Identify.appConfig.app_settings.web_app && Identify.appConfig.app_settings.web_app == '1') {
+            NavigationManager.openRootPage(this.props.navigation, 'WebAppPage', {
+                uri: url
+            });
+        } else {
+            NavigationManager.openRootPage(this.props.navigation, 'Home');
+        }
+        setTimeout(() => {
+            SplashScreen.hide();
+        }, 1000);
+    }
+
+    componentDidMount() {
+        this.openHome();
+        Linking.addEventListener('url', (event) => {
+            if (Identify.isOpenShareFB) {
+                Identify.saveIsOpenShareFB(false);
+            } else {
+                if (!this.isProcessingLink) {
+                    this.processAppLinkUrl(event.url);
+                }
+            }
+        });
+    }
+    componentWillUnmount() {
+        // Linking.removeEventListener('url', this._handleOpenURL);
     }
 
     render() {

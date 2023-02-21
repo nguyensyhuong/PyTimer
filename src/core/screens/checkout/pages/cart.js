@@ -1,16 +1,17 @@
 import React from 'react';
-import { Container, Content, Text, Button, View, Input, Item, Toast, ActionSheet } from 'native-base';
-import { StyleSheet, Keyboard, ScrollView, RefreshControl, Image } from 'react-native';
+import { Container, Content, Text, View, Toast } from 'native-base';
+import { Keyboard, RefreshControl } from 'react-native';
 import md5 from 'md5';
 import SimiPageComponent from "@base/components/SimiPageComponent";
-import Connection from "@base/network/Connection";
+import NewConnection from "@base/network/NewConnection";
 import { quoteitems } from '@helper/constants';
 import Identify from '@helper/Identify';
-import Total from '@screens/checkout/components/totals';
 import variable from "@theme/variables/material";
 import { connect } from 'react-redux';
 import Layout from '@helper/config/layout';
 import Events from '@helper/config/events';
+import material from '@theme/variables/material';
+import AppStorage from '@helper/storage';
 
 class Cart extends SimiPageComponent {
     constructor(props) {
@@ -18,13 +19,19 @@ class Cart extends SimiPageComponent {
         this.state = {
             ...this.state,
             refreshing: false,
-         };
+        };
         this.list = null;
         this.totals = null;
         this.useDiffLayoutForHorizontal = true;
         this.from = 'cart';
         this.is_go_detail = true;
         this.isRight = false;
+        if (this.props.data) {
+            this.dataTracking = {
+                quoteitems: this.props.data
+            }
+        }
+
     }
     renderLayout(content, position = null) {
         this.list = this.props.data.quoteitems.length > 0 ? this.props.data.quoteitems : null;
@@ -69,40 +76,65 @@ class Cart extends SimiPageComponent {
         return components;
     }
     componentWillMount() {
-        if (this.props.loading.type === 'none' && Identify.isEmpty(this.props.data)) {
-            this.props.storeData('showLoading', { type: 'full' });
+        if (this.props.loading.type === 'none') {
+            if (Identify.isEmpty(this.props.data) || Identify.TRUE(this.props.data.reload_data)) {
+                this.props.storeData('showLoading', { type: 'full' });
+            }
         }
+        this.props.navigation.addListener(
+            'willFocus',
+            () => {
+                if (Identify.TRUE(this.props.data.reload_data)) {
+                    this.requestCart()
+                }
+            }
+        )
     }
     componentDidMount() {
-        Connection.restData();
-        if (Identify.isEmpty(this.props.data)) {
-            Connection.connect(quoteitems, this, 'GET');
+        super.componentDidMount();
+        if (Identify.isEmpty(this.props.data) || Identify.TRUE(this.props.data.reload_data)) {
+            this.requestCart()
+        } else {
+            if (this.props.data.message && !Identify.TRUE(this.props.data.is_can_checkout)) {
+                let messages = this.props.data.message;
+                let message = messages[0];
+                Keyboard.dismiss();
+                Toast.show({
+                    text: Identify.__(message),
+                    duration: 3000,
+                    textStyle: { fontFamily: material.fontFamily }
+                });
+            }
         }
     }
+
+    requestCart() {
+        newConnection = new NewConnection();
+        newConnection.init(quoteitems, 'get_quoteitems', this);
+        newConnection.connect();
+    }
     setData(data) {
-        if (data.message) {
-            let messages = data.message;
-            let message = messages[0];
-            Keyboard.dismiss();
-            Toast.show({
-                text: message,
-                duration: 3000
-            });
+        data['reload_data'] = true;
+        this.dataTracking = {
+            quoteitems: data
         }
         this.props.storeData('actions', [
             { type: 'showLoading', data: { type: 'none' } },
             { type: 'quoteitems', data: data }
         ]);
+        if (data.message) {
+            let messages = data.message;
+            let message = messages[0];
+            Keyboard.dismiss();
+            Toast.show({
+                text: Identify.__(message),
+                duration: 3000
+            });
+        }
     }
     qtyHandle(e) { return; }
     updateCart(item_id, qty) {
         this.props.storeData('showLoading', { type: 'dialog' });
-        Connection.restData();
-        if (!Identify.isEmpty(this.props.data) && this.props.data.quote_id != null) {
-            let params = [];
-            params['quote_id'] = this.props.data.quote_id;
-            Connection.setGetData(params);
-        }
         let json = {};
         json[item_id] = qty;
         let data = {};
@@ -112,9 +144,12 @@ class Cart extends SimiPageComponent {
         data['qty'] = qty;
         Events.dispatchEventAction(data, this);
 
-        Connection.setBodyData(json);
-        Connection.connect(quoteitems, this, 'PUT');
+        new NewConnection()
+            .init(quoteitems, 'update_item', this, 'PUT')
+            .addBodyData(json)
+            .connect();
     }
+    
     qtySubmit(e, item_id, default_qty) {
         if (e.nativeEvent.text && e.nativeEvent.text != default_qty.toString()) {
             this.updateCart(item_id, e.nativeEvent.text);
@@ -133,48 +168,38 @@ class Cart extends SimiPageComponent {
     refreshListView() {
         //Start Rendering Spinner
         this.setState({ refreshing: true });
-        Connection.restData();
-        if (!Identify.isEmpty(this.props.data.quoteitems) && this.props.data.quote_id != null) {
-            let params = [];
-            params['quote_id'] = this.props.data.quote_id;
-            Connection.setGetData(params);
-            Connection.connect(quoteitems, this, 'GET');
-            this.props.storeData('showLoading', { type: 'full' });
-        }
+        new NewConnection()
+            .init(quoteitems, 'refresh_quoteitems', this)
+            .connect();
+        this.props.storeData('showLoading', { type: 'full' });
         this.setState({ refreshing: false }); //Stop Rendering Spinner
     }
     renderPhoneLayout() {
-        if (Identify.isEmpty(this.props.data)) {
-            return (null);
-        }
-        let items = this.props.data.quoteitems;
-        if (items.length <= 0) {
+        if (Identify.isEmpty(this.props.data) || this.props.data.quoteitems.length <= 0) {
             return (
-                <Container style={{backgroundColor: variable.appBackground}}>
+                <Container style={{ backgroundColor: variable.appBackground }}>
                     <Content refreshControl={this.refreshControl()}>
                         <Text style={{ textAlign: 'center', marginTop: 90 }}>{Identify.__('You have no items in your shopping cart')}</Text>
                     </Content>
                 </Container>
             );
         }
+        let isCanCheckout = this.props.data.is_can_checkout && this.props.data.is_can_checkout == '1';
         return (
             <Container style={{ position: 'relative', backgroundColor: variable.appBackground }}>
-                <Content refreshControl={this.refreshControl()} style={{ marginBottom: 30, paddingBottom: 60 }}>
-                    {this.renderLayout('content')}
+                <Content refreshControl={this.refreshControl()} style={isCanCheckout ? { marginBottom: material.isIphoneX ? 50 : 30, paddingBottom: 60 } : {}}>
+                    <View style={{ paddingBottom: 60 }}>
+                        {this.renderLayout('content')}
+                    </View>
                 </Content>
                 {this.renderLayout('container')}
             </Container>
         )
     }
     renderTabletHorizontalLayout() {
-        if (Identify.isEmpty(this.props.data)) {
-            return (null);
-        }
-
-        let items = this.props.data.quoteitems;
-        if (items.length <= 0) {
+        if (Identify.isEmpty(this.props.data) || this.props.data.quoteitems.length <= 0) {
             return (
-                <Container style={{backgroundColor: variable.appBackground}}>
+                <Container style={{ backgroundColor: variable.appBackground }}>
                     <Content refreshControl={this.refreshControl()}>
                         <Text style={{ textAlign: 'center', marginTop: 90 }}>{Identify.__('You have no items in your shopping cart')}</Text>
                     </Content>
@@ -202,7 +227,8 @@ class Cart extends SimiPageComponent {
 const mapStateToProps = (state) => {
     return {
         loading: state.redux_data.showLoading,
-        data: state.redux_data.quoteitems
+        data: state.redux_data.quoteitems,
+        customer_data: state.redux_data.customer_data,
     };
 }
 //Save to redux.

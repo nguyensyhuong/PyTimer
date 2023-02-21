@@ -5,6 +5,7 @@ import FloatingInput from '@base/components/form/FloatingInput';
 import PickerInput from '@base/components/form/PickerInput';
 import DateInput from '@base/components/form/DateInput';
 import DropDownInput from '@base/components/form/DropDownInput';
+import CheckboxInput from '@base/components/form/CheckBoxInput'
 import Identify from '@helper/Identify';
 
 export default class CustomerForm extends SimiComponent {
@@ -18,6 +19,11 @@ export default class CustomerForm extends SimiComponent {
         this.address_option = json.storeview.customer.address_option;
         this.account_option = json.storeview.customer.account_option;
         this.gender_value = json.storeview.customer.address_option.gender_value;
+
+        this.social_login = false;
+        if (this.data && this.data.social_login === true) {
+            this.social_login = true;
+        }
     }
 
     componentDidMount() {
@@ -68,21 +74,31 @@ export default class CustomerForm extends SimiComponent {
             this.renderField('text', 'taxvat', Identify.__('Tax/VAT number'), this.address_option.taxvat_show)
         );
 
-        let labelPassword = Identify.__('Password');
-        if (this.isEditProfile) {
-            labelPassword = Identify.__('Current Password');
-        }
-        fields.push(
-            this.renderField('password', 'password', labelPassword, this.isEditProfile ? 'opt' : 'req')
-        );
-        if (this.isEditProfile) {
+        if (!this.social_login) {
+            let labelPassword = Identify.__('Password');
+            if (this.isEditProfile) {
+                labelPassword = Identify.__('Current Password');
+            }
             fields.push(
-                this.renderField('password', 'new_password', Identify.__('New Password'), this.isEditProfile ? 'opt' : 'req')
+                this.renderField('password', 'password', labelPassword, this.isEditProfile ? 'opt' : 'req')
+            );
+            if (this.isEditProfile) {
+                fields.push(
+                    this.renderField('password', 'new_password', Identify.__('New Password'), this.isEditProfile ? 'opt' : 'req')
+                );
+            }
+            fields.push(
+                this.renderField('password', 'com_password', Identify.__('Confirm Password'), this.isEditProfile ? 'opt' : 'req')
             );
         }
-        fields.push(
-            this.renderField('password', 'com_password', Identify.__('Confirm Password'), this.isEditProfile ? 'opt' : 'req')
-        );
+
+        if (this.account_option.show_newsletter === '1') {
+            if (!this.isEditProfile) {
+                fields.push(
+                    this.renderField('checkbox', 'news_letter', Identify.__('Sign Up for Newsletter'), 'opt')
+                );
+            }
+        }
 
         fields = fields.filter(function (element) {
             return element !== undefined;
@@ -145,6 +161,18 @@ export default class CustomerForm extends SimiComponent {
                             required={required}
                             parent={this} />
                     );
+                case 'checkbox':
+                    return (
+                        <CheckboxInput
+                            key={inputKey}
+                            inputType={inputType}
+                            inputKey={inputKey}
+                            inputValue={inputValue}
+                            inputTitle={inputTitle}
+                            required={required}
+                            parent={this}
+                        />
+                    )
                 default:
                     return (
                         <FloatingInput

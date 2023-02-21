@@ -1,15 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Modal, NativeModules, Platform } from 'react-native';
-import Identify from '../../../helper/Identify';
-import AdvanceList from '../../../base/components/advancelist/index';
-import { Container, Content} from "native-base";
-import Connection from '../../../base/network/Connection';
-import { storeviews } from '../../../helper/constants';
-import AppStorage from '../../../helper/storage';
+import { Modal, NativeModules, Platform, Linking } from 'react-native';
+import Identify from '@helper/Identify';
+import AdvanceList from '@base/components/advancelist';
+import { Container, Content } from "native-base";
+import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
+import { storeviews } from '@helper/constants';
+import AppStorage from '@helper/storage';
 import RNRestart from 'react-native-restart';
 import { I18nManager } from 'react-native';
-import SimiPageComponent from "../../../base/components/SimiPageComponent";
+import SimiPageComponent from "@base/components/SimiPageComponent";
 import variable from '@theme/variables/material';
 
 const NativeMethod = Platform.OS === 'ios' ? NativeModules.NativeMethod : NativeModules.NativeMethodModule;
@@ -30,17 +31,17 @@ class Viewsettings extends SimiPageComponent {
             stores = this.props.data.storeview.stores.stores;
         }
         stores.forEach(item => {
-            if(item.group_id == this.baseStore.group_id){
+            if (item.group_id == this.baseStore.group_id) {
                 this.storeName = item.name
             }
         })
     }
-    getDataToShow(key, hasDataInParent){
-        if(key){
+    getDataToShow(key, hasDataInParent) {
+        if (key) {
             return this.baseStore[key]
-        }else if(hasDataInParent){
+        } else if (hasDataInParent) {
             return this.storeName
-        }else return null
+        } else return null
     }
     getDefaultStoreViewByGroupId(value) {
         let stores = this.props.data.storeview.stores.stores
@@ -59,9 +60,9 @@ class Viewsettings extends SimiPageComponent {
         let api = storeviews;
         if (!value) return;
         let keys = [
-            {key: 'currency_code'}
+            { key: 'currency_code' }
         ];
-        let params = [];
+        let connection = new NewConnection();
         if (type == 0) {
             if (value == this.baseStore.group_id) {
                 this.showLoading('none', true);
@@ -71,7 +72,6 @@ class Viewsettings extends SimiPageComponent {
             if (storeDefaultId == null) return;
             api += "/" + storeDefaultId;
             Identify.store_id = storeDefaultId;
-            Connection.restData();
         } else if (type == 1) {
             if (value == this.baseStore.store_id) {
                 this.showLoading('none', true);
@@ -79,23 +79,24 @@ class Viewsettings extends SimiPageComponent {
             }
             api += "/" + value;
             Identify.store_id = value;
-            Connection.restData();
         } else {
             if (value == this.baseStore.currency_code) {
                 this.showLoading('none', true);
                 return;
             }
             api += "/" + this.baseStore.store_id;
-            params['currency'] = value;
-            Connection.setGetData(params)
+            connection.addGetData({
+                currency: value
+            })
         }
-
-        Connection.connect(api, this, 'GET');
+        connection.init(api, 'get_store_config', this)
+            .connect();
 
     }
     setData(data) {
         this.props.clearData();
         Connection.setMerchantConfig(data);
+        Identify.setMerchantConfig(data);
 
         if (data.storeview.hasOwnProperty('base') && data.storeview.base.hasOwnProperty('locale_identifier')) {
             Identify.locale_identifier = data.storeview.base.locale_identifier;
@@ -104,10 +105,12 @@ class Viewsettings extends SimiPageComponent {
         this.showLoading('none', false);
         this.props.storeData('merchant_configs', data);
 
-        if(data.storeview.base.is_rtl == '1') {
+        if (data.storeview.base.is_rtl == '1') {
             I18nManager.forceRTL(true);
+            AppStorage.saveData('appIsRtl', 'yes');
         } else {
             I18nManager.forceRTL(false);
+            AppStorage.saveData('appIsRtl', 'no');
         }
 
         this.props.navigation.goBack(null)
@@ -115,7 +118,7 @@ class Viewsettings extends SimiPageComponent {
         AppStorage.saveData('store_id', data.storeview.base.store_id).then(
             () => {
                 AppStorage.saveData('currency_code', data.storeview.base.currency_code).then(
-                    () => {RNRestart.Restart()}
+                    () => { RNRestart.Restart() }
                 )
             }
         )
@@ -137,7 +140,7 @@ class Viewsettings extends SimiPageComponent {
         );
     }
 
-    generateActionForModal(dataContainer, title, keyItem, type, noMatch=false, extraData={searchStr: '', baseData: ''}){
+    generateActionForModal(dataContainer, title, keyItem, type, noMatch = false, extraData = { searchStr: '', baseData: '' }) {
         let compareData = noMatch ? this.baseStore[extraData.baseData] : this.baseStore[keyItem];
         let data = [];
         for (let i in dataContainer) {
@@ -151,15 +154,15 @@ class Viewsettings extends SimiPageComponent {
         this.showModal(data, title)
     }
 
-    itemAction(keyItem, title){
-        switch (keyItem){
+    itemAction(keyItem, title) {
+        switch (keyItem) {
             case 'store':
                 let stores = null;
                 if (!Identify.isEmpty(this.props.data.storeview.stores) && parseInt(this.props.data.storeview.stores.total) >= 1) {
                     stores = this.props.data.storeview.stores.stores;
                 }
-                if (stores) {
-                    this.generateActionForModal(stores,title, 'group_id', 0)
+                if (stores.length > 1) {
+                    this.generateActionForModal(stores, title, 'group_id', 0)
                 }
                 return null;
                 break;
@@ -175,8 +178,18 @@ class Viewsettings extends SimiPageComponent {
                         }
                     }
                 }
+
                 if (storeView) {
-                    this.generateActionForModal(storeView, title, 'store_id', 1)
+                    let storeViewActives = [];
+                    for (let j in storeView) {
+                        let store = storeView[j];
+                        if (store.is_active == '1') {
+                            storeViewActives.push(store);
+                        }
+                    }
+                    if (storeViewActives.length > 1) {
+                        this.generateActionForModal(storeViewActives, title, 'store_id', 1)
+                    }
                 }
                 return null;
                 break;
@@ -185,20 +198,20 @@ class Viewsettings extends SimiPageComponent {
                 if (!Identify.isEmpty(this.baseStore.currencies)) {
                     currenies = this.baseStore.currencies;
                 }
-                if (currenies) {
-                    this.generateActionForModal(currenies, title, 'value', 2, true, {searchStr: 'title', baseData: 'currency_code'})
+                if (currenies && currenies.length > 1) {
+                    this.generateActionForModal(currenies, title, 'value', 2, true, { searchStr: 'title', baseData: 'currency_code' })
                 }
                 return null;
                 break;
             default:
-                NativeMethod.openSetting();
+                Linking.openSettings();
                 break;
         }
     }
 
     renderPhoneLayout() {
         return (
-            <Container style={{paddingLeft: 15, paddingRight: 15, backgroundColor: variable.appBackground}}>
+            <Container style={{ paddingLeft: 15, paddingRight: 15, backgroundColor: variable.appBackground }}>
                 {this.renderModal()}
                 <Content style={{ flex: 1, paddingTop: 15 }}>
                     {this.renderLayoutFromConfig('setting_layout', 'content')}

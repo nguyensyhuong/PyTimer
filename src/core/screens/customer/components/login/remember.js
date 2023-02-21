@@ -1,28 +1,28 @@
 import React from 'react';
 import SimiComponent from '@base/components/SimiComponent';
 import { TouchableOpacity } from 'react-native';
-import { CheckBox, Text } from 'native-base';
+import { CheckBox, Text, Icon } from 'native-base';
 import Identify from '../../../../helper/Identify';
 
-export default class RememberEmailPass extends SimiComponent {
+const RememberEmailPass = (props) => {
 
-    onCheckRemember() {
-        this.props.parent.setState((previousState) => {
+    function onCheckRemember() {
+        props.parent.setState((previousState) => {
             return { rememberMeEnable: !previousState.rememberMeEnable };
         });
     }
 
-    renderPhoneLayout() {
-        return (
-            <TouchableOpacity
-                style={{ flex: 1, marginTop: 25, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
-                onPress={() => { this.onCheckRemember() }}>
-                <CheckBox color={'gray'}
-                    checked={this.props.parent.state.rememberMeEnable}
-                    style={{ width: 25, height: 25, left: 0 }}
-                    onPress={() => { this.onCheckRemember() }} />
-                <Text style={{ marginLeft: 10 }}>{Identify.__('Remember me')}</Text>
-            </TouchableOpacity>
-        );
-    }
+    return (
+        <TouchableOpacity
+            style={{ flex: 1, marginTop: 25, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
+            onPress={() => { onCheckRemember() }}>
+            <Icon name={props.parent.state.rememberMeEnable ? "ios-checkmark-circle" : "ios-radio-button-off"}
+                style={{ fontSize: 25, left: 0 }}
+            />
+            <Text style={{ marginLeft: 10 }}>{Identify.__('Remember me')}</Text>
+        </TouchableOpacity>
+
+    );
 }
+
+export default RememberEmailPass;

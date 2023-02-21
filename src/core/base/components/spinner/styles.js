@@ -8,14 +8,14 @@ export default StyleSheet.create({
   fullSpinnerContainer: {
     backgroundColor: 'white',
     flex: 1,
-    marginTop: variable.isIphoneX ? 81 : variable.platform === 'ios' ? 63 : 56,
+    marginTop: variable.platform === 'ios' ? 68 + (variable.isIphoneX ? 24: 0) : 56,
     alignItems: 'center',
     justifyContent: 'center'
   },
   dialogSpinnerContainer: {
     backgroundColor: '#00000033',
     flex: 1,
-    marginTop: variable.isIphoneX ? 81 : variable.platform === 'ios' ? 63 : 56,
+    marginTop: variable.platform === 'ios' ? 68 + (variable.isIphoneX ? 24: 0) : 56,
     alignItems: 'center',
     justifyContent: 'center'
   }

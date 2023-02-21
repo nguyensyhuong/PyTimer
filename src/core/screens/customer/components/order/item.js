@@ -5,17 +5,17 @@ import { Card, CardItem, Text } from 'native-base';
 import NavigationManager from '@helper/NavigationManager';
 import Identify from '@helper/Identify';
 import styles from './listStyles';
+import material from '@theme/variables/material';
 
-export default class OrderItem extends SimiComponent {
-
-    openOrderHistoryDetail = () => {
-        NavigationManager.openPage(this.props.navigation, 'OrderHistoryDetail', {
-            orderId: this.props.order.entity_id,
-            order: this.props.order
+const OrderBilling = (props) => {
+    const openOrderHistoryDetail = () => {
+        NavigationManager.openPage(props.navigation, 'OrderHistoryDetail', {
+            orderId: props.order.entity_id,
+            order: props.order
         });
     }
 
-    renderShipTo = (shipping) => {
+    const renderShipTo = (shipping) => {
         let shipTo = '';
         if (shipping.prefix !== undefined && shipping.prefix !== '' && shipping.prefix !== null) {
             shipTo += shipping.prefix;
@@ -36,71 +36,71 @@ export default class OrderItem extends SimiComponent {
         return shipTo;
     }
 
-    renderOrderNumber() {
+    function renderOrderNumber() {
         return (
             <CardItem listItemPadding={0}>
-                <Text style={styles.title}>{Identify.__('Order #')}</Text>
-                <Text>{this.props.order.increment_id}</Text>
+                <Text style={[styles.title, { fontFamily: material.fontBold }]}>{Identify.__('Order #')}</Text>
+                <Text>{props.order.increment_id}</Text>
             </CardItem>
         );
     }
 
-    renderDate() {
+    function renderDate() {
         return (
             <CardItem listItemPadding={0}>
-                <Text style={styles.title}>{Identify.__('Date')}</Text>
-                <Text>{this.props.order.updated_at}</Text>
+                <Text style={[styles.title, { fontFamily: material.fontBold }]}>{Identify.__('Date')}</Text>
+                <Text>{props.order.updated_at}</Text>
             </CardItem>
         );
     }
 
-    renderShipping() {
+    function renderShipping() {
         return (
             <CardItem listItemPadding={0}>
-                <Text style={styles.title}>{Identify.__('Ship To')}</Text>
-                <Text>{this.renderShipTo(this.props.order.shipping_address)}</Text>
+                <Text style={[styles.title, { fontFamily: material.fontBold }]}>{Identify.__('Ship To')}</Text>
+                <Text>{renderShipTo(props.order.shipping_address)}</Text>
             </CardItem>
         );
     }
 
-    renderOrderTotal() {
+    function renderOrderTotal() {
         return (
             <CardItem listItemPadding={0}>
-                <Text style={styles.title}>{Identify.__('Order Total')}</Text>
-                <Text>{Identify.formatPriceWithCurrency(this.props.order.total.grand_total_incl_tax, this.props.order.total.currency_symbol)}</Text>
+                <Text style={[styles.title, { fontFamily: material.fontBold }]}>{Identify.__('Order Total')}</Text>
+                <Text>{Identify.formatPriceWithCurrency(props.order.total.grand_total_incl_tax, props.order.total.currency_symbol)}</Text>
             </CardItem>
         );
     }
 
-    renderStatus() {
+    function renderStatus() {
         return (
             <CardItem listItemPadding={0}>
-                <Text style={styles.title}>{Identify.__('Status')}</Text>
-                <Text>{this.props.order.status}</Text>
+                <Text style={[styles.title, { fontFamily: material.fontBold }]}>{Identify.__('Status')}</Text>
+                <Text>{Identify.__(props.order.status)}</Text>
             </CardItem>
         );
     }
 
-    renderItem() {
+    function renderItem() {
         return (
-            <Card style={{ flex: 1 }} key={this.props.order.entity_id}>
-                {this.renderOrderNumber()}
-                {this.renderDate()}
-                {this.renderShipping()}
-                {this.renderOrderTotal()}
-                {this.renderStatus()}
+            <Card style={{ flex: 1 }} key={props.order.entity_id}>
+                {renderOrderNumber()}
+                {renderDate()}
+                {renderShipping()}
+                {renderOrderTotal()}
+                {renderStatus()}
             </Card>
         );
     }
 
-    renderPhoneLayout() {
-        return (
-            <TouchableOpacity style={{ flex: 1 }}
-                onPress={() => {
-                    this.openOrderHistoryDetail();
-                }}>
-                {this.renderItem()}
-            </TouchableOpacity>
-        );
-    }
+    return (
+        <TouchableOpacity style={{ flex: 1 }}
+            onPress={() => {
+                openOrderHistoryDetail();
+            }}>
+            {renderItem()}
+        </TouchableOpacity>
+    );
 }
+
+export default OrderBilling;

@@ -9,7 +9,7 @@ export default class NavigationManager {
             index: 0,
             actions: [NavigationActions.navigate({
                 routeName: routeName,
-                params: params,
+                params: {...params,previousRoute : (navigation && navigation !== null) ? navigation.state.routeName : null}
             })],
         });
         if(navigation == null) {
@@ -21,7 +21,7 @@ export default class NavigationManager {
     static openPage(navigation, routeName, params = {}) {
         const pushAction = StackActions.push({
             routeName: routeName,
-            params: params,
+            params: {...params,previousRoute : (navigation && navigation !== null) ? navigation.state.routeName : null}
         });
         if(navigation == null) {
             navigation = this.savedNavigation
@@ -60,6 +60,14 @@ export default class NavigationManager {
             })],
         });
         navigation.dispatch(resetAction);
+    }
+
+    static clearStackAndOpenPage(navigation, routeName, params = {}) {
+        if(navigation == null) {
+            navigation = this.savedNavigation
+        }
+        this.backToRootPage(navigation);
+        this.openPage(navigation, routeName, params);
     }
 
     static saveNavigation(navigation) {

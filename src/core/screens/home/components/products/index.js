@@ -5,80 +5,44 @@ import { Spinner } from 'native-base';
 import { View } from 'react-native';
 import Identify from '@helper/Identify';
 import { home_spot_products } from '@helper/constants';
-import Connection from '@base/network/Connection';
- 
+import NewConnection from '@base/network/NewConnection';
+import Device from '@helper/device';
+
 class Products extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            showLoading: true
-        }
-    }
-
-    componentDidMount() {
-        if (Identify.isEmpty(this.props.data)) {
-            this.requestData();
-        }
-    }
-
-    requestData() {
-        Connection.restData();
-        Connection.connect(home_spot_products, this, 'GET');
-    }
-
-    handleWhenRequestFail() {
-        this.setState({showLoading: false});
-    }
-
-    setData(data) {
-        let dataForSave = {};
-        let products = data.homeproductlists;
-        products.forEach(element => {
-            dataForSave[element.productlist_id] = element;
-        });
-        this.state.showLoading = false;
-        this.props.storeData('add_home_spot_data', dataForSave);
-    }
-
-    renderLoading() {
-        return(
-            <Spinner color={Identify.theme.key_color}/>
-        );
+        this.homeproductlists = this.props.data;
     }
 
     renderHomeProductsList() {
-        let row = []
-        let data = this.props.data;
-        for(let key in data) {
-            let item = data[key];
+        let row = [];
+        this.homeproductlists.sort(function (a, b) {
+            return parseInt(a.sort_order) - parseInt(b.sort_order);
+        });
+        this.homeproductlists.forEach(element => {
             row.push(
-                <Item key={item.productlist_id} item={item} navigation={this.props.navigation}/>)
-        }
+                <Item
+                    productlist_id={element.productlist_id}
+                    key={Identify.makeid()}
+                    title={element.list_title}
+                    item={element}
+                    navigation={this.props.navigation} />)
+        });
         return row;
     }
 
-    render(){
-        if(!Identify.isEmpty(this.props.data)) {
-            return(
-                <View>
-                    {this.renderHomeProductsList()}
-                </View>
-            );
-        } else if(this.state.showLoading) {
-            return(
-                <View>
-                    {this.renderLoading()}
-                </View>
-            );
-        } else {
-            return(null);
-        }
+    render() {
+        return (
+            <View>
+                {this.renderHomeProductsList()}
+            </View>
+        );
     }
 }
 
 const mapStateToProps = (state) => {
-    return { data: state.redux_data.home_spot_data };
+    return { data: state.redux_data.home_data.home.homeproductlists.homeproductlists };
 }
 //Save to redux.
 const mapDispatchToProps = (dispatch) => {

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import Identify from '@helper/Identify';
 import PickerInput from '@base/components/form/PickerInput';
 import FloatingInput from '@base/components/form/FloatingInput';
+import SimiContext from '@base/components/SimiContext'
 
 export default class CountryStateFields extends React.Component {
 
@@ -10,11 +11,37 @@ export default class CountryStateFields extends React.Component {
         super(props);
         this.selectedCountry = {};
         this.selectedState = {};
+        this.listRefs = {}
         this.address = this.props.address;
         let json = Identify.getMerchantConfig();
         this.allowedCountries = json.storeview.allowed_countries;
         this.allowedStates = [];
         this.initCountryState();
+        // this.grandParent = this.props.parent.props.parent
+        this.parent = this.props.parent;
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(this.props.addressStat !== '' && nextProps.addressState !== this.props.addressState) {
+            let selectedCountry = this.allowedCountries.find(allowedCountry => allowedCountry.country_code === this.selectedCountry.country_id)
+            if(!selectedCountry) {
+                selectedCountry = this.allowedCountries[0]
+            }
+
+            let value = ''
+            if(selectedCountry.states.length > 0) {
+                const nextState = selectedCountry.states.find(state => state.state_code === nextProps.addressState)
+                if(nextState) {
+                    value = nextState.state_id
+                    this.setSelectedState(nextState.state_id, nextState.state_name, nextState.state_code)
+                }
+            }
+            if(!value) {
+                this.setSelectedState('', '', '');
+            }
+            this.statePickerInput && this.statePickerInput.setState({value})
+            this.updateFormData('region_id', value, true)
+        }
     }
 
     initCountryState() {
@@ -65,8 +92,8 @@ export default class CountryStateFields extends React.Component {
     updateFormData(key, value, validated) {
         if (key === 'country_id') {
             this.updateCountry(value);
-            this.setState({});
-        } else if(key === 'region') {
+
+        } else if (key === 'region') {
             this.setSelectedState('', value, '');
         } else {
             this.setSelectedState('', '', '');
@@ -76,10 +103,22 @@ export default class CountryStateFields extends React.Component {
                 }
             });
         }
+        this.setState({});
+        let isValidated = true;
+        if (this.allowedStates.length > 0 && (!this.selectedState || !this.selectedState.region)) {
+            isValidated = false;
+        }else{
+            if (this.props.address_option.region_id_show === 'req') {
+                if (!this.selectedState.region || this.selectedState.region === '') {
+                    isValidated = false;
+                }
+            }
+
+        }
         this.props.parent.updateFormData('country_state', {
             ...this.selectedCountry,
             ...this.selectedState
-        }, true);
+        }, isValidated);
     }
 
     setSelectedCountry(countryId, countryName) {
@@ -96,11 +135,12 @@ export default class CountryStateFields extends React.Component {
     createStateInput() {
         if (this.allowedStates.length > 0) {
             return (<PickerInput
+                ref={(node) => {this.statePickerInput = node}}
                 key={'region_id'}
                 inputKey={'region_id'}
                 inputValue={this.selectedState.region_id}
                 inputTitle={Identify.__('State')}
-                required={true}
+                required={(this.props.address_option.region_id_show === 'req' || this.allowedStates.length > 0) ? true : false}
                 parent={this}
                 keyForDisplay={'state_name'}
                 keyForSave={'state_id'}
@@ -114,34 +154,49 @@ export default class CountryStateFields extends React.Component {
                 inputKey={'region'}
                 inputValue={this.selectedState.region}
                 inputTitle={Identify.__('State')}
-                required={true}
+                required={(this.props.address_option.region_id_show === 'req' || this.allowedStates.length > 0) ? true : false}
                 parent={this} />);
         }
     }
 
     componentDidMount() {
+        let isValidated = true;
+        if (this.allowedStates.length > 0 && (!this.selectedState || !this.selectedState.region)) {
+            isValidated = false;
+        }
+
+        if (this.props.address_option.region_id_show === 'req') {
+            if (!this.selectedState || !this.selectedState.region || this.selectedState.region === '') {
+                isValidated = false;
+            }
+        }
+
         this.props.parent.updateFormData('country_state', {
             ...this.selectedCountry,
             ...this.selectedState
-        }, true);
+        }, isValidated);
     }
 
     render() {
-        return (
-            <View>
-                <PickerInput
-                    key={'country_id'}
-                    inputKey={'country_id'}
-                    inputValue={this.selectedCountry.country_id}
-                    inputTitle={Identify.__('Country')}
-                    required={true}
-                    parent={this}
-                    keyForDisplay={'country_name'}
-                    keyForSave={'country_code'}
-                    dataSource={this.allowedCountries}
-                />
-                {this.createStateInput()}
-            </View>
-        );
+        if (this.props.address_option) {
+            return (
+                <View>
+                    {this.props.address_option.country_id_show !== "" && <PickerInput
+                        key={'country_id'}
+                        inputKey={'country_id'}
+                        inputValue={this.selectedCountry.country_id}
+                        inputTitle={Identify.__('Country')}
+                        required={true}
+                        parent={this}
+                        keyForDisplay={'country_name'}
+                        keyForSave={'country_code'}
+                        dataSource={this.allowedCountries}
+                    />}
+                    {this.props.address_option.region_id_show !== "" && this.createStateInput()}
+                </View>
+            );
+        } else {
+            return null
+        }
     }
 }

@@ -1,17 +1,25 @@
 import React from 'react';
 import SimiComponent from '@base/components/SimiComponent';
 import { ScrollView, FlatList } from 'react-native';
-import { Spinner, View } from 'native-base';
+import { Spinner, View, Text, Toast } from 'native-base';
 import Device from '@helper/device';
 import VerticalProductItem from './item';
 import styles from './styles';
 import Identify from '@helper/Identify';
+import material from "../../../../../../native-base-theme/variables/material";
 
 export default class VerticalProducts extends SimiComponent {
     constructor(props) {
         super(props);
         let showList = this.props.parent.state.showList;
-        this.numColumns = (showList && !Device.isTablet()) ? 1 : ((showList && Device.isTablet() || !showList && !Device.isTablet()) ? 2 : 4)
+    }
+
+    componentDidMount() {
+        Toast.show({
+            text: this.props.parent.state.data.total + ' ' + Identify.__('Product') + '(' + Identify.__('s') + ')',
+            duration: 3000,
+            textStyle: { textAlign: "center", fontFamily: material.fontFamily },
+        })
     }
 
     formatData = (data, numColumns) => {
@@ -27,7 +35,7 @@ export default class VerticalProducts extends SimiComponent {
                 }
             }
             ///
-            data.push({ entity_id: Identify.makeid(), empty: true })
+            data.push({ entity_id: Identify.makeid(), empty: true, app_prices: { has_special_price: null } })
             numOfItemOnLastRow = numOfItemOnLastRow + 1;
         }
         return data;
@@ -39,43 +47,51 @@ export default class VerticalProducts extends SimiComponent {
             product={item}
             navigation={this.props.navigation}
             showList={this.props.parent.state.showList}
-            itemStyle={{flex: 1}}
+            itemStyle={{ flex: 1 }}
         />);
     }
 
     createListProps() {
         let showList = this.props.parent.state.showList;
+        let numColumns = (showList && !Device.isTablet()) ? 1 : ((showList && Device.isTablet() || !showList && !Device.isTablet()) ? 2 : 4)
         return {
             style: styles.verticalList,
-            data: this.formatData(this.props.products, this.numColumns),
+            data: this.formatData(this.props.products, numColumns),
             extraData: this.props.parent.state.data,
             showsVerticalScrollIndicator: false,
             keyExtractor: (item) => item.entity_id,
-            numColumns: (showList && !Device.isTablet()) ? 1 : ((showList && Device.isTablet() || !showList && !Device.isTablet()) ? 2 : 4),
+            numColumns: numColumns,
             key: (showList) ? 'ONE COLUMN' : 'TWO COLUMN'
         };
     }
 
     renderPhoneLayout() {
         let showLoadMore = this.props.parent.state.loadMore;
-        return (
-            <ScrollView
-                onScroll={this.props.parent.onListScroll}
-                scrollEventThrottle={400}>
-                <FlatList
-                    {...this.createListProps()}
-                    renderItem={({ item }) => {
-                        if (item.empty) {
-                            return <View style={{ flex: 1 }} />
+        if (this.props.products.length === 0) {
+            return (
+                <Text style={{ textAlign: 'center', fontFamily: material.fontBold, marginTop: 30 }}>{Identify.__('There are no products matching the selection')}</Text>
+            )
+        } else {
+            return (
+                <ScrollView
+                    onScroll={this.props.parent.onListScroll}
+                    scrollEventThrottle={400}
+                    showsVerticalScrollIndicator={false}>
+                    <FlatList
+                        {...this.createListProps()}
+                        renderItem={({ item }) => {
+                            if (item.empty) {
+                                return <View style={{ flex: 1 }} />
+                            }
+                            return (
+                                this.renderItem(item)
+                            );
                         }
-                        return(
-                            this.renderItem(item)
-                        );
-                    }
-                    } />
-                <Spinner style={(showLoadMore) ? {} : { display: 'none' }} />
-            </ScrollView>
-        );
+                        } />
+                    <Spinner color={Identify.theme.loading_color} style={(showLoadMore) ? {} : { display: 'none' }} />
+                </ScrollView>
+            );
+        }
     }
 
 }

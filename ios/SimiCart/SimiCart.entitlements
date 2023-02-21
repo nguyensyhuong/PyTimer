@@ -6,7 +6,13 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:ugyj4.app.goo.gl</string>
+		<string>applinks:www.chnen.com</string>
+		<string>applinks:chnen.com</string>
+		<string>kalkifashion://</string>
+		<string>applinks:albazaarshops.page.link</string>
+		<string>applinks:*.albazaar.shop</string>
+		<string>applinks:my.fnlife.com</string>
+		<string>applinks:www.my.fnlife.com</string>
 	</array>
 </dict>
 </plist>

@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import SimiPageComponent from '@base/components/SimiPageComponent';
 import { Container } from 'native-base';
 import { notifications_history } from '@helper/constants';
-import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import variable from '@theme/variables/material';
+import AppStorage from '@helper/storage';
 
 class NotificationHistory extends SimiPageComponent {
 
@@ -16,13 +17,20 @@ class NotificationHistory extends SimiPageComponent {
 
     componentDidMount() {
         if (!this.checkExistData()) {
-            Connection.restData();
-            Connection.setGetData({
-                limit: 100,
-                offset: 0,
-                dir: 'desc'
+            AppStorage.getData('notification_token').then((savedToken) => {
+                let jsonBody = {
+                    limit: 100,
+                    offset: 0,
+                    dir: 'desc'
+                };
+                if (savedToken) {
+                    jsonBody['device_token'] = savedToken;
+                }
+                new NewConnection()
+                    .init(notifications_history, 'get_noti_history', this)
+                    .addGetData(jsonBody)
+                    .connect();
             });
-            Connection.connect(notifications_history, this, 'GET');
         }
     }
 
@@ -57,7 +65,7 @@ class NotificationHistory extends SimiPageComponent {
 
     renderPhoneLayout() {
         return (
-            <Container style={{backgroundColor: variable.appBackground}}>
+            <Container style={{ backgroundColor: variable.appBackground }}>
                 {this.renderLayoutFromConfig('notification_history_layout', 'container')}
             </Container>
         );

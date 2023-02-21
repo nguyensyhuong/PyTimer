@@ -3,22 +3,40 @@ import Identify from '@helper/Identify';
 import { Container, Content, Button, Text, View, Icon, Card, H2 } from "native-base";
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import NavigationManager from '@helper/NavigationManager';
+import { checkout_mode } from '@helper/constants';
 
-export default class ThankOrder extends React.Component{
-    onThankyouSelect(){
-        NavigationManager.openPage(this.props.navigation, 'OrderHistoryDetail', {orderId: this.props.navigation.getParam('invoice')});
+const ThankOrder = (props) => {
+
+    function onThankyouSelect() {
+        NavigationManager.openPage(props.navigation, 'OrderHistoryDetail', { orderId: props.navigation.getParam('invoice') });
     }
-    render(){
-        return(
-            <TouchableOpacity onPress={() => {
-                this.onThankyouSelect()
+
+    if (props.navigation.getParam('mode') == checkout_mode.guest) {
+        return (
+            <View style={{
+                marginTop: 20,
+                paddingTop: 15,
+                paddingBottom: 15
             }}>
-              <Card style={styles.card}>
-                <View style={styles.cardContainer}>
-                  <Text style={styles.orderLabel}>{Identify.__('Your order is')}: #{this.props.navigation.getParam('invoice')}</Text>
-                  <Icon style={styles.extendIcon} name="ios-arrow-forward"/>
-                </View>
-              </Card>
+                <Text style={styles.orderLabel}>{Identify.__('Your order is')}: #{props.navigation.getParam('invoice')}</Text>
+            </View>
+        )
+    } else {
+        let disabledButton = props.navigation.getParam('mode') == checkout_mode.new_customer && !Identify.getCustomerData();
+        return (
+            <TouchableOpacity
+                disabled={disabledButton}
+                onPress={() => {
+                    onThankyouSelect()
+                }}>
+                <Card style={styles.card}>
+                    <View style={styles.cardContainer}>
+                        <Text style={styles.orderLabel}>{Identify.__('Your order is')}: #{props.navigation.getParam('invoice')}</Text>
+                        {disabledButton ?
+                            null :
+                            <Icon style={styles.extendIcon} name={Identify.isRtl() ? 'ios-arrow-back' : "ios-arrow-forward"} />}
+                    </View>
+                </Card>
             </TouchableOpacity>
         );
     }
@@ -53,3 +71,5 @@ const styles = StyleSheet.create({
         padding: 20,
     },
 });
+
+export default ThankOrder;

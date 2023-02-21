@@ -3,20 +3,20 @@ import SimiComponent from '../../../../base/components/SimiComponent';
 import { Button, Text } from 'native-base';
 import Identify from '../../../../helper/Identify';
 
-export default class LoginButton extends SimiComponent {
+const LoginButton = (props) => {
 
-    onClickLogin() {
-        this.props.parent.startLogin();
+    function onClickLogin() {
+         props.parent.startLogin();
     }
-
-    renderPhoneLayout() {
-        return (
-            <Button style={{marginTop:30, flex:1, flexDirection: 'row', alignItems:'center', justifyContent: 'center',}}
-                full
-                disabled={!this.props.parent.state.enableSignIn}
-                onPress={() => {this.onClickLogin()}}>
-                <Text> {Identify.__('Sign In')} </Text>
-            </Button>
-        );
-    }
+    
+    return (
+        <Button style={{ marginTop: 30, flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', }}
+            full
+            disabled={! props.parent.state.enableSignIn}
+            onPress={() => {  onClickLogin() }}>
+            <Text> {Identify.__('Sign In')} </Text>
+        </Button>
+    );
 }
+
+export default LoginButton;

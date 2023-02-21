@@ -1,11 +1,14 @@
 import React from 'react';
+import {View, Text} from 'react-native'
 import SimiComponent from '@base/components/SimiComponent';
 import SimiForm from '@base/components/form/SimiForm';
 import FloatingInput from '@base/components/form/FloatingInput';
 import PickerInput from '@base/components/form/PickerInput';
 import DateInput from '@base/components/form/DateInput';
+import AutoCompleteInput from '@base/components/form/AutoCompleteInput';
 import Identify from '@helper/Identify';
 import CountryStateField from './countrystate';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 export default class AddressForm extends SimiComponent {
 
@@ -17,8 +20,16 @@ export default class AddressForm extends SimiComponent {
         this.account_option = json.storeview.customer.account_option;
         this.gender_value = json.storeview.customer.address_option.gender_value;
         this.mode = this.props.navigation.getParam('mode');
-        this.address = this.props.navigation.getParam('address') ? this.props.navigation.getParam('address') : {};
-        if(Object.keys(this.address).length > 0) {
+        this.address = {};
+        this.count = 1;
+        this.state = {
+            ...this.state,
+            city: '',
+            addressState: '',
+            postcode: '',
+            street: ''
+        };
+        if (Object.keys(this.address).length > 0) {
             this.initData['entity_id'] = this.address.entity_id;
         }
     }
@@ -28,7 +39,7 @@ export default class AddressForm extends SimiComponent {
             this.props.onRef(this)
         }
     }
-    
+
     componentWillUnmount() {
         if (this.props.onRef) {
             this.props.onRef(undefined)
@@ -39,12 +50,24 @@ export default class AddressForm extends SimiComponent {
         this.props.parent.updateButtonStatus(status);
     }
 
+    addData = (data, street = null) => {
+        const {city, postCode, state} = data
+
+        this.setState({
+            city: city, 
+            postcode: postCode, 
+            addressState: state,
+            street: street || data.formatted_address
+        });
+    }
+
     createFields() {
         let fields = [];
 
         fields.push(
             this.renderField('text', 'prefix', Identify.__('Prefix'), this.address_option.prefix_show)
         );
+        
         fields.push(
             this.renderField('text', 'firstname', Identify.__('First Name'), 'req')
         );
@@ -54,7 +77,7 @@ export default class AddressForm extends SimiComponent {
         fields.push(
             this.renderField('text', 'suffix', Identify.__('Suffix'), this.address_option.suffix_show)
         );
-        if (this.mode.includes('checkout') && !this.mode.includes('exist_customer')) {
+        if (this.mode.includes('checkout') && !this.mode.includes('exist_customer') && !this.mode.includes('new_customer_edit_shipping')) {
             fields.push(
                 this.renderField('email', 'email', Identify.__('Email'), 'req')
             );
@@ -62,16 +85,26 @@ export default class AddressForm extends SimiComponent {
         fields.push(
             this.renderField('text', 'company', Identify.__('Company'), this.address_option.company_show)
         );
+        if(Identify.getMerchantConfig().storeview.address_autocomplete && Identify.getMerchantConfig().storeview.address_autocomplete.enable == 1){
+            fields.push(
+                this.renderField('street_autocomplete', 'street', Identify.__('Street'), this.address_option.street_show)
+            );
+        } else {
+            fields.push(
+                this.renderField('text', 'street', Identify.__('Street'), this.address_option.street_show)
+            );
+        }
         fields.push(
-            this.renderField('text', 'street', Identify.__('Street'), this.address_option.street_show)
-        );
-        fields.push(
-            this.renderField('text', 'vat_id', Identify.__('VAT Number'), this.account_option.taxvat_show == '1' ? "opt" : "")
+            this.renderField('text', 'vat_id', Identify.__('VAT Number'), this.address_option.taxvat_show)
         );
         fields.push(
             this.renderField('text', 'city', Identify.__('City'), this.address_option.city_show)
         );
-        fields.push(<CountryStateField key={'country_state'} inputKey={'country_state'} parent={this} address={this.address} required={false}/>);
+        if (this.address_option.country_id_show !== "" || this.address_option.region_id_show !== "") {
+            fields.push(
+                <CountryStateField key={'country_state'} inputKey={'country_state'} parent={this} addressState={this.state.addressState} address={this.address} required={false} address_option={this.address_option} />
+            );
+        }
         // fields.push(
         //     this.renderField('select', 'country_id', Identify.__('Country'), this.address_option.country_id_show || "req", this.allowed_countries, 'country_name', 'country_code')
         // );
@@ -93,6 +126,7 @@ export default class AddressForm extends SimiComponent {
         fields.push(
             this.renderField('text', 'fax', Identify.__('Fax'), this.address_option.fax_show)
         );
+
         if (this.mode.includes('checkout')) {
             fields.push(
                 this.renderField('datetime', 'dob', Identify.__('Date of Birth'), this.address_option.dob_show)
@@ -105,12 +139,11 @@ export default class AddressForm extends SimiComponent {
                 this.renderField('select', 'gender', Identify.__('Gender'), this.address_option.gender_show, this.gender_value, 'label', 'value')
             );
             fields.push(
-                this.renderField('text', 'tax', Identify.__('Tax/VAT number'), this.address_option.taxvat_show)
+                this.renderField('text', 'tax', Identify.__('Tax/VAT number'), this.account_option.taxvat_show == '1' ? 'opt' : '')
             );
-
-            if (this.mode.includes('new_customer_add_new')) {
+            if (this.mode.includes('new_customer_add_new') || this.mode.includes('new_customer_edit_billing')) {
                 fields.push(
-                    this.renderField('password', 'password', Identify.__('Password'), "req")
+                    this.renderField('password', 'customer_password', Identify.__('Password'), "req")
                 );
                 fields.push(
                     this.renderField('password', 'confirm_password', Identify.__('Confirm Password'), "req")
@@ -122,7 +155,25 @@ export default class AddressForm extends SimiComponent {
             return element !== undefined;
         });
 
+        if (this.address_option.hasOwnProperty('custom_fields')) {
+            this.addCustomFields(fields);
+        }
+
         return fields;
+    }
+
+    addCustomFields(fields) {
+        this.address_option.custom_fields.forEach(element => {
+            if (element.type == 'single_option') {
+                fields.splice(parseInt(element.position) - 1, 0,
+                    this.renderField('select', element.code, Identify.__(element.title), element.required, element.option_array, 'label', 'value')
+                );
+            } else {
+                fields.splice(parseInt(element.position) - 1, 0,
+                    this.renderField('text', element.code, Identify.__(element.title), element.required)
+                );
+            }
+        });
     }
 
     renderField = (inputType = 'text', inputKey, inputTitle, show = 'req', pickerData = [], pickerKeyDisplay = '', pickerKeySave = '') => {
@@ -131,13 +182,28 @@ export default class AddressForm extends SimiComponent {
             if (show === 'req') {
                 required = true;
             }
+            let editable = false;
 
             let inputValue = undefined;
-            if(this.address.hasOwnProperty(inputKey)) {
+            if (this.address.hasOwnProperty(inputKey) && this.count < 4) {
                 inputValue = this.address[inputKey];
                 this.initData[inputKey] = inputValue;
+            } else {
+                if(inputKey == 'postcode') {
+                    this.initData['postcode'] = this.state.postcode;
+                    inputValue = this.state.postcode;
+                    // editable = true;
+                }
+                if(inputKey == 'city') {
+                    this.initData['city'] = this.state.city;
+                    inputValue = this.state.city;
+                    // editable = true;
+                }
+                if(inputKey == 'street') {
+                    this.initData['street'] = this.state.street;
+                    inputValue = this.state.street;
+                }
             }
-
             switch (inputType) {
                 case 'select':
                     return (
@@ -164,6 +230,18 @@ export default class AddressForm extends SimiComponent {
                             required={required}
                             parent={this} />
                     );
+                case 'street_autocomplete':
+                    return (
+                        <AutoCompleteInput
+                            key={inputKey}
+                            inputType={inputType}
+                            inputKey={inputKey}
+                            inputValue={inputValue}
+                            inputTitle={inputTitle}
+                            addData={this.addData}
+                            required={required}
+                            parent={this} />
+                    )
                 default:
                     return (
                         <FloatingInput
@@ -173,13 +251,16 @@ export default class AddressForm extends SimiComponent {
                             inputValue={inputValue}
                             inputTitle={inputTitle}
                             required={required}
-                            parent={this} />
+                            parent={this}
+                            disabled={editable} />
                     );
             }
         }
     };
 
     renderPhoneLayout() {
+        this.count = this.count + 1;
+        this.address = this.props.parent.state.address
         return (
             <SimiForm fields={this.createFields()}
                 parent={this}

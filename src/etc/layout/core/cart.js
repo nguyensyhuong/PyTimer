@@ -7,6 +7,12 @@ export default {
         },
     },
     content : {
+        default_estimate_shipping : {
+            active: true,
+            sort_order: 1,
+            content: require('@screens/checkout/components/estimateshipping').default,
+            left: true
+        },
         default_list : {
             active: true,
             sort_order: 1000,

@@ -13,7 +13,6 @@ export default StyleSheet.create({
         alignItems:'flex-start'
     },
     title: {
-        fontFamily: material.fontBold,
         marginRight: 15
     },
     header:{

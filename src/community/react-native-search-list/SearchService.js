@@ -13,26 +13,25 @@ export default class SearchService {
   static search(source, searchStr) {
     let tempResult = []
     source.forEach((item, idx, array) => {
-      if (item) {
-        // 全局匹配字符
-        if (item.searchStr) {
+      if (item.data) {
+        item.data.forEach(element => {
           let searchHandler = item.searchHandler
           let result = SearchService.generateMacherInto(
-            item.searchStr,
-            item,
+            element.searchStr,
+            element,
             searchStr,
             searchHandler ? searchHandler.translatedStr : '',
             searchHandler ? searchHandler.charIndexerArr : [])
           if (result.matcher) {
             tempResult.push(result)
           }
-        }
+        });
       }
     })
     return tempResult
   }
-  // FIXME 这个函数需要改造为一个字符串匹配多项
-  static generateMacherInto (source, item, inputLower, transStr, charIndexer) {
+
+  static generateMacherInto(source, item, inputLower, transStr, charIndexer) {
     let result = {}
     Object.assign(result, item)
     if (source) {
@@ -42,7 +41,7 @@ export default class SearchService {
         matcher.machStart = source.toLowerCase().indexOf(inputLower)
         matcher.machEnd = matcher.machStart + inputLower.length
 
-        matcher.matches.push({'start': matcher.machStart, 'end': matcher.machEnd})
+        matcher.matches.push({ 'start': matcher.machStart, 'end': matcher.machEnd })
         result.matcher = matcher
       } else {
         if (transStr && charIndexer) {
@@ -62,7 +61,7 @@ export default class SearchService {
                       find = true
                       matcher.machStart = startCharIndexer.index
                       matcher.machEnd = endCharIndexer.index + 1
-                      matcher.matches.push({'start': matcher.machStart, 'end': matcher.machEnd})
+                      matcher.matches.push({ 'start': matcher.machStart, 'end': matcher.machEnd })
                       result.matcher = matcher
                       break
                     }
@@ -82,7 +81,7 @@ export default class SearchService {
     return result
   }
 
-  static sortResultList (searchResultList, resultSortFunc) {
+  static sortResultList(searchResultList, resultSortFunc) {
     searchResultList.sort(resultSortFunc || function (a, b) {
       if (b.matcher && a.matcher) {
         if (b.matcher.machStart < a.matcher.machStart) {
@@ -96,20 +95,17 @@ export default class SearchService {
         return 0
       }
     })
-    let searchResultWithSection = {'': ''}
+    // let searchResultWithSection = { '': '' }
     const rowIds = [[]]
-    let tRows = rowIds[0]
-    searchResultList.forEach((result) => {
-      tRows.push(result.searchKey)
-      searchResultWithSection[':' + result.searchKey] = result
-    })
-    return {
-      searchResultWithSection,
-      rowIds
-    }
+    // let tRows = rowIds[0]
+    // searchResultList.forEach((result) => {
+    //   tRows.push(result.searchKey)
+    //   searchResultWithSection[':' + result.searchKey] = result
+    // })
+    return searchResultList;
   }
 
-  static generateSearchHandler (source) {
+  static generateSearchHandler(source) {
     let searchHandler = null
     if (containsChinese(source)) {
       searchHandler = {}
@@ -137,7 +133,7 @@ export default class SearchService {
     return searchHandler
   }
 
-  static parseList (srcList) {
+  static parseList(srcList) {
     let rowsWithSection = {}
     const sectionIDs = []
     const rowIds = [[]]
@@ -157,8 +153,8 @@ export default class SearchService {
     srcList.forEach((item) => {
       if (item) {
         // 加入到section
-        let orderIndex = item.orderIndex
-        if (!isCharacter(item.orderIndex)) {
+        let orderIndex = item.title
+        if (!isCharacter(item.title)) {
           orderIndex = '#'
         }
         if (!rowsWithSection[orderIndex]) {
@@ -193,7 +189,7 @@ export default class SearchService {
     }
   }
 
-  static initList (srcList) {
+  static initList(srcList) {
     srcList.forEach((item) => {
       if (item) {
         // 生成排序索引
@@ -233,7 +229,7 @@ export default class SearchService {
     return srcList
   }
 
-  static sortList (srcList, sortFunc) {
+  static sortList(srcList, sortFunc) {
     srcList.sort(sortFunc || function (a, b) {
       if (!isCharacter(b.orderIndex)) {
         return -1

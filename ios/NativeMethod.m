@@ -18,4 +18,19 @@ RCT_EXPORT_METHOD(openSetting)
   [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
 }
 
+RCT_EXPORT_METHOD(getDeviceID:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  resolve([[[UIDevice currentDevice] identifierForVendor] UUIDString]);
+}
+
+RCT_EXPORT_METHOD(registerNotification)
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+
+  [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+  
+  
+  [[UIApplication sharedApplication] registerForRemoteNotifications];
+  });
+}
+
 @end

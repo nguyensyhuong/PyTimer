@@ -1,28 +1,26 @@
 import React from 'react';
-import { Container } from "native-base";
 import { FlatList, ScrollView, View } from 'react-native';
 import { ListItem, Left, Right, Icon, Text, Button, Body, H3 } from "native-base";
-import { HeaderApp } from "../../../../base/components/layout/config";
-import Identify from '../../../../helper/Identify';
-import NavigationManager from '../../../../helper/NavigationManager';
+import Identify from '@helper/Identify';
+import NavigationManager from '@helper/NavigationManager';
 import styles from './styles';
-import SimiPageComponent from '../../../../base/components/SimiPageComponent';
+import SimiPageComponent from '@base/components/SimiPageComponent';
 import variable from '@theme/variables/material';
 
 class Filter extends SimiPageComponent {
 	constructor(props) {
 		super(props);
 		this.isPage = true;
-		this.parent = this.props.navigation.getParam("parent");
 		this.selected = this.props.navigation.getParam("filter");
-		this.title = Identify.__('Filter By');
+		this.onFilterAction = this.props.navigation.getParam("onFilterAction");
+
 	}
 
 	openSelection = (item) => {
 		NavigationManager.openPage(this.props.navigation, 'FilterSelection', {
-			parent: this.parent,
 			attribute: item,
-			seleted: this.selected.layer_state
+			seleted: this.selected.layer_state,
+			onFilterAction: this.onFilterAction
 		});
 	}
 
@@ -37,14 +35,14 @@ class Filter extends SimiPageComponent {
 				}
 			}
 
-			this.parent.onFilterAction(params);
+			this.onFilterAction(params);
 
 			NavigationManager.backToPreviousPage(this.props.navigation);
 		}
 	}
 
 	onClearFilter() {
-		this.parent.onFilterAction(null);
+		this.onFilterAction(null);
 		NavigationManager.backToPreviousPage(this.props.navigation);
 	}
 
@@ -60,8 +58,8 @@ class Filter extends SimiPageComponent {
 			<ListItem onPress={() => { this.onRemoveFilter(item) }}>
 				<Left>
 					<View style={styles.selectedContainer}>
-						<Text style={styles.itemText}>{item.title}:</Text>
-						<Text style={styles.selectedText}>{item.label}</Text>
+						<Text style={styles.itemText}>{Identify.__(item.title)}:</Text>
+						<Text style={styles.selectedText}>{Identify.__(item.label)}</Text>
 					</View>
 				</Left>
 				<Right>
@@ -79,37 +77,46 @@ class Filter extends SimiPageComponent {
 	}
 
 	renderItemSelection(item) {
-		return (
-			<ListItem onPress={() => { this.openSelection(item) }}>
-				<Left>
-					<Text style={styles.itemText}>{item.title}</Text>
-				</Left>
-				<Right>
-					<Icon name="ios-arrow-forward" />
-				</Right>
-			</ListItem>
-		);
+		if (item.filter && item.filter.length > 0) {
+			return (
+				<ListItem onPress={() => { this.openSelection(item) }}>
+					<Left>
+						<Text style={styles.itemText}>{Identify.__(item.title)}</Text>
+					</Left>
+					<Right>
+						<Icon name="ios-arrow-forward" />
+					</Right>
+				</ListItem>
+			);
+		} else {
+			return null;
+		}
+
 	}
 
 	renderPhoneLayout() {
 		return (
 			<ScrollView style={{ backgroundColor: variable.appBackground }}>
-				<H3 style={styles.title}>{Identify.__('ACTIVATED')}</H3>
-				<FlatList
-					{...this.createSelectedListProps()}
-					keyExtractor={(item) => item.attribute}
-					renderItem={({ item }) => this.renderItemSelected(item)} />
-				<Body style={styles.btnClearContainer}>
-					<Button bordered warning onPress={() => { this.onClearFilter() }}>
-						<Icon name='md-close' />
-						<Text>{Identify.__('Clear All')}</Text>
-					</Button>
-				</Body>
-				<H3 style={styles.title}>{Identify.__('SELECT A FILTER')}</H3>
-				<FlatList
-					{...this.createSelectionListProps()}
-					keyExtractor={(item) => item.attribute}
-					renderItem={({ item }) => this.renderItemSelection(item)} />
+				{this.selected.layer_state && this.selected.layer_state.length > 0 && <View>
+					<H3 style={styles.title}>{Identify.__('ACTIVATED')}</H3>
+					<FlatList
+						{...this.createSelectedListProps()}
+						keyExtractor={(item) => item.attribute}
+						renderItem={({ item }) => this.renderItemSelected(item)} />
+					<Body style={styles.btnClearContainer}>
+						<Button bordered warning onPress={() => { this.onClearFilter() }}>
+							<Icon name='md-close' />
+							<Text>{Identify.__('Clear All')}</Text>
+						</Button>
+					</Body>
+				</View>}
+				{this.selected.layer_filter && this.selected.layer_filter.length > 0 && <View>
+					<H3 style={styles.title}>{Identify.__('SELECT A FILTER')}</H3>
+					<FlatList
+						{...this.createSelectionListProps()}
+						keyExtractor={(item) => item.attribute}
+						renderItem={({ item }) => this.renderItemSelection(item)} />
+				</View>}
 			</ScrollView>
 		);
 	}

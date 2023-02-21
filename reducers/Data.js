@@ -27,9 +27,9 @@ const initialState = {
         type: 'none',
         style: {}
     },
-    popover_config:{
-        visible:false,
-        modalStackMode:'MyAccountStack'
+    popover_config: {
+        visible: false,
+        modalStackMode: 'MyAccountStack'
     },
     customPayment: null,
     showNotification: {
@@ -40,7 +40,8 @@ const initialState = {
     showUpdate: {
         show: false,
         urlApp: ''
-    }
+    },
+    currentURL: ''
 }
 
 export function redux_data(state = initialState, action) {
@@ -102,29 +103,13 @@ function processSingleAction(state, action) {
         case 'address_book_data':
             return { ...state, ...{ 'address_book_data': action.data } };
         case 'clear_all_data':
-            state.home_data = {};
-            state.home_spot_data = [];
-            state.category_data = [];
-            state.products_data = [];
-            state.product_details_data = [];
-            state.customer_data = {};
-            state.order_history_data = {};
-            state.order_review_data = {};
-            state.quoteitems = {};
-            state.orders_onepage = {};
-            state.address_book_data = {};
-            state.checkout_steps = {
-                selected_shipping_address: false,
-                selected_billing_address: false,
-                selected_payment_method: false,
-                selected_shipping_method: false,
-                selected_terms_and_conditions: false,
+            return {
+                ...initialState,
+                ...{ dashboard_configs: state.dashboard_configs },
+                ...{ merchant_configs: state.merchant_configs },
+                ...{ showLoading: state.showLoading },
+                ...{ customPayment: state.customPayment }
             };
-            state.selectedShippingAddress = null;
-            state.selectedBillingAddress = null;
-            state.useSameShippingAddress = true;
-            state.currentStepCheckout = 1;
-            return state;
         case 'clear_checkout_data':
             return {
                 ...state, ...{
@@ -171,9 +156,12 @@ function processSingleAction(state, action) {
         case 'notification_history_data':
             return { ...state, ...{ 'notification_history_data': action.data } };
         case 'showUpdate':
-            return { ...state, ...{ 'showUpdate' : action.data } };
+            return { ...state, ...{ 'showUpdate': action.data } };
+        case 'currentURL':
+            return { ...state, ...{ 'currentURL': action.data } };
         default:
-            state[action.type] = action.data;
-            return state;
+            let customData = {};
+            customData[action.type] = action.data;
+            return { ...state, ...customData };
     }
 }

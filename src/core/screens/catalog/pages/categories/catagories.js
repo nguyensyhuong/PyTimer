@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import { category } from '@helper/constants';
-import { Content } from "native-base";
+import { Content, Container } from "native-base";
 import Identify from '@helper/Identify';
 import SimiPageComponent from "@base/components/SimiPageComponent";
 import variable from '@theme/variables/material';
@@ -16,9 +16,13 @@ class Category extends SimiPageComponent {
         if (this.props.navigation.getParam("categoryName")) {
             this.cateName = this.props.navigation.getParam("categoryName");
         } else {
-            this.cateName = Identify.__('All Categories');
+            this.cateName = Identify.__('All categories');
         }
-        this.title = this.cateName;
+        this.isBack = this.props.navigation.state.params.hasOwnProperty("showBack") ? this.props.navigation.getParam("showBack") : true;
+        this.dataTracking = {
+            cat_name: this.cateName,
+            cat_id: this.cateId
+        };
     }
 
     componentWillMount() {
@@ -28,16 +32,18 @@ class Category extends SimiPageComponent {
     }
 
     componentDidMount() {
+        super.componentDidMount();
         if (!this.categoryData) {
-            Connection.restData();
-            Connection.setGetData({
-                limit: 100
-            });
+            let extendUrl = '';
             if (this.cateId !== -1) {
-                Connection.connect(category + '/' + this.cateId, this, 'GET');
-            } else {
-                Connection.connect(category, this, 'GET');
+                extendUrl = '/' + this.cateId;
             }
+            new NewConnection()
+                .init(category + extendUrl, 'get_category_data', this)
+                .addGetData({
+                    limit: 100
+                })
+                .connect();
         }
     }
     setData(data) {
@@ -63,7 +69,7 @@ class Category extends SimiPageComponent {
     }
 
     shouldShowComponent(element) {
-        if(element.id == 'default_catalog_products_list' && !this.showViewAll) {
+        if (element.id == 'default_catalog_products_list' && !this.showViewAll) {
             return false;
         }
         return true;
@@ -71,9 +77,13 @@ class Category extends SimiPageComponent {
 
     renderPhoneLayout() {
         return (
-            <Content style={{backgroundColor: variable.appBackground}}>
-                {this.renderLayoutFromConfig('catalog_layout', 'content')}
-            </Content>
+            <Container>
+                {this.renderLayoutFromConfig('catalog_layout', 'container')}
+                <Content style={{ backgroundColor: variable.appBackground }}>
+                    {this.renderLayoutFromConfig('catalog_layout', 'content')}
+                </Content>
+            </Container>
+
         );
     }
 }

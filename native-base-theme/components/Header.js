@@ -1,6 +1,7 @@
 import { PixelRatio, StatusBar } from "react-native";
 
 import variable from "./../variables/platform";
+import material from '@theme/variables/material';
 
 export default (variables = variable) => {
   const platformStyle = variables.platformStyle;
@@ -26,14 +27,14 @@ export default (variables = variable) => {
       "NativeBase.Body": {
         "NativeBase.Title": {
           fontSize: variables.titleFontSize - 2,
-          fontFamily: variables.titleFontfamily,
+          fontFamily: material.fontBold,
           textAlign: "center",
           fontWeight: "500",
           paddingBottom: 3
         },
         "NativeBase.Subtitle": {
           fontSize: variables.subTitleFontSize,
-          fontFamily: variables.titleFontfamily,
+          fontFamily: material.fontBold,
           color: variables.subtitleColor,
           textAlign: "center"
         }

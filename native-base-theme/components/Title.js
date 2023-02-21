@@ -1,11 +1,12 @@
 import { Platform } from "react-native";
 
 import variable from "./../variables/platform";
+import material from '@theme/variables/material';
 
 export default (variables = variable) => {
   const titleTheme = {
     fontSize: variables.titleFontSize,
-    fontFamily: variables.titleFontfamily,
+    fontFamily: material.fontBold,
     color: variables.titleFontColor,
     fontWeight: Platform.OS === "ios" ? "700" : undefined,
     textAlign: "center",

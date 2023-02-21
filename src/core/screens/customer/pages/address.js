@@ -1,24 +1,25 @@
 import React from 'React';
 import SimiPageComponent from '@base/components/SimiPageComponent';
 import { connect } from 'react-redux';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 import { Container, Content } from 'native-base';
-import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import NavigationManager from '@helper/NavigationManager';
 import variable from '@theme/variables/material';
 import { addresses, address_detail_mode, checkout_mode } from "@helper/constants";
+import Identify from "@helper/Identify";
 
 class AddressDetailPage extends SimiPageComponent {
 
     constructor(props) {
         super(props);
         this.mode = this.props.navigation.getParam('mode');
-        this.address = this.props.navigation.getParam('address') ? this.props.navigation.getParam('address') : {};
         this.onSaveShippingAddress = this.props.navigation.getParam('onSaveShippingAddress');
         this.onSaveBillingAddress = this.props.navigation.getParam('onSaveBillingAddress');
+        this.countryStateData = {};
         this.state = {
             ...this.state,
-            buttonEnabled: Object.keys(this.address).length == 0 ? false : true
+            address: this.props.navigation.getParam('address') ? this.props.navigation.getParam('address') : {}
         };
         if (this.mode.includes('checkout')) {
             this.isRight = false;
@@ -26,31 +27,33 @@ class AddressDetailPage extends SimiPageComponent {
     }
 
     updateButtonStatus(status) {
-        if (status != this.state.buttonEnabled) {
-            this.setState({ buttonEnabled: status });
+        if (this.button) {
+            this.button.updateButtonStatus(status);
         }
     }
 
     editNewAddress = () => {
         this.addressData = this.form.getAddressData();
         let countryStateData = this.addressData.country_state;
-        delete this.addressData.country_state;
         this.addressData = {
+            ...this.state.address,
             ...this.addressData,
             ...countryStateData
         }
+        delete this.addressData.country_state;
 
         if (this.mode.includes('checkout')) {
             if (this.mode.includes('add_new')) {
                 if (this.mode.includes('exist_customer')) {
                     this.props.storeData('showLoading', { type: 'dialog' });
-                    Connection.restData();
-                    Connection.setBodyData(this.addressData);
-                    Connection.connect(addresses, this, 'POST');
+                    new NewConnection()
+                        .init(addresses, 'add_new_address_checkout', this, 'POST')
+                        .addBodyData(this.addressData)
+                        .connect();
                 } else {
-                    if (this.addressData.password !== this.addressData.confirm_password) {
+                    if (this.addressData.customer_password !== this.addressData.confirm_password) {
                         Alert.alert(
-                            'Error',
+                            Identify.__('Error'),
                             Identify.__('Password and Confirm password don\'t match'),
                         );
                         return;
@@ -83,20 +86,22 @@ class AddressDetailPage extends SimiPageComponent {
         } else {
             this.props.storeData('showLoading', { type: 'dialog' });
             if (this.mode == address_detail_mode.normal.edit) {
-                Connection.restData();
-                Connection.setBodyData(this.addressData);
-                Connection.connect(addresses, this, 'PUT');
+                new NewConnection()
+                    .init(addresses, 'edit_address', this, 'POST')
+                    .addBodyData(this.addressData)
+                    .connect();
             } else if (this.mode == address_detail_mode.normal.add_new) {
-                Connection.restData();
-                Connection.setBodyData(this.addressData);
-                Connection.connect(addresses, this, 'POST');
+                new NewConnection()
+                    .init(addresses, 'add_new_address_normal', this, 'POST')
+                    .addBodyData(this.addressData)
+                    .connect();
             }
         }
     }
 
-    setData(data) {
+    setData(data, requestID) {
         this.props.storeData('actions', [
-            { type: 'showLoading', data: { type: 'none' } }, 
+            { type: 'showLoading', data: { type: 'none' } },
             { type: 'address_book_data', data: undefined }
         ]);
         if (this.mode == address_detail_mode.checkout.exist_customer.add_new) {
@@ -114,7 +119,7 @@ class AddressDetailPage extends SimiPageComponent {
             //     }
             // } else {
 
-                NavigationManager.backToPreviousPage(this.props.navigation);
+            NavigationManager.backToPreviousPage(this.props.navigation);
             // }
         }
     }
@@ -123,6 +128,8 @@ class AddressDetailPage extends SimiPageComponent {
         switch (id) {
             case 'default_address_form':
                 return ref => (this.form = ref);
+            case 'default_address_button':
+                return ref => (this.button = ref);
             default:
                 return undefined;
         }
@@ -136,7 +143,7 @@ class AddressDetailPage extends SimiPageComponent {
 
     renderPhoneLayout() {
         return (
-            <Container style={{backgroundColor: variable.appBackground}}>
+            <Container style={{ backgroundColor: variable.appBackground }}>
                 <Content>
                     <View style={{ flex: 1, paddingLeft: 15, paddingRight: 15, paddingTop: 15, paddingBottom: 80 }}>
                         {this.renderLayoutFromConfig('address_layout', 'content')}

@@ -1,6 +1,7 @@
 import React from 'react';
 import Identify from "@helper/Identify";
 import { Text, View, Toast } from 'native-base';
+import material from "../../../../../../../native-base-theme/variables/material";
 
 class OptionAbstract extends React.Component {
     constructor(props) {
@@ -107,9 +108,10 @@ class OptionAbstract extends React.Component {
         }
         if (!check) {
             Toast.show({
-                text: 'Please select the options required (*)',
+                text: Identify.__('Please select the options required') + ' (*)',
                 type: "danger",
-                duration: 3000
+                duration: 3000,
+                textStyle: {fontFamily: material.fontFamily}
             });
         }
         return check;

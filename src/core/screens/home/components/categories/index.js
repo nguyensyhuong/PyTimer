@@ -2,20 +2,29 @@ import React from 'react';
 import NavigationManager from '@helper/NavigationManager';
 import Identify from '@helper/Identify';
 import styles from './styles';
-import { Image, FlatList, TouchableOpacity} from 'react-native';
-import {View,Text,H3} from 'native-base';
+import { Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, H3 } from 'native-base';
 import { connect } from 'react-redux';
 import Events from '@helper/config/events';
+import material from '@theme/variables/material';
 
 class Categories extends React.Component {
-    tracking(item){
+
+    constructor(props) {
+        super(props);
+        this.listCategories = this.props.data;
+        this.listCategories.sort(function (a, b) {
+            return parseInt(a.sort_order) - parseInt(b.sort_order);
+        });
+    }
+
+    tracking(item) {
         let data = {};
         data['event'] = 'home_action';
         data['action'] = 'selected_category';
         data['category_id'] = item.category_id;
         data['category_name'] = item.cat_name;
         Events.dispatchEventAction(data, this);
-
     }
     onClickCategory(item) {
 
@@ -33,28 +42,30 @@ class Categories extends React.Component {
             };
         }
         this.tracking(item);
-        NavigationManager.openRootPage(this.props.navigation, routeName, params);
+        NavigationManager.openPage(this.props.navigation, routeName, params);
     }
-    renderCategoriesItem(item){
-        return(
+    renderCategoriesItem(item) {
+        return (
             <TouchableOpacity onPress={() => { this.onClickCategory(item) }}>
                 <View style={styles.listItem}>
-                    <Image resizeMode='center' source={{ uri: item.simicategory_filename }} style={styles.imageListItem} />
+                    <View style={[styles.imageListItem, { borderColor: material.imageBorderColor, borderWidth: 0.5, justifyContent: 'center', alignItems: 'center' }]}>
+                        {item.simicategory_filename  ? <Image resizeMode='contain' source={{ uri: item.simicategory_filename }} style={{ width: '100%', aspectRatio: item.width/item.height }} />: null}
+                    </View>
                     <Text style={styles.textListItem}>{item.cat_name}</Text>
                 </View>
             </TouchableOpacity>
         )
     }
-    generatePropsFlatlist(){
+    generatePropsFlatlist() {
         return {
             style: styles.list,
-            data: this.props.data,
+            data: this.listCategories,
             horizontal: true,
             showsHorizontalScrollIndicator: false
         }
     }
-    render(){
-        if (!this.props.data || Identify.isEmpty(this.props.data)) {
+    render() {
+        if (!this.listCategories || Identify.isEmpty(this.listCategories)) {
             return (
                 <View />
             );

@@ -18,10 +18,15 @@ export default {
             sort_order: 3000,
             content: require('../../../core/screens/customer/components/login/loginbutton').default
         },
+        default_forgot_password:{
+            active: true,
+            sort_order: 5000,
+            content: require('../../../core/screens/customer/components/login/forgotPass').default
+        },
         default_register_button: {
             active: true,
-            sort_order: 4000,
+            sort_order: 8000,
             content: require('../../../core/screens/customer/components/login/registerbutton').default
-        },
+        }
     }
 }

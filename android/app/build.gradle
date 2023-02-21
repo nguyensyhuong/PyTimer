@@ -1,14 +1,20 @@
 buildscript {
     repositories {
-        maven { url 'https://maven.fabric.io/public' }
+        // maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        // classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.1, 0.99.99]'
     }
 }
 apply plugin: "com.android.application"
-apply plugin: 'io.fabric'
+// apply plugin: 'io.fabric'
 
 import com.android.build.OutputFile
 
@@ -83,10 +89,13 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "index.js",
+    enableHermes: false,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
+
+apply from: "../../node_modules/@sentry/react-native/sentry.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -103,20 +112,48 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
+/**
+ * The preferred build flavor of JavaScriptCore.
+ *
+ * For example, to use the international variant, you can use:
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ *
+ * The international variant includes ICU i18n library and necessary data
+ * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
+ * give correct results when using with locales other than en-US.  Note that
+ * this variant is about 6MiB larger per architecture than default.
+ */
+def jscFlavor = 'org.webkit:android-jsc:+'
+/**
+ * Whether to enable the Hermes VM.
+ *
+ * This should be set on project.ext.react and mirrored here.  If it is not set
+ * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
+ * and the benefits of using Hermes will therefore be sharply reduced.
+ */
+def enableHermes = project.ext.react.get("enableHermes", false);
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
-        applicationId "com.simicart"
+        applicationId "com.pytimberwarehouse.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
+        versionCode 8
+        versionName "0.1.6"
+        // ndk {
+        //     abiFilters "armeabi-v7a", "x86"
+        // }
         multiDexEnabled true
+        ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
+        missingDimensionStrategy 'react-native-camera', 'mlkit'
     }
     signingConfigs {
         release {
@@ -133,7 +170,8 @@ android {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            // include "armeabi-v7a", "x86"
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
     buildTypes {
@@ -151,7 +189,8 @@ android {
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            // def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
@@ -159,55 +198,83 @@ android {
             }
         }
     }
+
+    packagingOptions {
+        pickFirst '**/armeabi-v7a/libc++_shared.so'
+        pickFirst '**/x86/libc++_shared.so'
+        pickFirst '**/arm64-v8a/libc++_shared.so'
+        pickFirst '**/x86_64/libc++_shared.so'
+        pickFirst '**/x86/libjsc.so'
+        pickFirst '**/armeabi-v7a/libjsc.so'
+    }
 }
 
 
 
 dependencies {
-    compile project(':react-native-fbsdk')
-    compile project(':react-native-image-picker')
-    implementation project(':react-native-mixpanel')
-    implementation project(':react-native-fabric')
-    implementation project(':react-native-camera')
-    implementation project(':react-native-voice')
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation project(':react-native-youtube')
-    implementation project(':react-native-video')
-
-    //implementation project(':react-native-firebase')
-    implementation(project(":react-native-firebase")) {
-        transitive = false
-    }
+    implementation project(':@react-native-community_voice')
+    implementation project(':react-native-device-info')
+    implementation project(':@react-native-community_cookies')
+    implementation project(':react-native-image-picker')
     implementation project(':react-native-restart')
+    implementation project(':react-native-webview')
+    implementation project(':@react-native-community_geolocation')
+    implementation project(':react-native-awesome-card-io')
+    implementation project(':@react-native-community_netinfo')
+    implementation project(':react-native-splash-screen')
     implementation project(':react-native-vector-icons')
+    implementation project(':react-native-screens')
+    implementation project(':react-native-reanimated')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':@react-native-community_async-storage')
+    implementation project(':react-native-fbsdk-next')
+    implementation project(':@sentry_react-native')
+    implementation project(':react-native-onesignal')
+    // implementation 'com.facebook.fresco:animated-gif:1.9.0'
+    implementation 'com.android.support:multidex:1.0.3'
+    // implementation(project(":react-native-firebase"))
+
+    implementation project(':react-native-firebase')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     //implementation project(':react-native-maps')
-    implementation(project(':react-native-maps')){
-        exclude group: 'com.google.android.gms', module: 'play-services-base'
-        exclude group: 'com.google.android.gms', module: 'play-services-maps'
-    }
-    implementation 'com.google.android.gms:play-services-base:15.0.1'
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    // implementation "me.leolin:ShortcutBadger:1.1.22@aar"
+    implementation 'com.google.android.gms:play-services-base:17.1.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
-    implementation "com.google.firebase:firebase-core:16.0.3"
-    implementation "com.google.firebase:firebase-messaging:17.3.1"
-
-    implementation "com.google.firebase:firebase-database:16.0.2"
-    implementation "com.google.firebase:firebase-auth:16.0.3"
-    implementation "com.google.firebase:firebase-ads:15.0.1"
-    implementation "com.google.firebase:firebase-analytics:16.0.3"
-    implementation "com.google.firebase:firebase-appindexing:16.0.1"
-    implementation "com.google.firebase:firebase-firestore:17.1.0"
-    implementation "com.google.firebase:firebase-functions:16.1.0"
-    implementation "com.google.firebase:firebase-storage:16.0.2"
-    implementation "com.google.firebase:firebase-invites:16.0.3"
+    implementation "com.google.firebase:firebase-core:17.2.0"
+    implementation "com.google.firebase:firebase-messaging:20.0.0"
+    implementation "com.google.firebase:firebase-appindexing:19.0.0"
+    implementation "com.google.firebase:firebase-analytics:17.2.0"
 
     // library for facebook
-    implementation 'com.facebook.android:facebook-core:4.34.0'
-    implementation 'com.facebook.android:facebook-login:4.34.0'
-    implementation 'com.facebook.android:facebook-share:4.34.0'
+    implementation 'com.facebook.android:facebook-core:12.1.0'
+    implementation 'com.facebook.android:facebook-login:12.1.0'
+    implementation 'com.facebook.android:facebook-share:12.1.0'
+    
+    compile 'com.facebook.fresco:fresco:1.+'
+
+    // For animated GIF support
+    compile 'com.facebook.fresco:animated-gif:1.+'
+
+    // For WebP support, including animated WebP
+    compile 'com.facebook.fresco:animated-webp:1.+'
+    compile 'com.facebook.fresco:webpsupport:1.+'
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
+        transitive = true;
+    }
+
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+
+    if (enableHermes) {
+      def hermesPath = "../../node_modules/hermes-engine/android/";
+      debugImplementation files(hermesPath + "hermes-debug.aar")
+      releaseImplementation files(hermesPath + "hermes-release.aar")
+    } else {
+      implementation jscFlavor
+    }
 
 }
 
@@ -218,5 +285,10 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
 apply plugin: 'com.google.gms.google-services'
-com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+
+googleServices { disableVersionCheck = true }
+
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'

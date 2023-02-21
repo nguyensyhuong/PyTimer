@@ -1,4 +1,5 @@
 import { products } from '../../../core/helper/constants';
+import Device from '@helper/device';
 
 export default {
     container : {
@@ -17,7 +18,7 @@ export default {
             data: {
                 api: products,
                 param: {
-                    limit : 10,
+                    limit : Device.isTablet() ? 16 : 10,
                     offset: 0,
                 },
                 type: {

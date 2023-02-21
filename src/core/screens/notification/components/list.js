@@ -5,29 +5,30 @@ import { Text } from 'native-base';
 import Identify from '@helper/Identify';
 import NotificationItem from './item';
 
-export default class NotificationList extends SimiComponent {
-    generatePropsToFlatlist(){
+const NotificationList = (props) => {
+
+    function generatePropsToFlatlist() {
         return {
-            style: {marginLeft: 10, marginRight: 10},
-            data : this.props.notifications,
-            extraData: this.props.parent.props.data,
-            showsVerticalScrollIndicator : false
+            style: { marginLeft: 10, marginRight: 10 },
+            data:  props.notifications,
+            extraData:  props.parent.props.data,
+            showsVerticalScrollIndicator: false
         }
     }
-    renderPhoneLayout() {
-        if(this.props.notifications.length == 0) {
-            return(
-                <Text style={{ textAlign: 'center', marginTop: 90 }}>{Identify.__('You have not received any notifications')}</Text>
-            );
-        }
+    if ( props.notifications.length == 0) {
         return (
-            <FlatList
-                {...this.generatePropsToFlatlist()}
-                keyExtractor={(item) => item.notice_id}
-                renderItem={({ item }) =>
-                    <NotificationItem notification={item} parent={this.props.parent}/>
-                }
-            />
+            <Text style={{ textAlign: 'center', marginTop: 90 }}>{Identify.__('You have not received any notifications')}</Text>
         );
     }
+    return (
+        <FlatList
+            {... generatePropsToFlatlist()}
+            keyExtractor={(item) => item.notice_id}
+            renderItem={({ item }) =>
+                <NotificationItem notification={item} parent={ props.parent} />
+            }
+        />
+    );
 }
+
+export default NotificationList

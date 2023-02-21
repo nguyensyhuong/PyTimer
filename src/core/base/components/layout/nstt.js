@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text} from 'native-base';
-import {NetInfo} from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
 import {styles} from './style';
 
 class NetWorkStt extends React.Component {

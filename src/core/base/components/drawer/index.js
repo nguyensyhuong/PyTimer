@@ -1,11 +1,12 @@
 import React from 'react';
-import { Container, List } from "native-base";
+import { StyleProvider, Container, List } from "native-base";
 import { routes, routes_login } from '../../../../../router/config';
 import Identify from '@helper/Identify';
 import { connect } from 'react-redux';
 import variable from '@theme/variables/material';
 import Events from '@helper/config/events';
 import Item from './item';
+import getTheme from '@theme/components/index';
 
 class Drawer extends React.Component {
 
@@ -27,7 +28,7 @@ class Drawer extends React.Component {
 
         let activeItems = [];
         items.forEach(element => {
-            if (element.active == true && !this.checkDisableItem(element.key)) {
+            if (element.active == true && !this.checkDisableItem(element.key) && (!element.hasOwnProperty('shouldDisplay') || element.shouldDisplay())) {
                 activeItems.push(element);
             }
         });
@@ -41,7 +42,7 @@ class Drawer extends React.Component {
 
     checkDisableItem(key) {
         let plugins = Events.events.menu_left_disable_items;
-        if(plugins.indexOf(key) >= 0) {
+        if (plugins.indexOf(key) >= 0) {
             return true;
         }
         return false;
@@ -49,8 +50,19 @@ class Drawer extends React.Component {
 
     addCms() {
         let cmsItems = [];
-        let cmsList = this.props.merchant_configs.storeview.cms.cmspages;
+        let cmsList = null;
+        if (this.props.merchant_configs.storeview && this.props.merchant_configs.storeview.cms.cmspages) {
+            cmsList = this.props.merchant_configs.storeview.cms.cmspages;
+        }
+
         if (cmsList) {
+            cmsList.sort(function(a, b){
+                var keyA = a.sort_order,
+                    keyB = b.sort_order;
+                if(keyA < keyB) return -1;
+                if(keyA > keyB) return 1;
+                return 0;
+            });
             cmsList.forEach(element => {
                 cmsItems.push({
                     active: true,
@@ -60,7 +72,7 @@ class Drawer extends React.Component {
                         html: element.cms_content
                     },
                     label: element.cms_title,
-                    image: element.cms_image,
+                    image: element.cms_image ? { uri: element.cms_image } : {},
                     is_extend: false,
                     is_more: false,
                     position: 701 + cmsList.indexOf(element)
@@ -76,8 +88,15 @@ class Drawer extends React.Component {
         if (plugins) {
             for (let i = 0; i < plugins.length; i++) {
                 let item = plugins[i];
-                if ((item.active == true && (item.require_logged_in == false || item.hasOwnProperty('require_logged_in') == false))
-                    || (item.require_logged_in == true && !Identify.isEmpty(this.props.customer_data))) {
+                let passRequireLogin = true;
+                if (item.hasOwnProperty('require_logged_in') && item.require_logged_in == true && Identify.isEmpty(this.props.customer_data)) {
+                    passRequireLogin = false;
+                }
+                let passAdditionalCondition = true;
+                if (item.hasOwnProperty('add_condition') && item.add_condition() == false) {
+                    passAdditionalCondition = false;
+                }
+                if (item.active && passRequireLogin && passAdditionalCondition) {
                     items.push(item);
                 }
             }
@@ -91,16 +110,18 @@ class Drawer extends React.Component {
         }
         let items = this.initData();
         return (
-            <Container style={{ backgroundColor: variable.menuLeftColor, paddingTop: 30 }}>
-                <List
-                    dataArray={items}
-                    renderRow={data => {
-                        return (
-                            <Item data={data} navigation={this.props.navigation} />
-                        );
-                    }}
-                />
-            </Container>
+            <StyleProvider style={getTheme(variable)}>
+                <Container style={{ backgroundColor: variable.menuLeftColor, paddingTop: 30 }}>
+                    <List
+                        dataArray={items}
+                        renderRow={data => {
+                            return (
+                                <Item data={data} navigation={this.props.navigation} />
+                            );
+                        }}
+                    />
+                </Container>
+            </StyleProvider>
         );
     }
 

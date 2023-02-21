@@ -4,8 +4,8 @@ import { ListItem, Left, Right, Icon, Text } from "native-base";
 import NavigationManager from '../../../../helper/NavigationManager';
 import Identify from '@helper/Identify';
 
-class CategoriesItem extends SimiComponent{
-    openCategory = (category) => {
+const CategoriesItem = (props) => {
+    function openCategory(category) {
         if (category.has_children) {
             routeName = 'Category',
                 params = {
@@ -20,21 +20,21 @@ class CategoriesItem extends SimiComponent{
                     categoryName: category.name,
                 };
         }
-        NavigationManager.openPage(this.props.navigation, routeName, params);
+        NavigationManager.openPage(props.navigation, routeName, params);
         // comment
     };
-    render(){
-        let item = this.props.item;
-        return(
-            <ListItem onPress={() => { this.openCategory(item) }}>
-                <Left>
-                    <Text>{item.name}</Text>
-                </Left>
-                <Right>
-                    <Icon name={Identify.isRtl() ? 'ios-arrow-back' : "ios-arrow-forward"} />
-                </Right>
-            </ListItem>
-        )
-    }
+
+    let item = props.item;
+    return (
+        <ListItem onPress={() => { openCategory(item) }}>
+            <Left>
+                <Text>{item.name}</Text>
+            </Left>
+            <Right>
+                <Icon name={Identify.isRtl() ? 'ios-arrow-back' : "ios-arrow-forward"} color="red" />
+            </Right>
+        </ListItem>
+    )
+
 }
 export default CategoriesItem;

@@ -3,10 +3,10 @@ import SimiComponent from '@base/components/SimiComponent';
 import { Card, CardItem, Text, H3 } from 'native-base';
 import Identify from '@helper/Identify';
 import styles from './detailStyles';
+import material from '@theme/variables/material';
 
-export default class OrderBilling extends SimiComponent {
-
-    renderName(item) {
+const OrderBilling = (props) => {
+    function renderName(item) {
         let name = '';
         if (item.prefix !== undefined && item.prefix !== null && item.prefix !== '') {
             name += item.prefix + ' ';
@@ -26,7 +26,7 @@ export default class OrderBilling extends SimiComponent {
         return name;
     }
 
-    renderCompany(item) {
+    function renderCompany(item) {
         let company = '';
         if (item.company !== undefined && item.company !== null && item.company !== '') {
             company = item.company
@@ -34,7 +34,7 @@ export default class OrderBilling extends SimiComponent {
         return company;
     }
 
-    renderStreet(item) {
+    function renderStreet(item) {
         let street = '';
         if (item.street !== undefined && item.street !== null && item.street !== '') {
             street = item.street
@@ -42,21 +42,21 @@ export default class OrderBilling extends SimiComponent {
         return street;
     }
 
-    renderCityStatePostCode(item) {
+    function renderCityStatePostCode(item) {
         let info = '';
         if (item.city !== undefined && item.city !== null && item.city !== '') {
-            info = item.city + ', ';
+            info += item.city + ', ';
         }
         if (item.region !== undefined && item.region !== null && item.region !== '') {
-            info = item.region + ', ';
+            info += item.region + ', ';
         }
         if (item.postcode !== undefined && item.postcode !== null && item.postcode !== '') {
-            info = item.postcode;
+            info += item.postcode;
         }
         return info;
     }
 
-    renderCountry(item) {
+    function renderCountry(item) {
         let country = '';
         if (item.country_name !== undefined && item.country_name !== null && item.country_name !== '') {
             country = item.country_name;
@@ -64,7 +64,7 @@ export default class OrderBilling extends SimiComponent {
         return country;
     }
 
-    renderPhone(item) {
+    function renderPhone(item) {
         let telephone = '';
         if (item.telephone !== undefined && item.telephone !== null && item.telephone !== '') {
             telephone = item.telephone;
@@ -72,7 +72,7 @@ export default class OrderBilling extends SimiComponent {
         return telephone;
     }
 
-    renderEmail(item) {
+    function renderEmail(item) {
         let email = '';
         if (item.email !== undefined && item.email !== null && item.email !== '') {
             email = item.email;
@@ -80,31 +80,32 @@ export default class OrderBilling extends SimiComponent {
         return email;
     }
 
-    renderPhoneLayout() {
-        let address = this.props.order.billing_address;
-        let couponCode = 'None';
-        if (this.props.order.coupon_code !== undefined && this.props.order.coupon_code !== null && this.props.order.coupon_code !== '') {
-            couponCode = this.props.order.coupon_code;
-        }
-        return (
-            <Card style={{ flex: 1 }} key={'payment'}>
-                <H3 style={{ width: '100%', backgroundColor: '#EDEDED', paddingLeft: 15, paddingRight: 10, paddingTop: 10, paddingBottom: 10 }}>{Identify.__('PAYMENT')}</H3>
-                <CardItem>
-                    <Text style={styles.title}>{Identify.__(this.props.order.payment_method)}</Text>
-                </CardItem>
-                <CardItem style={styles.address}>
-                    <Text>{this.renderName(address)}</Text>
-                    <Text>{this.renderCompany(address)}</Text>
-                    <Text>{this.renderStreet(address)}</Text>
-                    <Text>{this.renderCityStatePostCode(address)}</Text>
-                    <Text>{this.renderCountry(address)}</Text>
-                    <Text>{this.renderPhone(address)}</Text>
-                    <Text>{this.renderEmail(address)}</Text>
-                </CardItem>
-                <CardItem>
-                    <Text style={styles.title}>{Identify.__('Coupon code') + ': ' + couponCode}</Text>
-                </CardItem>
-            </Card>
-        );
+    let address =  props.order.billing_address;
+    let couponCode = Identify.__('None');
+    if ( props.order.coupon_code !== undefined &&  props.order.coupon_code !== null &&  props.order.coupon_code !== '') {
+        couponCode =  props.order.coupon_code;
     }
+
+    return (
+        <Card style={{ flex: 1 }} key={'payment'}>
+            <H3 style={{ width: '100%', backgroundColor: '#EDEDED', paddingLeft: 15, paddingRight: 10, paddingTop: 10, paddingBottom: 10, textAlign: 'left' }}>{Identify.__('Payment').toUpperCase()}</H3>
+            <CardItem>
+                <Text style={[styles.title,{fontFamily: material.fontBold}]}>{Identify.__( props.order.payment_method)}</Text>
+            </CardItem>
+            <CardItem style={styles.address}>
+                <Text>{ renderName(address)}</Text>
+                <Text>{ renderCompany(address)}</Text>
+                <Text>{ renderStreet(address)}</Text>
+                <Text>{ renderCityStatePostCode(address)}</Text>
+                <Text>{ renderCountry(address)}</Text>
+                <Text>{ renderPhone(address)}</Text>
+                <Text>{ renderEmail(address)}</Text>
+            </CardItem>
+            <CardItem>
+                <Text style={styles.title}>{Identify.__('Coupon code') + ': ' + couponCode}</Text>
+            </CardItem>
+        </Card>
+    );
 }
+
+export default OrderBilling;

@@ -119,7 +119,7 @@ export default {
   datePickerBg: "transparent",
 
   // Font
-  DefaultFontSize: 16,
+  DefaultFontSize: 14,
   fontFamily: platform === "ios" ? "System" : "Roboto",
   fontSizeBase: 15,
   get fontSizeH1() {

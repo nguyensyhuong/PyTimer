@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import material from '../../../../../../native-base-theme/variables/material';
-import Device from '../../../../../core/helper/device';
+import material from '@theme/variables/material';
+
 export default StyleSheet.create({
     list: {
         marginLeft: scale(15),
@@ -16,11 +16,11 @@ export default StyleSheet.create({
     imageListItem: {
         width: scale(130),
         aspectRatio: 1,
+        overflow: 'hidden'
     },
     outOfStock: {
         position: 'absolute',
         bottom: 0,
-        right: 0,
         backgroundColor: 'red',
         color: 'white',
         padding: 5,
@@ -41,8 +41,6 @@ export default StyleSheet.create({
         paddingBottom: 10
     },
     title: {
-        fontFamily: material.fontBold,
-        fontSize: material.textSizeBigger,
         marginBottom: 5,
     }
 })

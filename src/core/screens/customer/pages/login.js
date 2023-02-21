@@ -1,12 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import SimiPageComponent from '../../../base/components/SimiPageComponent';
-import { Content, Container } from 'native-base';
-import { customer_login, quoteitems, address_book_mode } from '../../../helper/constants';
-import AppStorage from '../../../helper/storage';
+import SimiPageComponent from '@base/components/SimiPageComponent';
+import { Container, Toast, View } from 'native-base';
+import { Platform, ScrollView } from 'react-native';
+import { customer_login, quoteitems, address_book_mode, devices } from '@helper/constants';
+import AppStorage from '@helper/storage';
 import Connection from '@base/network/Connection';
-import NavigationManager from '../../../helper/NavigationManager';
-import variable from '@theme/variables/material';
+import NewConnection from '@base/network/NewConnection';
+import NavigationManager from '@helper/NavigationManager';
+import simicart from '@helper/simicart';
+import Device from '@helper/device';
+import Identify from '@helper/Identify';
+import Events from '@helper/config/events';
+import SplashScreen from 'react-native-splash-screen'
+import material from "@theme/variables/material";
+import { requestTrackingPermission, getTrackingStatus } from 'react-native-tracking-transparency';
 
 class LoginPage extends SimiPageComponent {
 
@@ -18,50 +26,101 @@ class LoginPage extends SimiPageComponent {
             rememberMeEnable: false
         };
         this.isCheckout = this.props.navigation.getParam('isCheckout') ? this.props.navigation.getParam('isCheckout') : false;
-        this.shouldGetQuoteItems = false;
+        this.callback = this.props.navigation.getParam('callback') ? this.props.navigation.getParam('callback') : undefined;
         this.customerData = null;
         this.loginData = {};
+        this.isMenu = false;
+        this.dispatchSplashCompleted();
+    }
+
+    dispatchSplashCompleted() {
+        if (Identify.getMerchantConfig().storeview.base.force_login && Identify.getMerchantConfig().storeview.base.force_login == '1') {
+            this.isRight = false;
+            this.isBack = false;
+            this.isMenu = false;
+        }
+
+        for (let i = 0; i < Events.events.splash_completed.length; i++) {
+            let node = Events.events.splash_completed[i];
+            if (node.force_login && node.force_login === true) {
+                this.isRight = false;
+                this.isBack = false;
+                this.isMenu = false;
+            }
+        }
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        setTimeout(() => {
+            SplashScreen.hide();
+        }, 1000);
     }
 
     startLogin = () => {
         try {
             AppStorage.removeAllSavedInfo();
             Connection.setCustomer(null);
+            Identify.setCustomerParams(null);
             this.loginData = this.form.getLoginData();
             this.props.storeData('showLoading', { type: 'dialog' });
-            Connection.restData();
-            Connection.setGetData(this.loginData);
-            Connection.connect(customer_login, this, 'GET');
+            new NewConnection()
+                .init(customer_login, 'customer_login', this)
+                .addGetData(this.loginData)
+                .connect();
         } catch (e) {
             console.log(e.message);
         }
     }
 
-    setData(data) {
-        this.props.clearData();
-        if (!this.shouldGetQuoteItems) {
+    setData(data, requestID) {
+        if (requestID == 'customer_login') {
+            this.props.clearData();
             this.customerData = data;
             this.saveCustomerData();
-            this.shouldGetQuoteItems = true;
             this.getQuoteItems();
-        } else {
+            this.tracking();
+            AppStorage.saveData('quote_id', '');
+        } else if (requestID == 'get_quoteitems') {
+            if (!this.isCheckout) {
+                let welcomeMessage = this.generateWelcomeMessage(this.customerData.customer);
+                Toast.show({ text: welcomeMessage, duration: 3000, textStyle: { fontFamily: material.fontFamily } })
+            }
             this.props.storeData('actions', [
                 { type: 'showLoading', data: { type: 'none' } },
                 { type: 'customer_data', data: this.customerData.customer },
                 { type: 'quoteitems', data: data }
             ]);
+            this.registerDeviceWithEmail();
             this.navigate();
         }
     }
 
+    generateWelcomeMessage = (data) => {
+        let message = Identify.__('Welcome %@ %@ Start shopping now');
+        return message.replace("%@ %@", data.firstname + ' ' + data.lastname);
+    };
+
     getQuoteItems() {
-        Connection.restData();
-        Connection.connect(quoteitems, this, 'GET');
+        new NewConnection()
+            .init(quoteitems, 'get_quoteitems', this)
+            .connect();
     }
 
     saveCustomerData() {
         try {
-            Connection.setCustomer(this.loginData);
+            Identify.setCustomerData(this.customerData.customer);
+            let dataCustomer = null;
+            // if (this.customerData.customer.simi_hash && this.customerData.customer.simi_hash != '') {
+            //     dataCustomer = {
+            //         email: this.loginData.email,
+            //         simi_hash: this.customerData.customer.simi_hash
+            //     }
+            // } else {
+            dataCustomer = this.loginData;
+            // }
+            Connection.setCustomer(dataCustomer);   // For old customization
+            Identify.setCustomerParams(dataCustomer);
             AppStorage.saveCustomerAutoLoginInfo(this.loginData);
             if (this.state.rememberMeEnable === true) {
                 AppStorage.saveRemembermeLoginInfo(this.loginData);
@@ -71,13 +130,64 @@ class LoginPage extends SimiPageComponent {
         }
     }
 
+    registerDeviceWithEmail() {
+        if (Platform.OS === 'ios') {
+            if (Device.isTablet()) {
+                platformID = '2';
+            } else {
+                platformID = '1';
+            }
+        } else {
+            platformID = '3';
+        }
+        let location = Identify.getLocation();
+        if (location) {
+            locationParams = {
+                latitude: location.lat,
+                longitude: location.lng
+            }
+        }
+        AppStorage.getData('notification_token').then((savedToken) => {
+            if (savedToken) {
+                new NewConnection()
+                    .init(devices, 'register_device', this, 'POST')
+                    .addBodyData({
+                        device_token: savedToken,
+                        is_demo: simicart.isDemo,
+                        plaform_id: platformID,
+                        app_id: simicart.appID,
+                        build_version: simicart.appVersion,
+                        user_email: this.loginData.email,
+                        ...locationParams
+                    })
+                    .connect();
+            }
+        });
+    }
+
     navigate = () => {
-        this.props.navigation.goBack(null);
-        if (this.isCheckout) {
+    	getTrackingStatus().then(trackingStatus => {
+            if (!trackingStatus || trackingStatus === 'not-determined') {
+                requestTrackingPermission().then(newTrackingStatus => {
+                    if (newTrackingStatus && newTrackingStatus === 'authorized' || newTrackingStatus === 'unavailable') {
+                        Identify.enableAppTracking();
+                    }
+                });
+            }
+            if (trackingStatus && trackingStatus === 'authorized' || trackingStatus === 'unavailable') {
+                Identify.enableAppTracking();
+            }
+        });
+        if(this.callback) {
+            this.callback();
+        } else if (this.isCheckout) {
+            NavigationManager.backToPreviousPage(this.props.navigation);
             NavigationManager.openPage(this.props.navigation, 'AddressBook', {
                 isCheckout: true,
                 mode: address_book_mode.checkout.select
             });
+        } else {
+            NavigationManager.backToRootPage(this.props.navigation);
         }
     }
 
@@ -104,12 +214,22 @@ class LoginPage extends SimiPageComponent {
 
     renderPhoneLayout() {
         return (
-            <Container style={{ paddingLeft: 15, paddingRight: 15, paddingTop: 50, backgroundColor: variable.appBackground }}>
-                <Content>
-                    {this.renderLayoutFromConfig('login_layout', 'content')}
-                </Content>
+            <Container style={{ backgroundColor: material.appBackground }}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={{ paddingTop: 35, paddingBottom: 35, paddingLeft: 15, paddingRight: 15 }}>
+                        {this.renderLayoutFromConfig('login_layout', 'content')}
+                    </View>
+                </ScrollView>
             </Container>
         );
+    }
+
+    tracking() {
+        let data = {};
+        data['event'] = 'login_action';
+        data['action'] = 'login_success';
+        data['method'] = 'normal';
+        Events.dispatchEventAction(data, this);
     }
 }
 

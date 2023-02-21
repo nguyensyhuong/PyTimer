@@ -7,21 +7,21 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>991535663097-angk43hlbinvumthv2fo0egp8qoegkj8.apps.googleusercontent.com</string>
+	<string>643730520187-q0h6jiiq5r6pul990l2g7t98k9faj667.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.991535663097-angk43hlbinvumthv2fo0egp8qoegkj8</string>
+	<string>com.googleusercontent.apps.643730520187-q0h6jiiq5r6pul990l2g7t98k9faj667</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBtBd7ji_56tNmiWwfVK9Vs7Nm_w5xoQLI</string>
+	<string>AIzaSyAcOV9XT8KWSDm7jNJNpJL-RGKGkK75llA</string>
 	<key>GCM_SENDER_ID</key>
-	<string>991535663097</string>
+	<string>643730520187</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.simicart.Max</string>
+	<string>com.simicart.enterprise</string>
 	<key>PROJECT_ID</key>
-	<string>simicart-1494757484807</string>
+	<string>rn-simicart-test</string>
 	<key>STORAGE_BUCKET</key>
-	<string>simicart-1494757484807.appspot.com</string>
+	<string>rn-simicart-test.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<true></true>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -33,8 +33,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:991535663097:ios:1c37603b03a4ccc1</string>
+	<string>1:643730520187:ios:a53d234bb6a1493d</string>
 	<key>DATABASE_URL</key>
-	<string>https://simicart-1494757484807.firebaseio.com</string>
+	<string>https://rn-simicart-test.firebaseio.com</string>
 </dict>
 </plist>

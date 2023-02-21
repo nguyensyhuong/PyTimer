@@ -24,7 +24,7 @@ class Language extends React.Component {
             let laguageWithCode = language[languageCode];
             if (laguageWithCode && laguageWithCode.hasOwnProperty(this.text)) {
                 return (
-                  <Text style={this.style}>{laguageWithCode[this.text]}</Text>
+                  <Text style={this.style}>{laguageWithCode[this.text].toUpperCase()}</Text>
                 )
             }
         }

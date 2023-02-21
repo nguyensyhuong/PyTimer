@@ -1,8 +1,9 @@
 import React from 'react';
 import BaseInput from './BaseInput';
 import { Item, Icon, Input } from 'native-base';
-import {TouchableOpacity} from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import NavigationManager from "../../../helper/NavigationManager";
+import Identify from '@helper/Identify';
 
 export default class BorderedInput extends BaseInput {
 
@@ -36,14 +37,19 @@ export default class BorderedInput extends BaseInput {
             }
         }
     }
-    onForgotPassWord(){
-        NavigationManager.openPage(this.props.navigation, 'ForgotPassword')
+
+    renderExtraIcon() {
+        return this.props.extraIcon
     }
+
     createInputLayout() {
         return (
             <Item regular error={this.state.error} success={this.state.success} disabled={this.disabled} style={{ marginTop: 20, borderRadius: 4 }}>
-                {this.iconName && <Icon active name={this.iconName} style={{ fontSize: 24, color: 'gray' }} />}
+                {this.iconName && <Icon active name={this.iconName} style={{ fontSize: 24 }} />}
                 <Input
+                    ref={(input) => { this.props.parent.listRefs[this.inputKey] = input }}
+                    onSubmitEditing={() => { this.submitEditing() }}
+                    returnKeyType={"done"}
                     placeholder={this.inputTitle}
                     keyboardType={this.keyboardType}
                     autoCapitalize='none'
@@ -52,13 +58,10 @@ export default class BorderedInput extends BaseInput {
                     onChangeText={(text) => {
                         this.onInputValueChange(text);
                     }}
-                    value={this.props.inputValue}
-                    defaultValue={this.state.value}
+                    defaultValue={this.props.inputValue}
+                    style={{ textAlign: Identify.isRtl() ? 'right' : 'left' }}
                 />
-                {this.props.passwordExtraIcon && <TouchableOpacity key={'forgot'}
-                                                                   onPress={() => {this.onForgotPassWord()}}>
-                    <Icon style={{color: 'gray'}} name='ios-help-circle-outline'/>
-                </TouchableOpacity>}
+                {this.props.hasOwnProperty('extraIcon') && this.renderExtraIcon()}
                 {this.props.needWarning && this.addWarningIcon()}
             </Item>
         );

@@ -70,14 +70,27 @@ class ConfigurableAbstract extends OptionAbstract {
     getSelectedOptions() {
         return this.selected_options;
     }
-    renderOptions = () => {
-        let attributes = this.data.configurable_options.attributes;
-        let objOptions = [];
-        let labelRequired = this.renderLabelRequired();
-        let taxConfig = this.data.configurable_options.taxConfig;
+    sortOptions(attributes) {
+        let attArr = [];
         for (let i in attributes) {
             let attribute = attributes[i];
-            if (!this.selected_options[i]) this.selected_options[i] = null;
+            attArr.push(attribute);
+        }
+        attArr.sort(function (a, b) {
+            return parseInt(a.position) - parseInt(b.position);
+        });
+        return attArr;
+    }
+    renderOptions = () => {
+        let attributes = this.data.configurable_options.attributes;
+        let objOptions = this.sortOptions(attributes);
+        let optionViews = [];
+        let labelRequired = this.renderLabelRequired();
+        let taxConfig = this.data.configurable_options.taxConfig;
+        objOptions.forEach(attribute => {
+            if (!this.selected_options[attribute.id]) {
+                this.selected_options[attribute.id] = null;
+            }
             this.required.push(attribute.id);
 
             if (this.shouldInitCanSelect) {
@@ -85,25 +98,25 @@ class ConfigurableAbstract extends OptionAbstract {
                 attribute.options.forEach(element => {
                     canSelect.push(element.id);
                 });
-                this.updateCanSelect(i, canSelect);
+                this.updateCanSelect(attribute.id, canSelect);
             }
 
             let element = (
                 <View key={Identify.makeid()}>
                     <View>
-                        <Text style={{ fontFamily: material.fontBold, marginLeft: 10, marginTop: 10 }}>{attribute.label} {labelRequired}</Text>
+                        <Text style={{ fontFamily: material.fontBold, marginLeft: 10, marginTop: 10 }}>{Identify.__(attribute.label)} {labelRequired}</Text>
                     </View>
                     <View className="option-content">
                         <View>
-                            {this.renderAttribute(attribute, i)}
+                            {this.renderAttribute(attribute, attribute.id)}
                         </View>
                     </View>
                 </View>
             );
-            objOptions.push(element);
-        }
+            optionViews.push(element);
+        });
         this.shouldInitCanSelect = false;
-        return (<View>{objOptions}</View>);
+        return (<View>{optionViews}</View>);
     }
 
     renderAttribute = (attribute, id) => {
@@ -123,14 +136,9 @@ class ConfigurableAbstract extends OptionAbstract {
 
     updatePrices = (originalPrices = null) => {
         if (originalPrices == null) {
-            if (this.props.current_parent.option_custom) {
-                this.props.current_parent.option_custom.updatePrices();
-                return;
-            } else {
-                originalPrices = JSON.parse(JSON.stringify(this.props.prices));
-            }
+            originalPrices = JSON.parse(JSON.stringify(this.props.prices));
         }
-        if(Identify.isMagento2()) {
+        if (Identify.isMagento2()) {
             this.updatePricesM2(originalPrices);
         } else {
             this.updatePricesM1(originalPrices);
@@ -191,7 +199,12 @@ class ConfigurableAbstract extends OptionAbstract {
             prices.regular_price += this.exclT;
             prices.price += this.exclT;
         }
-        this.parentObj.updatePrices(prices);
+        if (this.props.current_parent.option_custom) {
+            this.props.current_parent.option_custom.updatePrices(prices);
+            return;
+        } else {
+            this.parentObj.updatePrices(prices);
+        }
     }
 
     updatePricesM2 = (originalPrices) => {
@@ -213,11 +226,31 @@ class ConfigurableAbstract extends OptionAbstract {
                 optionPrice = optionPrices[j];
             }
         }
-        if (optionPrice.oldPrice)
+        if (optionPrice.oldPrice) {
             prices.regular_price = optionPrice.oldPrice.amount;
-        if (optionPrice.finalPrice)
-            prices.price = optionPrice.finalPrice.amount + this.inclT;
-        this.parentObj.updatePrices(prices);
+            if (prices.show_ex_in_price != null && prices.show_ex_in_price == 1) {
+                prices.price_excluding_tax.price = optionPrice.basePrice.amount;
+            }
+        }
+        if (optionPrice.finalPrice) {
+            prices.price = parseFloat(optionPrice.finalPrice.amount) + this.inclT;
+            if (prices.show_ex_in_price != null && prices.show_ex_in_price == 1) {
+                prices.price_including_tax.price = optionPrice.finalPrice.amount;
+            }
+        }
+        if(optionPrice.tierPrices && optionPrice.tierPrices.length > 0){
+            prices.tierPrices = optionPrice.tierPrices
+        }
+        if (optionPrice.oldPrice && parseFloat(optionPrice.oldPrice.amount) > parseFloat(optionPrice.finalPrice.amount)){
+            prices.has_special_price = 1;
+        }else{
+            prices.has_special_price = 0;
+        }
+        if (this.props.current_parent.option_custom) {
+            this.props.current_parent.option_custom.updatePrices(prices);
+        } else {
+            this.parentObj.updatePrices(prices);
+        }
     }
 }
 

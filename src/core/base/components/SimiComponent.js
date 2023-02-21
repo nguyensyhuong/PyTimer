@@ -3,7 +3,7 @@ import Device from '../../helper/device';
 import { Dimensions, View } from 'react-native';
 import md5 from 'md5';
 import Layout from '@helper/config/layout';
-
+import SimiContext from './SimiContext'
 export default class SimiComponent extends React.Component {
 
     constructor(props) {
@@ -15,6 +15,7 @@ export default class SimiComponent extends React.Component {
                 this.setState({});
             }
         });
+        this.contextData = undefined;
     }
 
     isPortrait = () => {
@@ -34,7 +35,8 @@ export default class SimiComponent extends React.Component {
         return null;
     }
 
-    createLayout() {
+    createLayout(contextData) {
+        this.contextData = contextData;
         // let phoneLayout = this.renderPhoneLayout();
         // let tabletLayout = this.renderTabletLayout();
         if (!this.isPortrait() && this.useDiffLayoutForHorizontal && this.useTabletLayout) {
@@ -58,6 +60,10 @@ export default class SimiComponent extends React.Component {
     addMorePropsToComponent(element) {
         return {};
     }
+
+    addContextToConsumer(){
+        return {};
+    };
 
     renderLayoutFromConfig(layoutKey, containerKey) {
         let components = [];
@@ -83,9 +89,13 @@ export default class SimiComponent extends React.Component {
 
     render() {
         return (
-            <View style={{ flex: 1 }}>
-                {this.createLayout()}
-            </View>
+            <SimiContext.Consumer>
+                {(contextData) => (
+                    <View style={{ flex: 1 }}>
+                        {this.createLayout(contextData)}
+                    </View>
+                )}
+            </SimiContext.Consumer>
         );
     }
 

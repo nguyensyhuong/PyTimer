@@ -9,8 +9,22 @@ import styles from './styles';
 import Events from '@helper/config/events';
 import Identify from '@helper/Identify';
 import md5 from 'md5';
+import OutStockLabel from './outStockLabel'
+import material from '../../../../../../native-base-theme/variables/material';
 
 export default class ProductImagesComponent extends SimiComponent {
+    constructor(props){
+        super(props)
+        this.index = 0;
+        this.state = {
+            ... this.state,
+            showSwiper: false
+        }
+    }
+
+    componentWillMount(){
+        setTimeout(() => {this.setState({showSwiper:true})}, 500);
+    }
 
     tracking() {
         let params = {};
@@ -25,7 +39,7 @@ export default class ProductImagesComponent extends SimiComponent {
     onSelectImage(image) {
         NavigationManager.openPage(this.props.navigation, 'FullImage', {
             images: this.props.product.images,
-            index: image['simi_index']
+            index: image
         });
     }
 
@@ -37,7 +51,9 @@ export default class ProductImagesComponent extends SimiComponent {
             image['simi_index'] = i;
             images.push(
                 <TouchableOpacity
-                    onPress={() => { this.onSelectImage(image) }}
+                    onPress={() => {
+                        this.onSelectImage(i)
+                    }}
                     key={image.position}
                     style={{ flex: 1 }}>
                     <Image resizeMode='contain' source={{ uri: image.url }}
@@ -49,19 +65,93 @@ export default class ProductImagesComponent extends SimiComponent {
         return images;
     }
 
+    renderOutStock() {
+        if (this.props.product.is_salable == '0') {
+            return <OutStockLabel />
+        }
+    }
+
+    renderZoom(){
+        return(
+            <TouchableOpacity
+                onPress={() => { this.props.product ? this.onSelectImage(this.index + 1) : {} }}
+                style={{
+                    position: 'absolute',
+                    zIndex: 99,
+                    right: 10,
+                    top: 10,
+                    width: '7%',
+                    height: '7%'
+                }}
+            >
+                <Image style={{width: '100%', height: '100%', aspectRatio: 1, tintColor: '#b4b4b4'}} source={require('@media/scale-symbol.png')}/>
+            </TouchableOpacity>
+        )
+    }
+
+    renderSpecialPriceLabel(){
+        let saleOff = null;
+        let price = this.props.product.app_prices;
+        if (price.has_special_price !== null && price.has_special_price === 1) {
+            if (price.show_ex_in_price != null && price.show_ex_in_price == 1) {
+                saleOff = 100 - (price.price_including_tax.price / price.regular_price) * 100;
+                saleOff = saleOff.toFixed(0);
+            } else {
+                saleOff = 100 - (price.price / price.regular_price) * 100;
+                saleOff = saleOff.toFixed(0);
+            }
+        }
+        let showLabel = Identify.getMerchantConfig().storeview.catalog.frontend.show_discount_label_in_product;
+        if(saleOff){
+            if(showLabel && showLabel !== '1') {
+                return null;
+            }
+            return (
+                <View
+                    style={{
+                        position: 'absolute',
+                        zIndex: 99,
+                        left: 10,
+                        top: 10,
+                        backgroundColor: 'white',
+                        borderRadius: 4,
+                        borderColor: '#f0f0f0',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderWidth: 2,
+                        padding: 5
+                    }}
+                >
+                    <Text style={{color: Identify.theme.button_background, fontFamily: material.fontBold, textAlign: 'center'}}>{saleOff + '% ' + Identify.__('OFF')}</Text>
+                </View>
+            )
+        }
+    }
+
+    // componentDidMount() {
+    //     setTimeout(() => {
+    //         this.forceUpdate()
+    //     }, 400);
+    // }
+
     renderPhoneLayout() {
         if (this.props.product == null) {
             return (null);
         }
         return (
             <Card style={[styles.bannerCard, (!Device.isTablet() || this.isPortrait()) && { aspectRatio: 1 }]}>
-                <View style={{flex: 1}}>
-                    <Swiper
+                <View style={{ flex: 1 }}>
+                    {this.renderZoom()}
+                    {this.renderSpecialPriceLabel()}
+                    {this.state.showSwiper ? <Swiper
+                        onIndexChanged={(index) => {
+                            this.index = index
+                        }}
                         key={this.props.product.images.length}
                         horizontal={true}>
                         {this.renderImages()}
-                    </Swiper>
-                    {this.props.product.is_salable == '0' && <Text style={{position: 'absolute', bottom: 0, right: 0, backgroundColor: 'red', color: 'white', padding: 5, fontWeight: "bold"}}>{Identify.__('Out of stock')}</Text>}
+                    </Swiper> : null}
+                    {this.renderOutStock()}
                     {this.dispatchContent()}
                 </View>
             </Card>
@@ -70,13 +160,15 @@ export default class ProductImagesComponent extends SimiComponent {
 
     dispatchContent() {
         let items = [];
-        if(Events.events.add_labels) {
+        if (Events.events.add_labels) {
             for (let i = 0; i < Events.events.add_labels.length; i++) {
                 let node = Events.events.add_labels[i];
                 if (node.active === true) {
                     let key = md5("add_labels" + i);
                     let Content = node.content;
-                    items.push(<Content key={key} product={this.props.product}/>)
+                    let price = this.props.product.app_prices;
+                    let hasSpecial = price.has_special_price !== null && price.has_special_price === 1;
+                    items.push(<Content hasSpecial={hasSpecial} key={key} type={'4'} product={this.props.product} />)
                 }
             }
         }

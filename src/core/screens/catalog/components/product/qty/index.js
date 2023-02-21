@@ -21,11 +21,15 @@ class Quantity extends React.Component {
   }
 
   render() {
-    return(
+    return (
       <Item regular style={styles.container}>
-        <Input style={styles.input} keyboardType="numeric" onChangeText={(txt) => {
+        <Input
+          style={styles.input}
+          keyboardType="numeric"
+          returnKeyType="done"
+          onChangeText={(txt) => {
             this.checkoutQty = txt
-        }}>1</Input>
+          }}>1</Input>
       </Item>
     );
   }

@@ -12,6 +12,14 @@ export default StyleSheet.create({
     bannerImage: {
         flex: 1
     },
+    outOfStock: {
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: 'red',
+        color: 'white',
+        padding: 5,
+        fontWeight: "bold"
+    },
     card: {
         flex: 1,
         marginTop: 10,

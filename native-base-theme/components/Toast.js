@@ -1,17 +1,18 @@
 import variable from "./../variables/platform";
+import material from '@theme/variables/material';
 
 export default (variables = variable) => {
   const platform = variables.platform;
 
   const toastTheme = {
     ".danger": {
-      backgroundColor: variables.brandDanger
+      backgroundColor: variables.brandDanger,
     },
     ".warning": {
-      backgroundColor: variables.brandWarning
+      backgroundColor: variables.brandWarning,
     },
     ".success": {
-      backgroundColor: variables.brandSuccess
+      backgroundColor: variables.brandSuccess,
     },
     backgroundColor: "rgba(0,0,0,0.8)",
     borderRadius: platform === "ios" ? 5 : 0,
@@ -23,7 +24,7 @@ export default (variables = variable) => {
     "NativeBase.Text": {
       color: "#fff",
       flex: 1,
-      fontFamily: variables.fontFamily,
+      fontFamily: material.fontFamily,
     },
     "NativeBase.Button": {
       backgroundColor: "transparent",
@@ -31,7 +32,7 @@ export default (variables = variable) => {
       elevation: 0,
       "NativeBase.Text": {
         fontSize: 14,
-        fontFamily: variables.fontFamily,
+        fontFamily: material.fontFamily,
       }
     }
   };

@@ -1,4 +1,4 @@
-import { AsyncStorage } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 import { rememberme_info, autologin_info } from "./constants";
 
 class AppStorage {
@@ -24,7 +24,7 @@ class AppStorage {
 
     static removeData = async (keys) => {
         keys.forEach(async item => {
-            await AsyncStorage.removeItem(item.key);
+            await AsyncStorage.removeItem(item);
         });
     }
 

@@ -1,12 +1,8 @@
 import React from 'react';
-import { Container, View, Icon, Input } from 'native-base';
-import Identify from '@helper/Identify';
-import styles from './styles';
-import variable from '../../../../../../native-base-theme/variables/material';
-import md5 from 'md5';
+import { Container, Content } from 'native-base';
 import SimiPageComponent from "@base/components/SimiPageComponent";
+import NavigationManager from "@helper/NavigationManager";
 import Events from '@helper/config/events';
-import NavigationManager from "../../../../helper/NavigationManager";
 
 class SearchProducts extends SimiPageComponent {
 
@@ -16,71 +12,58 @@ class SearchProducts extends SimiPageComponent {
         this.showSearch = false;
         this.state = {
             ...this.state,
-            text: '',
-            showClear: false
+            suggestion: []
         }
     }
 
-    onChangeText(txt) {
-        this.state.text = txt;
-        if (this.state.showClear && this.state.text.length == 0) {
-            this.setState({ showClear: false });
-        } else if (!this.state.showClear && this.state.text.length > 0) {
-            this.setState({ showClear: true });
-        }
-    }
-
-    onEndEditing() {
-        if (this.state.text.length > 0) {
+    openSearchResults(query) {
+        if (query.length > 0) {
+            this.tracking(query);
+            if (this.recents) {
+                this.recents.saveQuery(query);
+            }
             routeName = 'Products';
             params = {
                 categoryId: this.props.navigation.getParam("categoryId"),
                 categoryName: this.props.navigation.getParam("categoryName"),
-                query: this.state.text
+                query: query
             };
-            NavigationManager.openPage(this.props.navigation, routeName, params)
+            NavigationManager.openPage(this.props.navigation, routeName, params);
         }
     }
 
+    createRef(id) {
+        switch (id) {
+            case 'default_recents':
+                return ref => (this.recents = ref);
+            default:
+                return undefined;
+        }
+    }
+
+    addMorePropsToComponent(element) {
+        return {
+            onRef: this.createRef(element.id)
+        };
+    }
+
     renderPhoneLayout() {
-        let voiceSearch = this.dispatchAddItem();
         return (
             <Container>
-                <View style={[styles.container, { backgroundColor: variable.toolbarDefaultBg == '#ffffff' ? variable.toolbarBtnColor : variable.toolbarDefaultBg }]}>
-                    <View regular style={styles.search}>
-                        <Icon name='search' style={[styles.icon, { color: variable.toolbarDefaultBg == '#ffffff' ? variable.toolbarBtnColor : variable.toolbarDefaultBg }]} />
-                        <View style={styles.inputContainer}>
-                            <Input style={{ flex: 1 }}
-                                placeholder={Identify.__('What are you looking for?')}
-                                autoFocus={true}
-                                ref={input => { this.textInput = input }}
-                                onChangeText={(txt) => { this.onChangeText(txt) }}
-                                onEndEditing={() => { this.onEndEditing() }} />
-                            {this.state.showClear && <Icon style={styles.clearIcon} name='md-close' onPress={() => {
-                                this.setState({ text: '', showClear: false });
-                            }} />}
-                            {voiceSearch}
-
-                        </View>
-                    </View>
-                </View>
+                {this.renderLayoutFromConfig('search_layout', 'container')}
+                {/* <Content>
+                    {this.renderLayoutFromConfig('search_layout', 'content')}
+                </Content> */}
             </Container>
         );
     }
 
-    dispatchAddItem() {
-        let plugins = [];
-        for (let i = 0; i < Events.events.search_page.length; i++) {
-            let node = Events.events.search_page[i];
-            if (node.active === true) {
-                let key = md5("pages_search_items" + i);
-                let Content = node.content;
-                plugins.push(<View style={{ marginBottom: 10, marginTop: 10, alignItems: 'baseline' }} key={key}>
-                    <Content obj={this} />
-                </View>);
-            }
-        }
-        return plugins;
+    tracking(query) {
+        let data = {};
+        data['event'] = 'search_action';
+        data['action'] = 'view_search_results';
+        data['search_term'] = query;
+        Events.dispatchEventAction(data, this);
     }
 
 }

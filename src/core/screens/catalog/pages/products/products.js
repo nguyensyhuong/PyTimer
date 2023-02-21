@@ -1,13 +1,14 @@
 import React from 'react';
-import SimiPageComponent from '../../../../base/components/SimiPageComponent';
-import Identify from '../../../../helper/Identify';
+import SimiPageComponent from '@base/components/SimiPageComponent';
+import Identify from '@helper/Identify';
 import { connect } from 'react-redux';
-import Connection from '../../../../base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
 import { Container, Content } from 'native-base';
 import { View } from 'react-native';
-import { products, home_spot_products, products_mode } from '../../../../helper/constants';
-import NavigationManager from '../../../../helper/NavigationManager';
+import { products, home_spot_products, products_mode } from '@helper/constants';
+import NavigationManager from '@helper/NavigationManager';
 import variable from '@theme/variables/material';
+import Device from '@helper/device';
 
 class ProductsPage extends SimiPageComponent {
 
@@ -22,15 +23,20 @@ class ProductsPage extends SimiPageComponent {
         };
         this.cateId = -1;
         this.spotId = -1;
-        this.query = '';
-        this.limit = 10;
+        this.query = this.props.navigation.getParam("query");
+        if(this.query) {
+            this.showSearch = false;
+        }
+        this.limit = Device.isTablet() ? 16 : 10;
         this.offset = 0;
         this.lastY = 0;
         this.isLoadingMore = false;
         this.shouldStoreData = true;
         this.mode = this.props.navigation.getParam('mode');
         this.layout = 'ProductDetail';
-        this.title = this.props.navigation.getParam("categoryName");
+        this.onFilterAction = this.onFilterAction.bind(this);
+        this.onSortAction = this.onSortAction.bind(this);
+        this.isBack = this.props.navigation.state.params.hasOwnProperty("showBack") ? this.props.navigation.getParam("showBack") : true;
     }
 
     componentWillMount() {
@@ -40,6 +46,7 @@ class ProductsPage extends SimiPageComponent {
     }
 
     componentDidMount() {
+        super.componentDidMount();
         if (!this.checkExistData()) {
             this.requestData(this.createParams());
         }
@@ -61,13 +68,14 @@ class ProductsPage extends SimiPageComponent {
     }
 
     requestData(params) {
-        Connection.restData();
-        Connection.setGetData(params);
         let url = products;
         if (this.mode === products_mode.spot) {
             url = home_spot_products + '/' + this.spotId;
         }
-        Connection.connect(url, this, 'GET');
+        new NewConnection()
+            .init(url, 'get_products_data', this)
+            .addGetData(params)
+            .connect();
     }
 
     setData(data) {
@@ -131,7 +139,6 @@ class ProductsPage extends SimiPageComponent {
     }
 
     checkExistData() {
-        this.query = this.props.navigation.getParam("query");
         this.spotId = this.props.navigation.getParam("spotId") ? this.props.navigation.getParam("spotId") : -1;
         this.cateId = this.props.navigation.getParam("categoryId") ? this.props.navigation.getParam("categoryId") : -1;
         if (this.query) {
@@ -166,35 +173,53 @@ class ProductsPage extends SimiPageComponent {
 
     openFilter = () => {
         NavigationManager.openPage(this.props.navigation, 'Filter', {
-            parent: this,
             filter: this.state.data.layers,
+            onFilterAction: this.onFilterAction
         });
     }
 
     onFilterAction(filterParams) {
+        this.limit = Device.isTablet() ? 16 : 10;
+        this.offset = 0;
         this.props.storeData('showLoading', { type: 'full' });
         params = {
             ...this.createParams(),
             ...filterParams
         };
+        if (this.sortOrder) {
+            params = {
+                ...params,
+                ...this.sortOrder
+            }
+        }
         this.shouldStoreData = false;
+        this.filterData = filterParams
         this.setState({ data: null });
         this.requestData(params);
     }
 
     openSort = () => {
         NavigationManager.openPage(this.props.navigation, 'Sort', {
-            parent: this,
             sort: this.state.data.orders,
+            onSortAction: this.onSortAction
         });
     }
 
     onSortAction(order, dir) {
+        this.limit = Device.isTablet() ? 16 : 10;
+        this.offset = 0;
         this.props.storeData('showLoading', { type: 'full' });
         params = this.createParams();
+        if (this.filterData) {
+            params = {
+                ...params,
+                ...this.filterData
+            }
+        }
         params['order'] = order;
         params['dir'] = dir;
         this.shouldStoreData = false;
+        this.sortOrder = { order, dir }
         this.setState({ data: null });
         this.requestData(params);
     }
@@ -203,7 +228,20 @@ class ProductsPage extends SimiPageComponent {
         if (this.offset + this.limit < this.state.data.total && !this.isLoadingMore) {
             this.isLoadingMore = true;
             this.offset += this.limit;
-            this.requestData(this.createParams());
+            let params = this.createParams()
+            if (this.filterData) {
+                params = {
+                    ...params,
+                    ...this.filterData
+                }
+            }
+            if (this.sortOrder) {
+                params = {
+                    ...params,
+                    ...this.sortOrder
+                }
+            }
+            this.requestData(params);
         }
     }
 

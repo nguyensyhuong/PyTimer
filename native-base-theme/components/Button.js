@@ -1,4 +1,5 @@
 import variable from "./../variables/platform";
+import material from '@theme/variables/material';
 
 export default (variables = variable) => {
   const platformStyle = variables.platformStyle;
@@ -314,7 +315,7 @@ export default (variables = variable) => {
     },
 
     "NativeBase.Text": {
-      fontFamily: variables.btnFontFamily,
+      fontFamily: material.fontFamily,
       marginLeft: 0,
       marginRight: 0,
       color: variables.inverseTextColor,

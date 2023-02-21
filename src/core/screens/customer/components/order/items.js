@@ -3,10 +3,10 @@ import SimiComponent from '@base/components/SimiComponent';
 import { Card } from 'native-base';
 import ListQuoteItems from '../../../checkout/components/quoteitem/list';
 
-export default class OrderSummary extends SimiComponent {
-    renderPhoneLayout() {
+    const OrderSummary = (props) => {
+
         let items = [];
-        let orderItems = this.props.order.order_items;
+        let orderItems = props.order.order_items;
         for (let index in orderItems) {
             let item = {
                 ...orderItems[index]
@@ -19,5 +19,6 @@ export default class OrderSummary extends SimiComponent {
                 <ListQuoteItems list={items} parent={this} from={'order_detail'} />
             </Card>
         );
-    }
 }
+
+export default OrderSummary;

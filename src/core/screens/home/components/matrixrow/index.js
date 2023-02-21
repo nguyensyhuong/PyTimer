@@ -19,7 +19,7 @@ class MatrixRow extends React.Component {
         let homeCategories = this.home_data.home.homecategories.homecategories;
         for (let index in homeCategories) {
             let homeCate = homeCategories[index];
-            if(!matrixMap[homeCate.matrix_row]) {
+            if (!matrixMap[homeCate.matrix_row]) {
                 matrixMap[homeCate.matrix_row] = [];
             }
             matrixMap[homeCate.matrix_row].push(homeCate);
@@ -27,28 +27,28 @@ class MatrixRow extends React.Component {
         let homeProductList = this.home_data.home.homeproductlists.homeproductlists;
         for (let index in homeProductList) {
             let homeProducts = homeProductList[index];
-            if(!matrixMap[homeProducts.matrix_row]) {
+            if (!matrixMap[homeProducts.matrix_row]) {
                 matrixMap[homeProducts.matrix_row] = [];
             }
             matrixMap[homeProducts.matrix_row].push(homeProducts);
         }
 
-        for(let key in matrixMap) {
+        for (let key in matrixMap) {
             this.matrixListRows.splice(key, 0, matrixMap[key]);
         }
     }
     renderMatrixItem = (item) => {
-        return (<Row items={item}/>);
+        return (<Row items={item} />);
     }
     render() {
-        return(
+        return (
             <FlatList
                 data={this.matrixListRows}
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(item, index) => md5(index)}
                 renderItem={({ item }) =>
                     this.renderMatrixItem(item)
-                }/>
+                } />
         )
 
     }

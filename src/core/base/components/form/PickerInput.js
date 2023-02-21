@@ -4,7 +4,7 @@ import { Item, Icon, Text, Label } from 'native-base';
 import { StyleSheet, Modal, View } from 'react-native';
 import FloatingInput from './FloatingInput';
 import AdvanceList from '@base/components/advancelist';
-import material from '../../../../../native-base-theme/variables/material';
+import material from '@theme/variables/material';
 import Identify from '@helper/Identify';
 
 export default class PickerInput extends BaseInput {
@@ -38,6 +38,7 @@ export default class PickerInput extends BaseInput {
     }
 
     handleSelected(type, key, item) {
+        console.log('run 12', item)
         this.state.value = item[this.keyForSave];
         this.setState({
             modalVisible: false
@@ -75,14 +76,14 @@ export default class PickerInput extends BaseInput {
                     onPress={() => {
                         this.showSelectOptions();
                     }}>
-                    {text}
+                    {Identify.__(text)}
                 </Text>
                 <Modal
                     animationType="slide"
                     transparent={false}
                     visible={this.state.modalVisible}
                     onRequestClose={() => {
-                        alert('Modal has been closed.');
+                        console.log('Modal has been closed.');
                     }}>
                     <AdvanceList
                         parent={this}
@@ -105,10 +106,10 @@ export default class PickerInput extends BaseInput {
             );
         } else {
             return (
-                <Item error={this.state.error} success={this.state.success} style={styles.item} inlineLabel>
-                    <Label>{this.inputTitle}</Label>
+                <Item error={this.state.error} success={this.state.success} style={[styles.item]} inlineLabel>
+                    <Text style={{ color: material.textColor, paddingRight: 10 }}>{this.inputTitle}</Text>
                     {this.renderShowText()}
-                    <Icon name={'ios-arrow-forward'} />
+                    <Icon style={{ color: material.textColor }} name={Identify.isRtl() ? 'ios-arrow-back' : "ios-arrow-forward"} />
                 </Item>
             );
         }
@@ -123,17 +124,13 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         flex: 1,
         height: 40,
-        marginTop: 30
+        marginBottom: 10
     },
     placeholder: {
         flex: 1,
-        fontSize: material.textSizeBigger,
-        color: '#808080',
     },
     value: {
         flex: 1,
-        fontSize: material.textSizeBigger,
-        color: 'black'
     },
     boundView: {
         flex: 1,

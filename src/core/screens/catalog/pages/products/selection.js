@@ -1,10 +1,9 @@
 import React from 'react';
-import { Container } from "native-base";
 import { FlatList } from 'react-native';
-import { ListItem, Left, Right, Text } from "native-base";
-import NavigationManager from '../../../../helper/NavigationManager';
+import { Container, ListItem, Left, Right, Text } from "native-base";
+import NavigationManager from '@helper/NavigationManager';
 import styles from './styles';
-import SimiPageComponent from '../../../../base/components/SimiPageComponent';
+import SimiPageComponent from '@base/components/SimiPageComponent';
 import variable from '@theme/variables/material';
 
 class FilterSelection extends SimiPageComponent {
@@ -12,6 +11,7 @@ class FilterSelection extends SimiPageComponent {
 		super(props);
 		this.isPage = true;
 		this.attribute = null;
+		this.onFilterAction = this.props.navigation.getParam("onFilterAction");
 	}
 
 	onSelectFilter(selection) {
@@ -19,15 +19,16 @@ class FilterSelection extends SimiPageComponent {
 		params['filter[layer][' + this.attribute.attribute + ']'] = selection.value;
 
 		let selected = this.props.navigation.getParam("seleted");
-		for (let i = 0; i < selected.length; i++) {
-			let item = selected[i];
-			if (item.attribute != 'cat') {
-				params['filter[layer][' + item.attribute + ']='] = item.value;
+		if(selected) {
+			for (let i = 0; i < selected.length; i++) {
+				let item = selected[i];
+				if (item.attribute != 'cat') {
+					params['filter[layer][' + item.attribute + ']='] = item.value;
+				}
 			}
 		}
 
-		let parent = this.props.navigation.getParam("parent");
-		parent.onFilterAction(params);
+		this.onFilterAction(params);
 
 		NavigationManager.backToPage(this.props.navigation, 2);
 	}
