@@ -1,17 +1,25 @@
 import React from 'react';
-import { Share } from 'react-native';
+import { Share, Platform } from 'react-native';
 import { Icon } from 'native-base';
 import simicart from '../../core/helper/simicart';
 
 export default class SocialShare extends React.Component {
     constructor(props) {
         super(props);
+        this.productName = ''
         this.productURL = '';
     }
     openShareDialog() {
-        Share.share({
-            message: this.productURL
-        });
+        if (Platform.OS === 'ios') {
+            Share.share({
+                message: this.productName,
+                url: this.productURL
+            });
+        } else {
+            Share.share({
+                message: this.productURL
+            })
+        }
     }
     initProductURL() {
         if (this.props.product) {
@@ -19,7 +27,12 @@ export default class SocialShare extends React.Component {
             if (url.slice(-1) !== '/') {
                 url = url + '/';
             }
-            this.productURL = url + this.props.product.url_path;
+            if (this.props.product.url_path && this.props.product.url_path != null && this.props.product.url_path != "") {
+                this.productURL = url + this.props.product.url_path;
+            } else {
+                this.productURL = url + "catalog/product/view/id/" + this.props.product.entity_id;
+            }
+            this.productName = this.props.product.name
         }
     }
     render() {

@@ -3,12 +3,15 @@ import { ScrollView, FlatList, TouchableOpacity, Image, View, Share, Alert } fro
 import { connect } from 'react-redux';
 import { Container, Card, Spinner, Text, Icon, Button, H3 } from 'native-base';
 import styles from './styles';
-import Connection from '../../core/base/network/Connection';
-import Price from '../../core/screens/catalog/components/product/price';
-import Identify from '../../../src/core/helper/Identify';
-import NavigationManager from '../../../src/core/helper/NavigationManager';
-import SimiPageComponent from "../../core/base/components/SimiPageComponent";
-import {wishlist_item} from '../constants'
+import NewConnection from '@base/network/NewConnection';
+import Price from '@screens/catalog/components/product/price';
+import Identify from '@helper/Identify';
+import NavigationManager from '@helper/NavigationManager';
+import SimiPageComponent from "@base/components/SimiPageComponent";
+import { wishlist_item } from '../constants'
+import { quoteitems } from '@helper/constants';
+import material from '@theme/variables/material';
+
 class Wishlist extends SimiPageComponent {
 
     constructor(props) {
@@ -33,34 +36,45 @@ class Wishlist extends SimiPageComponent {
         this.getWishlist();
     }
 
-    getWishlist() {
+    getWishlist(limit, offset) {
         let params = [];
-        params['limit'] = this.limit;
-        params['offset'] = this.offset;
+        params['limit'] = limit ?? this.limit;
+        params['offset'] = offset ?? this.offset;
         try {
-            Connection.restData();
-            Connection.setGetData(params);
-            Connection.connect(wishlist_item, this, 'GET');
+            new NewConnection()
+                .init(wishlist_item, 'get_wishlist_data', this)
+                .addGetData(params)
+                .connect();
         } catch (e) {
             console.log(e.message);
         }
     }
 
-    setData(data) {
-        if (this.props.loading != 'none') {
+    setData(data, requestId) {
+        if (requestId != 'delete_item') {
             this.props.storeData('showLoading', { type: 'none' });
+        }
+
+        if (data.hasOwnProperty('quoteitems')) {
+            this.props.storeData('actions', [
+                { type: 'quoteitems', data: data }
+            ]);
+            return
         }
 
         let canLoadMore = true;
         if (this.offset + this.limit >= data.total) {
             canLoadMore = false;
         }
-        if (this.addCart) {
-            this.state.data = null;
-            this.addCart = false;
-            this.offset = 0;
-            this.getWishlist();
+
+        if (requestId == 'add_to_cart') {
+            this.getQuoteItems();
         }
+
+        if (requestId == 'delete_item') {
+            this.getWishlist(this.offset + this.limit, 0);
+        }
+
         if (this.isLoadingMore) {
             let combinedWishlistItems = this.state.data.wishlistitems;
             combinedWishlistItems.push.apply(combinedWishlistItems, data.wishlistitems);
@@ -71,7 +85,18 @@ class Wishlist extends SimiPageComponent {
             data.all_ids = combinedIds;
         }
         this.isLoadingMore = false;
-        this.setState({ data: data, loadMore: canLoadMore });
+        if (requestId != 'add_to_cart' && requestId != 'delete_item') {
+            this.setState({ 
+                data: data, 
+                loadMore: canLoadMore
+            });
+        }
+    }
+
+    getQuoteItems() {
+        new NewConnection()
+            .init(quoteitems, 'get_quoteitems', this)
+            .connect();
     }
 
     handleWhenRequestFail() {
@@ -91,14 +116,15 @@ class Wishlist extends SimiPageComponent {
             Identify.__('Confirmation'),
             Identify.__('Are you sure you want to delete this product?'),
             [
-                { text: 'NO', onPress: () => { }, style: 'cancel' },
+                { text: Identify.__('NO'), onPress: () => { }, style: 'cancel' },
                 {
-                    text: 'YES', onPress: () => {
-                    this.props.storeData('showLoading', { type: 'dialog' });
-                    this.state.data = null;
-                    Connection.restData();
-                    Connection.connect(wishlist_item + '/' + item.wishlist_item_id, this, 'DELETE');
-                }
+                    text: Identify.__('YES'), onPress: () => {
+                        this.props.storeData('showLoading', { type: 'dialog' });
+                        this.state.data = null;
+                        new NewConnection()
+                            .init(wishlist_item + '/' + item.wishlist_item_id, 'delete_item', this, 'DELETE')
+                            .connect();
+                    }
                 },
             ],
             { cancelable: false }
@@ -111,20 +137,21 @@ class Wishlist extends SimiPageComponent {
                 productId: item.product_id,
             });
         } else {
-            Connection.restData();
-            Connection.setGetData({ 'add_to_cart': '1' });
-            Connection.connect(wishlist_item + '/' + item.wishlist_item_id, this, 'GET');
+            new NewConnection()
+                .init(wishlist_item + '/' + item.wishlist_item_id, 'add_to_cart', this)
+                .addGetData({ 'add_to_cart': '1' })
+                .connect();
             this.props.storeData('showLoading', { type: 'dialog' });
             this.addCart = true;
         }
     }
-    imageItemOnclick(item){
+    imageItemOnclick(item) {
         NavigationManager.openPage(this.props.navigation,
             'ProductDetail', {
                 productId: item.product_id
             })
     }
-    renderWishListItemImage(item){
+    renderWishListItemImage(item) {
         return (
             <TouchableOpacity onPress={() => {
                 this.imageItemOnclick(item)
@@ -134,10 +161,10 @@ class Wishlist extends SimiPageComponent {
             </TouchableOpacity>
         )
     }
-    renderWishlistItemInfor(item){
+    renderWishlistItemInfor(item) {
         return (
             <View style={{ marginLeft: 10, flex: 1, flexDirection: 'column' }}>
-                <H3>{item.name}</H3>
+                <H3 style={{ textAlign: 'left' }}>{item.name}</H3>
                 {this.addPriceRow(item)}
                 {item.stock_status && <Button full style={{ height: 40, marginTop: 15 }} onPress={() => {
                     this.addWishlistItemToCart(item);
@@ -147,7 +174,7 @@ class Wishlist extends SimiPageComponent {
             </View>
         )
     }
-    renderWishlistItemAction(item){
+    renderWishlistItemAction(item) {
         return (
             <View style={{ width: 40, alignItems: 'flex-end' }}>
                 <TouchableOpacity
@@ -188,61 +215,63 @@ class Wishlist extends SimiPageComponent {
             this.getWishlist();
         }
     }
-    generatePropsToFlatlist(){
+    generatePropsToFlatlist() {
         return {
-            style : styles.verticalList,
-            data : this.state.data.wishlistitems,
-            extraData : this.state.data
+            style: styles.verticalList,
+            data: this.state.data.wishlistitems,
+            extraData: this.state.data
         }
     }
     renderWishlistItems() {
-        if (this.state.data) {
-            return (
-                <ScrollView
-                    onScroll={({ nativeEvent }) => {
-                        if ((Number((nativeEvent.contentSize.height).toFixed(0)) - 1) <= Number((nativeEvent.contentOffset.y).toFixed(1)) + Number((nativeEvent.layoutMeasurement.height).toFixed(1))) {
-                            this.loadMore();
-                        }
-                    }}
-                >
-                    <FlatList
-                        {...this.generatePropsToFlatlist()}
-                        keyExtractor={(item) => item.wishlist_item_id}
-                        renderItem={({ item }) =>
-                            <View>
-                                {this.renderItem(item)}
-                            </View>
-                        }
-                    />
-                    <Spinner style={(this.state.loadMore) ? {} : { display: 'none' }} />
-                </ScrollView>
-            );
-        } else {
-            return (<View />);
-        }
+        return (
+            <ScrollView
+                onScroll={({ nativeEvent }) => {
+                    if ((Number((nativeEvent.contentSize.height).toFixed(0)) - 1) <= Number((nativeEvent.contentOffset.y).toFixed(1)) + Number((nativeEvent.layoutMeasurement.height).toFixed(1))) {
+                        this.loadMore();
+                    }
+                }}
+            >
+                <FlatList
+                    {...this.generatePropsToFlatlist()}
+                    keyExtractor={(item) => item.wishlist_item_id}
+                    renderItem={({ item }) =>
+                        <View>
+                            {this.renderItem(item)}
+                        </View>
+                    }
+                />
+                <Spinner style={(this.state.loadMore) ? {} : { display: 'none' }} />
+            </ScrollView>
+        );
     }
 
     renderPhoneLayout() {
+        if (this.state.data && this.state.data.wishlistitems.length > 0) {
+            return (
+                <Container>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                        <Button iconLeft transparent primary onPress={() => {
+                            Share.share({
+                                message: this.state.data.sharing_url[0]
+                            });
+                        }}>
+                            <Icon name='share' />
+                            <Text>{Identify.__('Share Wishlist')}</Text>
+                        </Button>
+                    </View>
+                    {this.renderWishlistItems()}
+                </Container>
+            );
+        }
         return (
-            <Container>
-                <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <Button iconLeft transparent primary onPress={() => {
-                        Share.share({
-                            message: this.state.data.message[0]
-                        });
-                    }}>
-                        <Icon name='share' />
-                        <Text>Share Wishlist</Text>
-                    </Button>
-                </View>
-                {this.renderWishlistItems()}
-            </Container>
+            <Text style={{ textAlign: 'center', fontFamily: material.fontBold, fontSize: 20, marginTop: 30 }}>{Identify.__('Your wishlist is empty')}</Text>
         );
     }
 }
 
 const mapStateToProps = (state) => {
     return {
+        data: state.redux_data.quoteitems,
         loading: state.redux_data.showLoading,
         wishlist: state.redux_data.wishlist,
     };

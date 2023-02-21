@@ -9,7 +9,7 @@ export default {
             content: require('@base/components/menu/ValueMenuItem').default,
             data:{
                 itemIcon: 'md-locate',
-                ItemToShow: Identify.__('Stores'),
+                ItemToShow: 'Store List',
                 hasDataInParent: true,
                 keyItem: 'store'
             }
@@ -20,7 +20,7 @@ export default {
             content: require('@base/components/menu/ValueMenuItem').default,
             data:{
                 itemIcon: 'md-map',
-                ItemToShow: Identify.__('Language'),
+                ItemToShow: 'Language',
                 ItemName: 'store_name',
                 keyItem: 'language'
             }
@@ -31,7 +31,7 @@ export default {
             content: require('@base/components/menu/ValueMenuItem').default,
             data:{
                 itemIcon: 'md-cash',
-                ItemToShow: Identify.__('Currency'),
+                ItemToShow: 'Currency',
                 ItemName: 'currency_code',
                 keyItem: 'currency'
             }
@@ -42,7 +42,7 @@ export default {
             content: require('@base/components/menu/ValueMenuItem').default,
             data:{
                 itemIcon: 'md-settings',
-                ItemToShow: Identify.__('App Settings'),
+                ItemToShow: 'App Settings',
                 typeAction: 2
             }
         }

@@ -5,7 +5,10 @@ export default {
             active: true,
             sort_order: 2000,
             content: require('../../../../plugins/coupon').default,
-            left: false
+            left: false,
+            data: {
+                is_cart: true
+            }
         },
     }
 }

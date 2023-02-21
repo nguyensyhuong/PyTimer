@@ -6,11 +6,12 @@ import Identify from "../../core/helper/Identify";
 import StarRating from 'react-native-star-rating';
 import ReviewItem from './reviewItem';
 import NavigationManager from '../../core/helper/NavigationManager';
+import material from '../../../native-base-theme/variables/material';
 
 class ReviewPage extends SimiPageComponent{
     constructor(props){
         super(props);
-        this.title = 'Review';
+        this.title = Identify.__('Review');
         this.productName = this.props.navigation.getParam('productName');
         this.reviewPageData = this.props.navigation.getParam('reviewPageData');
         this.ratePoint = this.props.navigation.getParam('ratePoint');
@@ -68,7 +69,7 @@ class ReviewPage extends SimiPageComponent{
                       }}
                 >
                     <ReviewItem item={item} navigation={this.props.navigation} />
-                    <Icon name='ios-arrow-forward-outline'/>
+                    <Icon name={Identify.isRtl() ? 'ios-arrow-back' : "ios-arrow-forward"}/>
                 </View>
             </TouchableOpacity>
         )
@@ -94,7 +95,7 @@ class ReviewPage extends SimiPageComponent{
             <View
                 style={{padding: 12, borderBottomWidth: 0.3, borderBottomColor: '#c9c9c9'}}
             >
-                <Text style={{ fontSize: 20, fontWeight: '900'}}>{Identify.__(this.productName)}</Text>
+                <Text style={{ fontSize: 20, fontFamily: material.fontBold }}>{Identify.__(this.productName)}</Text>
             </View>
         )
     }

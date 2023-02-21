@@ -64,7 +64,7 @@ export default {
                 redux_data_key: 'products_data',
                 idName : 'productId',
                 show_as_card: true,
-                title: Identify.__('Related Products')
+                title: 'Related Products'
             },
             position: 'right'
         },

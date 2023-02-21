@@ -1,5 +1,4 @@
 import Identify from '@helper/Identify';
-import Connection from '@base/network/Connection';
 
 export function onSplashCompleted() {
     let merchantConfig = Identify.getMerchantConfig();
@@ -11,10 +10,10 @@ export function onSplashCompleted() {
             ...address_option,
             ...address_fields_config
         };
-        account_option.taxvat_show = address_fields_config.taxvat_show;
+        // account_option.taxvat_show = address_fields_config.taxvat_show;
 
         merchantConfig.storeview.customer.address_option = address_option;
         merchantConfig.storeview.customer.account_option = account_option;
     }
-    Connection.setMerchantConfig(merchantConfig)
+    Identify.setMerchantConfig(merchantConfig)
 }

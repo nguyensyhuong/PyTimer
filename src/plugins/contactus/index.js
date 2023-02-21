@@ -1,24 +1,26 @@
 import React from 'react';
-import { Linking, ListView, TouchableOpacity } from 'react-native';
-import { Container, Text, View, Icon } from "native-base";
+import { Linking, TouchableOpacity, FlatList, View, StyleSheet } from 'react-native';
+import { Container, Text, Icon } from "native-base";
 import Identify from '@helper/Identify';
-import styles from './Styles';
 import SimiPageComponent from "@base/components/SimiPageComponent";
 
-class ContactUs extends SimiPageComponent {
+export default class ContactUs extends SimiPageComponent {
     constructor(props) {
         super(props)
+    }
 
+    createData() {
         const merchantConfig = Identify.getMerchantConfig()
-        if (!merchantConfig || !merchantConfig.storeview.instant_contact)
-            return
-            
-        const instantConfig = merchantConfig.storeview.instant_contact
-        this.isGrid = parseInt(instantConfig.style, 10)
+        if (!merchantConfig || !merchantConfig.storeview.instant_contact) {
+            return;
+        }
+
+        const instantConfig = merchantConfig.storeview.instant_contact;
+        this.isGrid = parseInt(instantConfig.style, 10);
         this.activeColor = instantConfig.activecolor ? '#' + instantConfig.activecolor : '#FF9900'
 
         let contactItems = []
-        if (instantConfig.email) {
+        if (instantConfig.email && instantConfig.email != '') {
             instantConfig.email.map(item => {
                 contactItems.push({
                     link: 'mailto:' + item,
@@ -28,10 +30,10 @@ class ContactUs extends SimiPageComponent {
             })
         }
 
-        if (instantConfig.phone) {
+        if (instantConfig.phone && instantConfig.phone != '') {
             instantConfig.phone.map(item => {
                 contactItems.push({
-                    link: 'tel::' + item,
+                    link: 'tel:' + item,
                     title: (instantConfig.phone.length == 1) ? Identify.__('Call') : Identify.__('Call') + item,
                     icon: 'ios-call'
                 })
@@ -39,10 +41,10 @@ class ContactUs extends SimiPageComponent {
             })
         }
 
-        if (instantConfig.message) {
+        if (instantConfig.message && instantConfig.message != '') {
             instantConfig.message.map(item => {
                 contactItems.push({
-                    link: 'sms::' + item,
+                    link: 'sms:' + item,
                     title: (instantConfig.message.length == 1) ? Identify.__('Message') : Identify.__('Message') + item,
                     icon: 'ios-chatboxes'
                 })
@@ -50,51 +52,92 @@ class ContactUs extends SimiPageComponent {
             })
         }
 
-        if (instantConfig.website)
+        if (instantConfig.website && instantConfig.website != '') {
             contactItems.push({
                 link: instantConfig.website,
                 title: Identify.__('Website'),
                 icon: 'ios-globe'
             })
-
-        const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-        this.state.dataSource = ds.cloneWithRows(contactItems)
+        }
+        return contactItems;
     }
 
     renderItem(item) {
         return (
-            <View style={this.isGrid ? styles.gridItem : styles.listItem}>
-                <TouchableOpacity onPress={() => Linking.openURL(item.link)}
-                    style={this.isGrid ? styles.gridItemTouchable : styles.listItemTouchable}>
-                    <Icon name={item.icon}
-                        style={
-                            [
-                                this.isGrid ? styles.gridItemIcon : styles.listItemIcon,
-                                {
-                                    color: this.activeColor,
-                                    borderColor: this.isGrid ? this.activeColor : 'transparent'
-                                }
-                            ]
-                        } />
-                    <Text style={this.isGrid ? styles.gridItemTitle : styles.listItemTitle}>{item.title}</Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+                onPress={() => Linking.openURL(item.link)}
+                style={this.isGrid ? styles.itemGrid : styles.itemList}>
+                <Icon name={item.icon}
+                    style={
+                        [
+                            this.isGrid ? styles.gridItemIcon : {},
+                            {
+                                fontSize: 30,
+                                color: this.activeColor,
+                                borderColor: this.isGrid ? this.activeColor : 'transparent'
+                            }
+                        ]
+                    }
+                />
+                <Text style={this.isGrid ? styles.titleGrid : styles.titleList}>{item.title}</Text>
+            </TouchableOpacity>
         )
     }
 
     renderPhoneLayout() {
-        if (!this.state.dataSource)
-            return
-
+        let data = this.createData();
+        if (!data) {
+            return;
+        }
         return (
             <Container>
-                <ListView
-                    contentContainerStyle={this.isGrid ? styles.grid : styles.list}
-                    dataSource={this.state.dataSource}
-                    renderRow={(rowData) => this.renderItem(rowData)}
+                <FlatList
+                    contentContainerStyle={{
+                        paddingLeft: 20,
+                        paddingRight: 20
+                    }}
+                    data={data}
+                    renderItem={({ item }) => this.renderItem(item)}
+                    numColumns={this.isGrid ? 2 : 1}
+                    keyExtractor={(item, index) => index.toString()}
                 />
             </Container>
         )
     }
 }
-export default (ContactUs);
+
+const styles = StyleSheet.create({
+    itemGrid: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '36%',
+        height: 150,
+    },
+    itemList: {
+        flex: 1,
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
+        paddingTop: 10,
+        paddingBottom: 10,
+        alignItems: 'center'
+    },
+    gridItemIcon: {
+        borderWidth: 1,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        paddingTop: 14,
+        textAlign: 'center',
+        fontSize: 30
+    },
+    titleGrid: {
+        marginTop: 15,
+        fontSize: 15
+    },
+    titleList: {
+        marginLeft: 15,
+        fontSize: 15
+    }
+})

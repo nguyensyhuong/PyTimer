@@ -1,13 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import SimiComponent from '../../core/base/components/SimiComponent';
-import {LoginButton, LoginManager, AccessToken, GraphRequestManager, GraphRequest} from 'react-native-fbsdk';
-import { quoteitems, address_book_mode } from '../../core/helper/constants';
-import Connection from '../../core/base/network/Connection';
-import AppStorage from '../../core/helper/storage';
+import SimiComponent from '@base/components/SimiComponent';
+import { LoginButton, AccessToken, GraphRequestManager, GraphRequest } from 'react-native-fbsdk-next';
+import { quoteitems, address_book_mode } from '@helper/constants';
+import Connection from '@base/network/Connection';
+import NewConnection from '@base/network/NewConnection';
+import AppStorage from '@helper/storage';
 import md5 from 'md5';
-import NavigationManager from '../../core/helper/NavigationManager';
-import simicart from '../../core/helper/simicart';
+import NavigationManager from '@helper/NavigationManager';
+import simicart from '@helper/simicart';
+import Identify from '@helper/Identify';
 
 class AddFBLogin extends SimiComponent {
     constructor(props) {
@@ -16,10 +18,8 @@ class AddFBLogin extends SimiComponent {
         this.customerData = null;
         this.email = '';
         this.password = '';
-        LoginManager.logOut()
     }
     setData(data) {
-        console.log(JSON.stringify(data));
         this.props.clearData();
         if (!this.shouldGetQuoteItems) {
             this.customerData = data;
@@ -29,26 +29,33 @@ class AddFBLogin extends SimiComponent {
         } else {
             this.props.storeData('actions', [
                 { type: 'showLoading', data: { type: 'none' } },
-                { type: 'customer_data', data: this.customerData },
+                { type: 'customer_data', data: this.customerData.customer },
                 { type: 'quoteitems', data: data }
             ]);
             this.navigate();
         }
     }
+    handleWhenRequestFail() {
+        this.props.storeData('showLoading', { type: 'none' });
+    }
     getQuoteItems() {
-        Connection.restData();
-        Connection.connect(quoteitems, this, 'GET');
+        new NewConnection()
+            .init(quoteitems, 'get_quoteitems', this)
+            .connect();
     }
     saveCustomerData() {
+        Identify.setCustomerData(this.customerData.customer);
         try {
             Connection.setCustomer({ email: this.email, password: this.password });
+            Identify.setCustomerParams({ email: this.email, password: this.password });
             AppStorage.saveCustomerAutoLoginInfo({ email: this.email, password: this.password });
         } catch (error) {
             // Error saving data
         }
     }
+
     navigate = () => {
-        this.props.navigation.goBack(null);
+        NavigationManager.backToRootPage(this.props.navigation);
         if (this.props.isCheckout) {
             NavigationManager.openPage(this.props.navigation, 'AddressBook', {
                 isCheckout: true,
@@ -56,38 +63,17 @@ class AddFBLogin extends SimiComponent {
             });
         }
     }
-    facebookLoginCallback(error: ?Object, result: ?Object) {
-        console.log(parent);
-        if (error) {
-            console.log('Error fetching data: ' + JSON.stringify(error.toString()));
-        } else {
-            console.log('Success fetching data: ' + JSON.stringify(result));
 
-            // let names = result.name.split(' ');
-
-            // let params = [];
-            // params['email'] = result.email;
-            // params['password'] = md5(simicart.merchant_authorization + result.email);
-            // params['firstname'] = encodeURI(names[0]);
-            // params['lastname'] = encodeURI(names[1]);
-            // this.requestSocialLogin(params);
-        }
-    }
-    requestSocialLogin(params) {
-        Connection.restData();
-        Connection.setGetData(params);
-        Connection.connect('simiconnector/rest/v2/customers/sociallogin', this, 'GET');
-    }
     renderPhoneLayout() {
         const that = this;
         return (
             <LoginButton
-                style={{width: '100%', marginTop: 17, height: 38, flex: 1, justifyContent: 'center'}}
-                readPermissions={['email','user_photos','user_birthday']}
+                style={{ width: '100%', marginTop: 17, height: 38, flex: 1, justifyContent: 'center' }}
+                readPermissions={['email', 'user_photos', 'user_birthday']}
                 onLoginFinished={
                     (error, result) => {
                         if (error) {
-                            console.log("Request login has error: " + result.error);
+                            console.log("Request login has error: " + JSON.stringify(error));
                         } else if (result.isCancelled) {
                             console.log("Request login is cancelled.");
                         } else {
@@ -108,15 +94,20 @@ class AddFBLogin extends SimiComponent {
                                         that.email = result.email;
                                         that.password = md5(simicart.merchant_authorization + result.email);
 
+                                        if (Identify.getMerchantConfig().storeview.base.magento_version && Identify.getMerchantConfig().storeview.base.magento_version === '2') {
+                                            that.password = 'Simi123a@' + md5(simicart.merchant_authorization + result.email);
+                                        }
+
                                         let params = [];
                                         params['email'] = that.email;
                                         params['password'] = that.password;
                                         params['firstname'] = encodeURI(names[0]);
                                         params['lastname'] = encodeURI(names[1]);
-                                        Connection.restData();
-                                        Connection.setGetData(params);
-                                        Connection.connect('simiconnector/rest/v2/customers/sociallogin', that, 'GET');
-                                        
+                                        new NewConnection()
+                                            .init('simiconnector/rest/v2/customers/sociallogin', 'social_login', this)
+                                            .addGetData(params)
+                                            .connect();
+
                                         that.props.storeData('showLoading', { type: 'dialog' });
                                     };
 

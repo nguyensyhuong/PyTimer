@@ -1,48 +1,48 @@
 import React from 'react';
-import SimiComponent from '../../../core/base/components/SimiComponent';
+import SimiComponent from '@base/components/SimiComponent';
 import { Container, Content, Button, Text, Toast } from 'native-base';
-import ShippingMethod from '../../../core/screens/checkout/components/checkout/shipping';
+import ShippingMethod from '@screens/checkout/components/checkout/shipping';
 import { connect } from 'react-redux';
-import Connection from '../../../core/base/network/Connection';
-import Identify from '../../../core/helper/Identify';
-import NavigationManager from '../../../core/helper/NavigationManager';
-import {pp_shipping_method, pp_place_order} from '../../constants'
+import NewConnection from '@base/network/NewConnection';
+import Identify from '@helper/Identify';
+import NavigationManager from '@helper/NavigationManager';
+import { pp_shipping_method, pp_place_order } from '../../constants'
+import material from "../../../../native-base-theme/variables/material";
+
 class PaypalExpressShippingModule extends SimiComponent {
 
     constructor(props) {
         super(props);
-        this.shippings = null;
+        this.state = {
+            shippings: null
+        }
         this.isPlaceOrder = false;
         this.bodyData = null;
     }
 
-    componentWillMount() {
-        if (this.props.data.showLoading.type === 'none') {
-            this.props.storeData('showLoading', { type: 'full' });
-        }
-    }
-
     componentDidMount() {
-        Connection.restData();
-        Connection.connect(pp_shipping_method, this, 'GET');
+        this.props.storeData('showLoading', { type: 'full' });
+        new NewConnection()
+            .init(pp_shipping_method, 'pp_shipping_method', this)
+            .addGetData(data)
+            .connect();
     }
 
-    setData(data) {
+    setData(data, requestID) {
         if (data) {
             if (this.isPlaceOrder) {
-                Toast.show({
-                    text: Identify.__('Thank you for your purchase'),
-                    type: 'success',
-                    buttonText: "Okay",
-                    duration: 3000
+                NavigationManager.clearStackAndOpenPage(this.props.navigation, 'Thankyou', {
+                    invoice: data.order.invoice_number
                 });
-                NavigationManager.backToRootPage(this.props.navigation);
-                this.props.navigation.goBack(null);
+                this.props.storeData('actions', [
+                    { type: 'showLoading', data: { type: 'none' } },
+                    { type: 'quoteitems', data: {} }
+                ]);
             } else if (data.ppexpressapi) {
-                this.shippings = data.ppexpressapi.methods;
+                this.state.shippings = data.ppexpressapi.methods;
 
-                if (this.shippings) {
-                    this.shippings.forEach(shippingMethod => {
+                if (this.state.shippings) {
+                    this.state.shippings.forEach(shippingMethod => {
                         if (shippingMethod.s_method_selected) {
                             this.bodyData = {
                                 s_method: {
@@ -52,38 +52,65 @@ class PaypalExpressShippingModule extends SimiComponent {
                         }
                     });
                 }
+                this.props.storeData('showLoading', { type: 'none' });
             }
         }
+    }
+
+    handleWhenRequestFail() {
         this.props.storeData('showLoading', { type: 'none' });
     }
 
     onSaveMethod(bodyData, isInitRequest = false) {
         this.bodyData = bodyData;
+        let newShippingData = JSON.parse(JSON.stringify(this.state.shippings));
+        newShippingData.forEach(element => {
+            if(bodyData.s_method.method == element.s_method_code) {
+                element.s_method_selected = true;
+            } else {
+                element.s_method_selected = false;
+            }
+        });
+        this.setState({shippings: newShippingData});
     }
 
     requestPlaceOrder() {
         this.isPlaceOrder = true;
-        Connection.restData();
-        Connection.setBodyData(this.bodyData);
-        Connection.connect(pp_place_order, this, 'POST');
+        new NewConnection()
+            .init(pp_place_order, 'pp_place_order', this, 'POST')
+            .addBodyData(this.bodyData)
+            .connect();
     }
 
     renderPhoneLayout() {
-        if (this.shippings == null) {
+        if (this.state.shippings == null) {
             return (null);
         } else {
             return (
                 <Container>
                     <Content>
-                        <ShippingMethod parent={this} data={this.shippings} navigation={this.props.navigation} />
+                        <ShippingMethod
+                            onRef={ref => (this.shipping = ref)}
+                            title={Identify.__('Shipping Method')}
+                            parent={this}
+                            data={this.state.shippings}
+                            navigation={this.props.navigation}
+                            isPpexpress={true} />
                     </Content>
                     <Button full style={{ position: 'absolute', bottom: 0, width: '100%', height: 50 }} onPress={() => {
-                        if (this.shippings.length > 0 && this.bodyData != null) {
+                        if (this.state.shippings.length > 0 && this.bodyData != null) {
                             this.props.storeData('showLoading', { type: 'dialog' });
                             this.requestPlaceOrder();
+                        } else {
+                            Toast.show({
+                                text: Identify.__('Please select valid address'),
+                                type: 'danger',
+                                duration: 3000,
+                                textStyle: { fontFamily: material.fontFamily }
+                            });
                         }
                     }}>
-                        <Text>{Identify.__('Place Order')}</Text>
+                        <Text>{Identify.__('PLACE ORDER')}</Text>
                     </Button>
                 </Container>
             );
@@ -93,7 +120,10 @@ class PaypalExpressShippingModule extends SimiComponent {
 }
 
 const mapStateToProps = (state) => {
-    return { data: state.redux_data };
+    return {
+        data: state.redux_data.order_review_data,
+        showLoading: state.redux_data.showLoading
+    };
 }
 //Save to redux.
 const mapDispatchToProps = (dispatch) => {

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Icon } from 'native-base';
-import {ShareDialog} from 'react-native-fbsdk';
+import { Alert } from 'react-native'
+import { ShareDialog } from 'react-native-fbsdk-next';
 import simicart from '../../core/helper/simicart';
+import Identify from '@helper/Identify'
 
 export default class AddFBShare extends React.Component {
     constructor(props) {
@@ -9,6 +11,8 @@ export default class AddFBShare extends React.Component {
     }
     openShareDialog() {
         var tmp = this;
+        Identify.saveIsOpenShareFB(true);
+
         ShareDialog.canShow(this.shareLinkContent)
             .then(function (canShow) {
                 if (canShow) {
@@ -18,9 +22,16 @@ export default class AddFBShare extends React.Component {
             .then(
                 function (result) {
                     if (result.isCancelled) {
-                        alert('Share cancelled');
+                        Identify.saveIsOpenShareFB(false);
+                        Alert.alert(
+                            Identify.__('Alert'),
+                            Identify.__('Share cancelled'),
+                        );
                     } else {
-                        alert('Share success');
+                        Alert.alert(
+                            Identify.__('Alert'),
+                            Identify.__('Share success'),
+                        );
                     }
                 },
                 function (error) {
@@ -34,7 +45,11 @@ export default class AddFBShare extends React.Component {
             if (url.slice(-1) !== '/') {
                 url = url + '/';
             }
-            url = url + this.props.product.url_path;
+            if (this.props.product.url_path && this.props.product.url_path != null && this.props.product.url_path != "") {
+                url = url + this.props.product.url_path;
+            } else {
+                url = url + "catalog/product/view/id/" + this.props.product.entity_id;
+            }
             this.shareLinkContent = {
                 contentType: 'link',
                 contentUrl: url,

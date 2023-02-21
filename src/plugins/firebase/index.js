@@ -1,6 +1,4 @@
 import React from "react";
-import {View} from 'react-native';
-import Connection from '@base/network/Connection';
 import Identify from '@helper/Identify';
 import Action from './action';
 
@@ -34,6 +32,9 @@ export default class FirebaseAnalytics extends React.Component {
   //0: new, 1, viewed, 2 view agian.
   pushData(status=0){
     //let Analytics = Firebase.analytics();
+    //if (!Identify.isAppTrackingEnable()) {
+      //return;
+    //}
     try{
       let currentProps = this.getKeyFromProps(this.props);
       if(currentProps){

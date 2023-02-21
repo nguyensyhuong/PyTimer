@@ -5,8 +5,9 @@ export default {
     content: {
         plugin_fb_login: {
             active: true,
-            sort_order: 3100,
-            content: require('../../../../plugins/facebook/login').default
+            sort_order: 8100,
+            // content: require('../../../../plugins/facebook/login').default
+            content: require('../../../../plugins/facebook/loginV2').default
         }
     }
 }

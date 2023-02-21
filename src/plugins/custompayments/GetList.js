@@ -1,14 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Connection from '../../core/base/network/Connection';
-import { customizepayments } from '../../core/helper/constants';
-import Identify from '../../core/helper/Identify';
+import NewConnection from '@base/network/NewConnection';
+import { customizepayments } from '@helper/constants';
+import Identify from '@helper/Identify';
 
 class CustomPayment extends React.Component {
     componentDidMount() {
         if (Identify.isEmpty(this.props.data.customPayment)) {
-            Connection.restData();
-            Connection.connect(customizepayments, this, 'GET');
+            new NewConnection()
+                .init(customizepayments, 'get_customize_payments', this)
+                .setShowErrorAlert(false)
+                .connect();
         }
     }
     setData(data) {

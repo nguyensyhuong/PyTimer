@@ -1,13 +1,13 @@
 import React from 'react';
-import SimiComponent from '../../../core/base/components/SimiComponent';
+import SimiPageComponent from '@base/components/SimiPageComponent';
 import { Container } from 'native-base';
 import PaypalExpressAddressModule from '../modules/address';
 
-export default class PayPalExpressAddress extends SimiComponent {
+export default class PayPalExpressAddress extends SimiPageComponent {
 
     constructor(props) {
         super(props);
-        this.isPage = true;
+        this.isRight = false;
     }
 
     renderPhoneLayout() {

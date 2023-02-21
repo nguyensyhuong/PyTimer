@@ -1,9 +1,10 @@
 import React from 'react';
 import SimiComponent from "../../core/base/components/SimiComponent";
 import { Toast, Icon } from 'native-base';
-import { Platform } from 'react-native';
-import Voice from 'react-native-voice';
+import { Platform, Keyboard } from 'react-native';
+import Voice from '@react-native-community/voice';
 import Identify from '../../core/helper/Identify';
+import material from "../../../native-base-theme/variables/material";
 
 export default class VoiceSearch extends SimiComponent {
     constructor(props) {
@@ -16,7 +17,7 @@ export default class VoiceSearch extends SimiComponent {
     }
     onSpeechResults(result) {
         console.log('Void search result: ' + JSON.stringify(result));
-        if(Platform.OS === 'ios') {
+        if (Platform.OS === 'ios') {
             Voice.stop();
         } else {
             Toast.toastInstance._root.closeToast();
@@ -31,10 +32,10 @@ export default class VoiceSearch extends SimiComponent {
         this.props.obj.state.text = '';
         Toast.show({
             text: 'Listening...',
-            buttonText: '',
+            textStyle: {fontFamily: material.fontFamily},
             duration: 10000,
             onClose: () => {
-                if(this.props.obj.state.text == '') {
+                if (this.props.obj.state.text == '') {
                     Voice.cancel();
                 }
             }
@@ -46,16 +47,15 @@ export default class VoiceSearch extends SimiComponent {
     onSpeechError(result) {
         console.log('error: ' + JSON.stringify(result));
         let message = Identify.__('No result');
-        if(result && result.error.message) {
+        if (result && result.error.message) {
             let messagesArr = result.error.message.split('/');
             let returnMessage = messagesArr[1];
-            if(returnMessage) {
+            if (returnMessage) {
                 message = returnMessage;
             }
         }
         Toast.show({
-            text: message,
-            buttonText: ''
+            text: message,textStyle: {fontFamily: material.fontFamily},duration: 3000
         });
     }
     componentWillUnmount() {
@@ -65,6 +65,7 @@ export default class VoiceSearch extends SimiComponent {
         return (
             <Icon style={{ marginLeft: 5, fontSize: 21, marginRight: 5, paddingLeft: 10 }}
                 name='md-recording' onPress={() => {
+                    Keyboard.dismiss();
                     Voice.start('en-US');
                 }} />
         );

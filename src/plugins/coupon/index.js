@@ -1,64 +1,136 @@
 import React from 'react';
-import {Text, Button, View, Input, Item , Toast} from 'native-base';
+import { Text, Button, View, Input, Item, Toast, Accordion, Icon } from 'native-base';
+import { TouchableOpacity } from 'react-native'
 import Identify from '@helper/Identify';
-import Connection from '../../core/base/network/Connection';
-import Events from '../../core/helper/config/events';
-import { quoteitems } from '@helper/constants';
-import {connect} from 'react-redux'
-class Coupon extends React.Component{
-    constructor(props){
+import NewConnection from '@base/network/NewConnection';
+import Events from '@helper/config/events';
+import { quoteitems, onepage } from '@helper/constants';
+import { connect } from 'react-redux'
+import material from '@theme/variables/material';
+
+class Coupon extends React.Component {
+    constructor(props) {
         super(props)
+        this.parent = this.props.parent;
+
+        if (this.props.is_cart) {
+            couponCode = this.parent.props.data.total.coupon_code ? this.parent.props.data.total.coupon_code : '';
+        } else {
+            couponCode = this.parent.props.data.order.total.coupon_code ? this.parent.props.data.order.total.coupon_code : '';
+        }
         this.state = {
-            coupon : ''
+            coupon: couponCode,
+            useCouponCode: couponCode !== ''
         }
-        this.parent = this.props.parent
     }
-    setData(data){
-        this.props.storeData('showLoading',{type: 'none'});
-        if(data.errors){
-            let text = data.error[0].message;
-            Toast.show({text: text})
-        }else {
-            this.parent.setData(data)
+    componentDidUpdate(nextProps, nextState) {
+        let nextPropsTotal = this.props.is_cart ? nextProps.parent.props.data.total : nextProps.parent.props.data.order.total;
+        if (nextPropsTotal.hasOwnProperty('coupon_code') && !this.state.useCouponCode) {
+            this.setState({
+                useCouponCode: true
+            })
         }
+    }
+    setData(data) {
+        this.props.storeData('showLoading', { type: 'none' });
+        data['reload_data'] = true;
+        this.parent.setData(data);
+        if (this.props.is_cart) {
+            couponCode = data.total.coupon_code ? data.total.coupon_code : '';
+        } else {
+            couponCode = data.order.total.coupon_code ? data.order.total.coupon_code : '';
+        }
+        this.setState({ coupon: couponCode });
     }
     couponChange(code) {
-        this.setState({coupon: code})
+        this.state.coupon = code
     }
-    tracking(){
+    tracking() {
         let data = {};
-        data['event'] = 'cart_action';
+        data['event'] = this.props.is_cart ? 'cart_action' : 'checkout_action';
         data['action'] = 'apply_coupon_code';
         data['coupon_code'] = this.state.coupon;
         Events.dispatchEventAction(data, this);
     }
-    couponHandle() {
-        if(this.state.coupon == ''){
-            Toast.show({text: 'Please re-enter your code!!'})
-        }else {
+    couponHandle(isRemove) {
+        if (this.state.coupon === '') {
+            Toast.show({ text: Identify.__('Please re-enter your code') + '!!', textStyle: { fontFamily: material.fontFamily } })
+        } else {
             this.tracking()
             this.props.storeData('showLoading', { type: 'dialog' });
-            Connection.restData();
-            if (!Identify.isEmpty(this.parent.props.data) && this.parent.props.data.quote_id != null) {
-                let params = [];
-                params['quote_id'] = this.parent.props.data.quote_id;
-                Connection.setGetData(params);
-            }
             let json = {};
-            json['coupon_code'] = this.state.coupon;
-            Connection.setBodyData(json);
-            Connection.connect(quoteitems, this, 'PUT');
+            json['coupon_code'] = isRemove ? '' : this.state.coupon;
+            new NewConnection()
+                .init(this.props.is_cart ? quoteitems : onepage, 'apply_coupon', this, 'PUT')
+                .addBodyData(json)
+                .connect();
         }
     }
-    render(){
+    _renderHeader(item, expanded) {
         return (
-            <View style={{ flex: 3, flexDirection: 'row', marginTop: 20, marginLeft: 15, marginRight: 10 }}>
-                <Item regular style={{ flex: 2, marginRight: 20, height: 45, borderColor: '#dedede', backgroundColor: '#dedede' }}>
-                    <Input style={{paddingStart: 10}} placeholder={Identify.__('Enter a coupon code')} value={this.state.coupon} onChangeText={(code) => { this.couponChange( code ) }} />
-                </Item>
-                <Button primary onPress={() => { this.couponHandle() }}><Text style={{ textAlign: 'center' }}>{Identify.__('Apply')}</Text></Button>
-            </View>
+            <TouchableOpacity
+                activeOpacity={0.8}
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                }}
+                onPress={() => {
+                    this.setState(oldState => {
+                        return {
+                            useCouponCode: !oldState.useCouponCode
+                        }
+                    })
+                }}
+            >
+                <Text style={{ fontFamily: material.fontBold }}>
+                    {item.title}
+                </Text>
+                {expanded
+                    ? <Icon style={{ fontSize: 18, color: '#c3c3c3' }} name="ios-arrow-up" />
+                    : <Icon style={{ fontSize: 18, color: '#c3c3c3' }} name="ios-arrow-down" />}
+            </TouchableOpacity>
         );
+    }
+    _renderContent(show) {
+        let hasCouponCode = false;
+        let couponCode = '';
+        if (this.props.is_cart) {
+            hasCouponCode = this.parent.props.data.total.coupon_code ? true : false;
+            couponCode = this.parent.props.data.total.coupon_code ? this.parent.props.data.total.coupon_code : ''
+        } else {
+            hasCouponCode = this.parent.props.data.order.total.coupon_code ? true : false;
+            couponCode = this.parent.props.data.order.total.coupon_code ? this.parent.props.data.order.total.coupon_code : ''
+        }
+        if (couponCode !== '') {
+            this.state.coupon = couponCode;
+        }
+        if (show) {
+            return (
+                <View style={{ flex: 3, flexDirection: 'row', paddingTop: 15 }}>
+                    <Item style={{ flex: 2, marginRight: 20, height: 45, borderBottomWidth: 2 }}>
+                        <Input disabled={hasCouponCode} style={{ paddingStart: 10 }} placeholder={Identify.__('Enter a coupon code')} placeholderTextColor={Identify.hexToRgb(material.textColor, 0.65)} defaultValue={this.state.coupon} onChangeText={(code) => { this.couponChange(code) }} />
+                    </Item>
+                    <Button onPress={() => { this.couponHandle(hasCouponCode) }}><Text style={{ textAlign: 'center' }}>{hasCouponCode ? Identify.__('Remove') : Identify.__('Apply')}</Text></Button>
+                </View>
+            );
+        }
+    }
+
+    render() {
+        return (
+            <View
+                style={{
+                    marginLeft: 15,
+                    marginRight: 15,
+                    marginTop: 25,
+                    marginBottom: 10
+                }}
+            >
+                {this._renderHeader({ title: Identify.__('Coupon Code').toUpperCase() }, this.state.useCouponCode)}
+                {this._renderContent(this.state.useCouponCode)}
+            </View>
+        )
     }
 }
 

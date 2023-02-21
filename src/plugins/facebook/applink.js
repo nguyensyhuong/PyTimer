@@ -14,20 +14,25 @@ export function processAppLink(link, navigation) {
                 params = {
                     categoryId: cateID,
                     categoryName: 'Facebook App Links',
+                    showBack: false
                 };
             } else {
                 routeName = 'Products';
                 params = {
                     categoryId: cateID,
                     categoryName: 'Facebook App Links',
+                    showBack: false
                 };
             }
-            NavigationManager.openRootPage(navigation, routeName, params);
+            NavigationManager.openPage(navigation, routeName, params);
         } else if (param[1].includes('product_id')) {
             let productID = param[1].split('=')[1];
-            NavigationManager.openRootPage(navigation, 'ProductDetail', {
+            NavigationManager.openPage(navigation, 'ProductDetail', {
                 productId: productID,
+                showBack: false
             });
+        } else {
+            return false;
         }
         return true;
     }
