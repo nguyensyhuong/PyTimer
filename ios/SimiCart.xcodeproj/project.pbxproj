@@ -896,7 +896,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 5L748QCS32;
+						DevelopmentTeam = JRTX64ZTY5;
 						LastSwiftMigration = 1250;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
@@ -1556,7 +1556,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = 5L748QCS32;
+				DEVELOPMENT_TEAM = JRTX64ZTY5;
 				ENABLE_BITCODE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)/**",
@@ -1569,16 +1569,16 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.0.10;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.simicart.enterprise;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pytimberwarehouse.app;
 				PRODUCT_NAME = SimiCart;
 				PROVISIONING_PROFILE = "9ac6a725-345d-44d6-9aa1-39fba1503c6d";
-				PROVISIONING_PROFILE_SPECIFIER = wildcard_adhoc;
+				PROVISIONING_PROFILE_SPECIFIER = PyTimber;
 				SWIFT_OBJC_BRIDGING_HEADER = "SimiCart-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1597,7 +1597,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5L748QCS32;
+				DEVELOPMENT_TEAM = JRTX64ZTY5;
 				ENABLE_BITCODE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)/**",
@@ -1610,16 +1610,16 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.0.10;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.simicart.enterprise;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pytimberwarehouse.app;
 				PRODUCT_NAME = SimiCart;
 				PROVISIONING_PROFILE = "42f71cc7-a7f0-4ab4-9c78-5aa5570f92b7";
-				PROVISIONING_PROFILE_SPECIFIER = wildcard_adhoc;
+				PROVISIONING_PROFILE_SPECIFIER = PyTimber;
 				SWIFT_OBJC_BRIDGING_HEADER = "SimiCart-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

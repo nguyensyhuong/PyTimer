@@ -22,9 +22,9 @@ class OrderPage extends SimiPageComponent {
 
     componentDidMount() {
         super.componentDidMount();
-        if (!this.state.order) {
-            this.getOrder();
-        }
+        // if (!this.state.order) {
+        this.getOrder();
+        // }
     }
 
     getOrder = () => {
