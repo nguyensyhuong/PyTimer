@@ -16,8 +16,22 @@ class AddToCart extends SimiComponent {
 
     constructor(props) {
         super(props);
+        this.state = {
+            ... this.state,
+            isSpecialOrder: props.product.special_order ? true : false
+        }
         this.storeConfig = Identify.getMerchantConfig().storeview.base;
-        
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.product.special_order !== this.props.product.special_order) {
+            if(this.props.product.special_order != '0') {
+                this.setState({ ...this.state, isSpecialOrder: true})
+            }
+            else {
+                this.setState({ ...this.state, isSpecialOrder: false})
+            }
+        }
     }
 
     setData(data) {
@@ -101,11 +115,15 @@ class AddToCart extends SimiComponent {
         if (!this.props.parent.product || this.props.product.is_salable != '1' || !showButton) {
             return (null);
         }
+        let text_button = 'Add To Cart'
+        if (Identify.getMerchantConfig().storeview?.preOrder && 
+            Identify.getMerchantConfig().storeview.preOrder.enable && this.state.isSpecialOrder) 
+                text_button = Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
         return (
             <View style={styles.addToCart}>
                 <Quantity onRef={ref => (this.qty = ref)} />
                 <Button full style={{ flex: 1, marginLeft: 10 }} onPress={() => { this.onClickAddToCart() }}>
-                    <Text>{Identify.__(this.props.product.is_salable == '1' ? 'Pre-Order' : 'Add To Cart' )}</Text>
+                    <Text>{Identify.__(text_button)}</Text>
                 </Button>
             </View>
         );

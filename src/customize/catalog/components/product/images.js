@@ -10,6 +10,7 @@ import Events from '@helper/config/events';
 import Identify from '@helper/Identify';
 import md5 from 'md5';
 import SpecialOrderLabel from '../specialOrder';
+import OutStockLabel from '@screens/catalog/components/product/outStockLabel';
 import material from '@theme/variables/material';
 
 export default class ProductImagesComponent extends SimiComponent {
@@ -21,7 +22,6 @@ export default class ProductImagesComponent extends SimiComponent {
             showSwiper: false,
             isSpecialOrder: props.product.special_order ? true : false
         }
-        this.isSpecialOrder = false
     }
 
     componentWillMount(){
@@ -83,6 +83,12 @@ export default class ProductImagesComponent extends SimiComponent {
     renderSpecialOrder() {
         if (this.state.isSpecialOrder) {
             return <SpecialOrderLabel fontSize={18}/>
+        }
+    }
+
+    renderOutStock() {
+        if (this.props.product.is_salable == '0') {
+            return <OutStockLabel  fontSize={18}/>
         }
     }
 
@@ -166,7 +172,8 @@ export default class ProductImagesComponent extends SimiComponent {
                         horizontal={true}>
                         {this.renderImages()}
                     </Swiper> : null}
-                    {this.renderSpecialOrder()}
+                    {Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable ? 
+                    this.renderSpecialOrder() : this.renderOutStock()}
                     {this.dispatchContent()}
                 </View>
             </Card>

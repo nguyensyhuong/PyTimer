@@ -28,6 +28,12 @@ const HorizontalItem = (props) => {
         }
     }
 
+    function renderOutStock() {
+        if (this.props.product.is_salable == '0') {
+            return <OutStockLabel  fontSize={18}/>
+        }
+    }
+
     function renderSpecialPriceLabel() {
         let saleOff = null;
         let price = props.item.app_prices;
@@ -72,7 +78,8 @@ const HorizontalItem = (props) => {
             <View style={[styles.imageListItem, { borderWidth: 0.5, borderColor: material.imageBorderColor }]}>
                 {renderSpecialPriceLabel()}
                 <Image resizeMode='contain' source={source} style={{ width: scale(130), height: scale(130), overflow: 'hidden' }} />
-                {renderSpecialOrder(item)}
+                {Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable ? 
+                    renderSpecialOrder(item) : renderOutStock(item)}
                 {dispatchContent()}
             </View>
         );

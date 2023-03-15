@@ -52,6 +52,7 @@ export default class ProductNamePriceComponent extends SimiComponent {
         else return null
     }
     renderPhoneLayout() {
+        console.log('this.props.product', this.props.product)
         if (this.props.product == null) {
             return (null);
         }

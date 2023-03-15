@@ -15,6 +15,7 @@ import { quoteitems } from '@helper/constants';
 import SpecialOrderLabel from '../specialOrder';
 import material from '@theme/variables/material';
 import AppStorage from '@helper/storage';
+import OutStockLabel from '@screens/catalog/components/product/outStockLabel';
 
 class VerticalProductItem extends SimiComponent {
     constructor(props) {
@@ -28,6 +29,13 @@ class VerticalProductItem extends SimiComponent {
             return <SpecialOrderLabel fontSize={18}/>
         }
     }
+
+    renderOutStock() {
+        if (this.props.product.is_salable == '0') {
+            return <OutStockLabel  fontSize={18}/>
+        }
+    }
+
     renderSpecialPriceLabel() {
         let saleOff = null;
         let price = this.props.product.app_prices;
@@ -73,7 +81,8 @@ class VerticalProductItem extends SimiComponent {
                 <View style={styles.image}>
                     {this.renderSpecialPriceLabel()}
                     <Image resizeMode='contain' source={source} style={styles.image} />
-                    {this.renderSpecialOrder()}
+                    {Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable ? 
+                    this.renderSpecialOrder() : this.renderOutStock()}
                     {this.dispatchContent()}
                 </View>
             </CardItem>
