@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList } from 'react-native';
 import styles from '@screens/home/pages/styles';
 import { View, H3, Text } from "native-base";
-import HorizontalProducts from '@screens/catalog/components/horizontalProducts';
+import HorizontalProducts from '../../../catalog/components/horizontalProducts';
 import Identify from '@helper/Identify';
 import NavigationManager from '@helper/NavigationManager';
 import { products_mode, home_spot_products } from '@helper/constants';
