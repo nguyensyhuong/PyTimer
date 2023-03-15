@@ -16,6 +16,7 @@ simi_fblogin_40 : {
 login: require('./plugins/simi_fblogin_40/login').default,
 },
 customize : {
+category: require('./customize/category').default,
 standard: require('./customize/standard').default,
 product: require('./customize/product').default,
 products: require('./customize/products').default,

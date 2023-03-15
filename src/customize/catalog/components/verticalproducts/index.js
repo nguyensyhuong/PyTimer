@@ -3,7 +3,7 @@ import SimiComponent from '@base/components/SimiComponent';
 import { ScrollView, FlatList } from 'react-native';
 import { Spinner, View, Text, Toast } from 'native-base';
 import Device from '@helper/device';
-import VerticalProductItem from '@screens/catalog/components/verticalproducts/item';
+import VerticalProductItem from './item';
 import styles from '@screens/catalog/components/verticalproducts/styles';
 import Identify from '@helper/Identify';
 import material from "@theme/variables/material";
@@ -52,6 +52,7 @@ export default class VerticalProducts extends SimiComponent {
     }
 
     createListProps() {
+        console.log('sdfdf', this.props.products)
         let showList = this.props.parent.state.showList;
         let numColumns = (showList && !Device.isTablet()) ? 1 : ((showList && Device.isTablet() || !showList && !Device.isTablet()) ? 2 : 4)
         return {
