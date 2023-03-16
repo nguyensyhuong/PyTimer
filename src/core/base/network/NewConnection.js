@@ -95,11 +95,12 @@ export default class NewConnection {
         this.createGetParams();
 
         if (this._dataGet) {
+            const time = Date.now()
             let getParams = Object.keys(this._dataGet).map((key) => {
                 return encodeURIComponent(key) + '=' +
                     encodeURIComponent(this._dataGet[key]);
             }).join('&');
-            _fullUrl += "?" + getParams;
+            _fullUrl += "?" + getParams + '&' + time;
         }
         return _fullUrl;
     }

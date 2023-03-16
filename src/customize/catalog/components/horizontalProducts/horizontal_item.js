@@ -11,6 +11,7 @@ import Events from '@helper/config/events';
 import md5 from 'md5';
 import material from '@theme/variables/material';
 import SpecialOrderLabel from '../specialOrder';
+import OutStockLabel from '@screens/catalog/components/product/outStockLabel';
 
 const HorizontalItem = (props) => {
     
@@ -26,11 +27,12 @@ const HorizontalItem = (props) => {
         if (isSpecialOrder && isSpecialOrder != '0') {
             return <SpecialOrderLabel />
         }
+        else return renderOutStock()
     }
-
+ 
     function renderOutStock() {
-        if (this.props.product.is_salable == '0') {
-            return <OutStockLabel  fontSize={18}/>
+        if (props.item.quantity_and_stock_status && !props.item.quantity_and_stock_status.is_in_stock) {
+            return <OutStockLabel />
         }
     }
 

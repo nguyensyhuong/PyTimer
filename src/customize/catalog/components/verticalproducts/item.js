@@ -24,15 +24,15 @@ class VerticalProductItem extends SimiComponent {
     }
 
     renderSpecialOrder() {
-        this.isSpecialOrder = this.props.product.special_order;
-        if (this.special_order && this.isSpecialOrder != '0') {
-            return <SpecialOrderLabel fontSize={18}/>
+        if (this.props.product.special_order && this.props.product.special_order != '0') {
+            return <SpecialOrderLabel />
         }
+        else return this.renderOutStock()
     }
 
     renderOutStock() {
-        if (this.props.product.is_salable == '0') {
-            return <OutStockLabel  fontSize={18}/>
+        if (this.props.product.quantity_and_stock_status && !this.props.product.quantity_and_stock_status.is_in_stock) {
+            return <OutStockLabel />
         }
     }
 

@@ -20,26 +20,12 @@ export default class ProductImagesComponent extends SimiComponent {
         this.state = {
             ... this.state,
             showSwiper: false,
-            isSpecialOrder: props.product.special_order ? true : false
         }
     }
 
     componentWillMount(){
         setTimeout(() => {this.setState({showSwiper:true})}, 500);
     }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.product.special_order !== this.props.product.special_order) {
-            if(this.props.product.special_order != '0') {
-                this.setState({ ...this.state, isSpecialOrder: true})
-            }
-            else {
-                this.setState({ ...this.state, isSpecialOrder: false})
-            }
-        }
-    }
-
-    // this.props.product.special_order ? this.setState({ ...this.state, isSpecialOrder: true}) : null
 
     tracking() {
         let params = {};
@@ -81,13 +67,14 @@ export default class ProductImagesComponent extends SimiComponent {
     } 
 
     renderSpecialOrder() {
-        if (this.state.isSpecialOrder) {
+        if (this.props.product.special_order && this.props.product.special_order != '0') {
             return <SpecialOrderLabel fontSize={18}/>
         }
+        else return this.renderOutStock()
     }
 
     renderOutStock() {
-        if (this.props.product.is_salable == '0') {
+        if (this.props.product.quantity_and_stock_status && !this.props.product.quantity_and_stock_status.is_in_stock) {
             return <OutStockLabel  fontSize={18}/>
         }
     }

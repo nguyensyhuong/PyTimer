@@ -52,7 +52,6 @@ export default class VerticalProducts extends SimiComponent {
     }
 
     createListProps() {
-        console.log('sdfdf', this.props.products)
         let showList = this.props.parent.state.showList;
         let numColumns = (showList && !Device.isTablet()) ? 1 : ((showList && Device.isTablet() || !showList && !Device.isTablet()) ? 2 : 4)
         return {
