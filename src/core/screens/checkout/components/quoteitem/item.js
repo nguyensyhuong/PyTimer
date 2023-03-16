@@ -2,14 +2,20 @@ import React from 'react';
 import SimiComponent from '@base/components/SimiComponent';
 import { ListItem, Body, Right, Button, Icon, View, Text, Input } from 'native-base';
 import Identify from '@helper/Identify';
-import { StyleSheet, TextInput, Image, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, TextInput, Image, Alert, TouchableOpacity, Dimensions } from 'react-native';
 import material from '@theme/variables/material';
 import NavigationManager from '@helper/NavigationManager';
 import QuoteItemView from './quote';
 import OutStockLabel from '../../../catalog/components/product/outStockLabel';
-
+import Entypo from 'react-native-vector-icons/Entypo'
 const QuoteItem = (props) => {
-
+    const listProductPreOrder = React.useMemo(() => {
+        if (props.orderInfo?.product_pre_order && JSON.parse(props.orderInfo?.product_pre_order)) {
+            return Object.keys(JSON.parse(props.orderInfo?.product_pre_order));
+        } else {
+            return [];
+        }
+    }, [props.orderInfo?.product_pre_order])
     function showDeleteItemPopup() {
         Alert.alert(
             Identify.__('Warning'),
@@ -120,33 +126,76 @@ const QuoteItem = (props) => {
     }
 
     return (
-        <ListItem
-            style={{
-                marginRight: 15,
-                marginLeft: 15,
-                paddingRight: 0
-            }}
-        >
-            <Body style={styles.viewFlexBody}>
+        <View style={styles.listItem}>
+            <Body style={[styles.viewFlexBody, { flex: 1 }]}>
                 <View style={{ paddingTop: 5 }}>
                     {renderImageItem()}
                 </View>
-                {renderItemContent()}
+                <View style={{ width: Dimensions.get("window").width * 0.6 }}>
+                    {renderItemContent()}
+                </View>
             </Body>
             <Right />
             {renderMoveItem()}
-        </ListItem>
+            {
+                // TH: Cart Page
+                Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable && props.data?.cart_contain_preorder && <View style={styles.wrapperMessage}>
+                    <View style={{ paddingHorizontal: 10 }}>
+                        <Entypo name="warning" style={{ color: "#c07600", fontSize: 18 }} />
+                    </View>
+                    <Text style={styles.message}>
+                        {Identify.__(Identify.getMerchantConfig().storeview?.preOrder?.note_in_cart)}
+                    </Text>
+                </View>
+            }
+            {
+                // TH: Order detail
+                props.orderInfo?.product_pre_order && listProductPreOrder && listProductPreOrder.includes(props?.data?.product_id) && <View style={styles.wrapperMessage}>
+                    <View style={{ paddingHorizontal: 10 }}>
+                        <Entypo name="warning" style={{ color: "#c07600", fontSize: 18 }} />
+                    </View>
+                    <Text style={styles.message}>
+                        {Identify.__(Identify.getMerchantConfig().storeview?.preOrder?.note_in_cart)}
+                    </Text>
+                </View>
+            }
+
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    qtyBox: { borderStyle: 'solid', width: 55, height: 35, fontSize: 13, borderColor: '#000', alignItems: 'center', borderWidth: 1, borderRadius: 4, textAlign: 'center', color: 'black' },
-    spaceLine: { fontFamily: material.fontBold, marginBottom: 5, textAlign: 'left' },
-    itemStyle: { marginBottom: 5, fontSize: material.textSizeSmall },
-    viewFlexBody: { flex: 3, flexDirection: 'row' },
-    viewFlexQty: { flex: 1, flexDirection: 'row', marginTop: 10 },
-    viewImage: { borderColor: '#dedede', height: 110, width: 110, borderWidth: 1 },
-    viewFlexCoupon: { flex: 3, flexDirection: 'row', marginTop: 20, marginLeft: 15, marginRight: 10 },
+    message: { color: "#6f4401", width: '100%' },
+    listItem: {
+        marginRight: 15,
+        marginLeft: 15,
+        paddingRight: 0,
+        paddingVertical: 15,
+        borderBottomColor: "#e0e0e0",
+        borderBottomWidth: 1
+    },
+    wrapperMessage: { paddingVertical: 5, backgroundColor: '#fdf0d5', marginTop: 10, flexDirection: 'row', alignItems: 'center', width: '100%' },
+    qtyBox: {
+        borderStyle: 'solid', width: 55, height: 35, fontSize: 13, borderColor: '#000', alignItems: 'center', borderWidth: 1, borderRadius: 4, textAlign: 'center', color: 'black'
+    },
+    spaceLine: {
+        fontFamily: material.fontBold, marginBottom: 5, textAlign: 'left'
+    },
+    itemStyle: {
+        marginBottom: 5, fontSize: material.textSizeSmall
+    },
+    viewFlexBody: {
+        flex: 3, flexDirection: 'row'
+    },
+    viewFlexQty: {
+        flex: 1, flexDirection: 'row', marginTop: 10
+    },
+    viewImage: {
+        borderColor: '#dedede', height: 110, width: 110, borderWidth: 1
+    },
+    viewFlexCoupon: {
+        flex: 3, flexDirection: 'row', marginTop: 20, marginLeft: 15, marginRight: 10
+    },
 });
 
 export default QuoteItem
