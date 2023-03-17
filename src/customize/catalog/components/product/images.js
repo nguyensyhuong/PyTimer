@@ -159,8 +159,7 @@ export default class ProductImagesComponent extends SimiComponent {
                         horizontal={true}>
                         {this.renderImages()}
                     </Swiper> : null}
-                    {Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable ? 
-                    this.renderSpecialOrder() : this.renderOutStock()}
+                    {this.renderSpecialOrder()}
                     {this.dispatchContent()}
                 </View>
             </Card>

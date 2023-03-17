@@ -99,6 +99,9 @@ post_install do |installer|
     if target.name == "React"
       target.remove_from_project
     end
+    if target.name == "yoga"
+      target.remove_from_project
+    end
   end
   find_and_replace("../node_modules/react-native/React/CxxBridge/RCTCxxBridge.mm",
     "_initializeModules:(NSArray<id<RCTBridgeModule>> *)modules", "_initializeModules:(NSArray<Class> *)modules")

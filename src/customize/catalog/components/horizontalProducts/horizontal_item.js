@@ -80,8 +80,7 @@ const HorizontalItem = (props) => {
             <View style={[styles.imageListItem, { borderWidth: 0.5, borderColor: material.imageBorderColor }]}>
                 {renderSpecialPriceLabel()}
                 <Image resizeMode='contain' source={source} style={{ width: scale(130), height: scale(130), overflow: 'hidden' }} />
-                {Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable ? 
-                    renderSpecialOrder(item) : renderOutStock(item)}
+                {renderSpecialOrder(item)}
                 {dispatchContent()}
             </View>
         );

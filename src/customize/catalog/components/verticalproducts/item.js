@@ -81,8 +81,7 @@ class VerticalProductItem extends SimiComponent {
                 <View style={styles.image}>
                     {this.renderSpecialPriceLabel()}
                     <Image resizeMode='contain' source={source} style={styles.image} />
-                    {Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable ? 
-                    this.renderSpecialOrder() : this.renderOutStock()}
+                    {this.renderSpecialOrder()}
                     {this.dispatchContent()}
                 </View>
             </CardItem>

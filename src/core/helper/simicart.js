@@ -7,7 +7,7 @@ class SimiCart {
   static simicart_url = "https://www.simicart.com/index.php/appdashboard/rest/app_configs/";
   static simicart_authorization = "5ValhIOlcIzC32N35OQIiUXLibY5cdzPQhrPNkc";
   static isDemo = "1";
-  static appVersion = "1.0.10";
+  static appVersion = "1.0.11";
   static appID = "com.simicart.enterprise";
   static fullSplash = "0";
   static colorSplash = "#FFFFFF";
