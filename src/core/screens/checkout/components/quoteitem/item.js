@@ -107,7 +107,7 @@ const QuoteItem = (props) => {
     }
 
     function renderOutStock() {
-        if (props.data.product.hasOwnProperty('is_salable') && !Identify.TRUE(props.data.product.is_salable)) {
+        if (props.data.product.hasOwnProperty('is_salable') && !Identify.TRUE(props.data.product.is_salable) && !Identify.getMerchantConfig().storeview?.preOrder?.enable) {
             return <OutStockLabel fontSize={12} />
         }
     }
