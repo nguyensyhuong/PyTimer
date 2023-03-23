@@ -85,6 +85,7 @@
   <androidx.privacysandbox.ads/>
   <androidx.privacysandbox.sdkruntime/>
   <androidx.privacysandbox.tools/>
+  <androidx.privacysandbox.ui/>
   <androidx.profileinstaller/>
   <androidx.recommendation/>
   <androidx.recyclerview/>
@@ -123,6 +124,7 @@
   <androidx.wear.watchface/>
   <androidx.webkit/>
   <androidx.window/>
+  <androidx.window.extensions.core/>
   <androidx.work/>
   <com.android/>
   <com.android.application/>

@@ -105,13 +105,13 @@ class AddToCart extends SimiComponent {
             return (null);
         }
         let text_button = 'Add To Cart'
-        if (Identify.getMerchantConfig().storeview?.preOrder && 
-            Identify.getMerchantConfig().storeview.preOrder.enable){
-                if (this.props.product.pre_order_status && 
-                    ((this.props.product.pre_order_status == '2' && !this.props.product.quantity_and_stock_status.is_in_stock) || this.props.product.pre_order_status == '1')){
-                    text_button = Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
-                }
-        } 
+        if (Identify.getMerchantConfig().storeview?.preOrder &&
+            Identify.getMerchantConfig().storeview.preOrder.enable) {
+            if (this.props.product.pre_order_status &&
+                ((this.props.product.pre_order_status == '2' && !this.props.product.quantity_and_stock_status.is_in_stock) || this.props.product.pre_order_status == '1')) {
+                text_button = Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
+            }
+        }
         return (
             <View style={styles.addToCart}>
                 <Quantity onRef={ref => (this.qty = ref)} />
