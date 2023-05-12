@@ -27,7 +27,6 @@
 		5B2B514A6A8642139E74D29D /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4DE56DD519BC4261A8E78202 /* Roboto.ttf */; };
 		606E1C7EA09445FFBA789228 /* Default-667h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CB1B5DE3565E4DA0B25D3A61 /* Default-667h@2x.png */; };
 		63ACAABB30204BCD8B0A93CA /* UniversNextArabic-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D380A6C4CA2C45F0A03A8DB5 /* UniversNextArabic-Regular.ttf */; };
-		6583E36B6217B5DE8E89852E /* libPods-SimiCart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21AD126D232F283900D116B9 /* libPods-SimiCart.a */; };
 		813B862A63A54474A8344B3C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 47DBC7D1AEFE4178BAEAAA68 /* Default@2x.png */; };
 		8579D95AA27D47CFB1A74319 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02B5DA372AEF48749A2C52C9 /* logo@2x.png */; };
 		89EF9E68EAE94583A6A04764 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42FBB913A7C5484DAD69D3E3 /* Roboto-Bold.ttf */; };
@@ -41,6 +40,7 @@
 		D26EA6CDC3B04A06B0762E48 /* Default~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F8F32F9E7B24C379088149E /* Default~ipad.png */; };
 		E2FFAFC8999F45B9A2941FB9 /* logo~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A37A32BB213A470DA6F09CDE /* logo~ipad.png */; };
 		ECC9470820ED4D05A7F46356 /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 051F4C27912A4A568AD0E191 /* Montserrat-Light.ttf */; };
+		EFAFCD0E0F9C932CDF698317 /* libPods-SimiCart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CE4E0B45126B3BDAACF8FEE /* libPods-SimiCart.a */; };
 		F17AAD761E374505A487403B /* Default-812h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 74799CA2B8324E8D9A0C5C4F /* Default-812h@3x.png */; };
 		F448299513B54E09A5D62456 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 2A6FE632D6F441C6AF38C09E /* Default-Landscape@2x~ipad.png */; };
 		FA63A1A7B1334CD78AC5ED61 /* Default-Portrait-v7~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 0CF15827985A47E9BEFD8DC2 /* Default-Portrait-v7~ipad.png */; };
@@ -342,7 +342,6 @@
 		2164823821DE09FC0021911A /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		21AD1212232F260300D116B9 /* libFirebaseDynamicLinks.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseDynamicLinks.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		21AD1238232F261000D116B9 /* libFirebaseCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		21AD126D232F283900D116B9 /* libPods-SimiCart.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-SimiCart.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		21AD126F232F285700D116B9 /* libFirebaseCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		21AD1271232F285D00D116B9 /* libFirebaseDynamicLinks.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseDynamicLinks.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		21AD127F232F29EB00D116B9 /* libFirebaseCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -373,7 +372,6 @@
 		21CC81D82151DAD700080424 /* SimiCart.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = SimiCart.entitlements; path = SimiCart/SimiCart.entitlements; sourceTree = "<group>"; };
 		21EA7E95216708CC0054A57D /* NativeMethod.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeMethod.h; sourceTree = "<group>"; };
 		21EA7E96216708DD0054A57D /* NativeMethod.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeMethod.m; sourceTree = "<group>"; };
-		21ED1FCC232CD9A1006A50C4 /* libPods-SimiCart.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-SimiCart.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A6FE632D6F441C6AF38C09E /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Default-Landscape@2x~ipad.png"; path = "../media/Images/Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		2BFE07EE565147D8B276046E /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -391,6 +389,7 @@
 		50A93F26214B54C100ECF3D7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "SimiCart/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		53D7798F41D24B3A914F845E /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		549C164212574F13AA9A4588 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Default-Landscape~ipad.png"; path = "../media/Images/Default-Landscape~ipad.png"; sourceTree = "<group>"; };
+		5639EED779D69FA4D76EA5CF /* Pods-SimiCart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SimiCart.release.xcconfig"; path = "Target Support Files/Pods-SimiCart/Pods-SimiCart.release.xcconfig"; sourceTree = "<group>"; };
 		5A22682895444599A8ABB0D7 /* libRNOpenAppSettings.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNOpenAppSettings.a; sourceTree = "<group>"; };
 		5E24BD5093974395B09FC28F /* Default-568h@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Default-568h@2x.png"; path = "../media/Images/Default-568h@2x.png"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
@@ -406,17 +405,17 @@
 		7F8F32F9E7B24C379088149E /* Default~ipad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Default~ipad.png"; path = "../media/Images/Default~ipad.png"; sourceTree = "<group>"; };
 		802645EA165047BCBA3412E1 /* DidotLTStd-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DidotLTStd-Bold.otf"; path = "../assets/fonts/DidotLTStd-Bold.otf"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		8913ABEAAD41781CD09FA2F7 /* Pods-SimiCart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SimiCart.debug.xcconfig"; path = "Target Support Files/Pods-SimiCart/Pods-SimiCart.debug.xcconfig"; sourceTree = "<group>"; };
 		8A076D162038490CB1918A43 /* 29LTZeynTRIAL-RegularTRIAL.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "29LTZeynTRIAL-RegularTRIAL.otf"; path = "../assets/fonts/29LTZeynTRIAL-RegularTRIAL.otf"; sourceTree = "<group>"; };
+		8CE4E0B45126B3BDAACF8FEE /* libPods-SimiCart.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SimiCart.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DC2C401DCA248A3B221E18C /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		92241A4153324D90890785C7 /* libAirMaps.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libAirMaps.a; sourceTree = "<group>"; };
 		92FFC9EDA1DF44E1B765F279 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		9B14FC4D1EA0465D85626D0D /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		9B58DF7B65FF41BD90512CDF /* logo.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = logo.png; path = ../media/Images/logo.png; sourceTree = "<group>"; };
 		9EEA31DDAA0D48CC816F3D5D /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
-		A112E8B6D0ACCF750B320112 /* Pods-SimiCart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SimiCart.release.xcconfig"; path = "Pods/Target Support Files/Pods-SimiCart/Pods-SimiCart.release.xcconfig"; sourceTree = "<group>"; };
 		A37A32BB213A470DA6F09CDE /* logo~ipad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "logo~ipad.png"; path = "../media/Images/logo~ipad.png"; sourceTree = "<group>"; };
 		A4461BA3B160443FA5485468 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		A4CF72E098CB05E8D33B5BBC /* libPods-SimiCart.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SimiCart.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		ADE21AA6D24949DCAE8E23F2 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		AED9F13A05F441C0937DAA82 /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
@@ -436,7 +435,6 @@
 		F64800FCC247418392B2CB95 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/native-base/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		F7CECBA5D7B94DDAAFE2E1E9 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		FA12532B0E6A42088D3F96E5 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
-		FCE83C692100F88328A0B5B7 /* Pods-SimiCart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SimiCart.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SimiCart/Pods-SimiCart.debug.xcconfig"; sourceTree = "<group>"; };
 		FFB20D3120E141D7A5015CA7 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -455,7 +453,7 @@
 			files = (
 				21AD13B7232F3BE400D116B9 /* libRNFirebase.a in Frameworks */,
 				21AD13B2232F3AD100D116B9 /* libFirebaseDynamicLinks.a in Frameworks */,
-				6583E36B6217B5DE8E89852E /* libPods-SimiCart.a in Frameworks */,
+				EFAFCD0E0F9C932CDF698317 /* libPods-SimiCart.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -687,15 +685,13 @@
 				21AD127F232F29EB00D116B9 /* libFirebaseCore.a */,
 				21AD1271232F285D00D116B9 /* libFirebaseDynamicLinks.a */,
 				21AD126F232F285700D116B9 /* libFirebaseCore.a */,
-				21AD126D232F283900D116B9 /* libPods-SimiCart.a */,
 				21AD1238232F261000D116B9 /* libFirebaseCore.a */,
 				21AD1212232F260300D116B9 /* libFirebaseDynamicLinks.a */,
 				214D7E9A232DEA8C00CB84E3 /* libreact-native-fbsdk.a */,
 				214D7E95232DE6C800CB84E3 /* libreact-native-netinfo.a */,
 				214D7E93232DE6BD00CB84E3 /* libreact-native-geolocation.a */,
-				21ED1FCC232CD9A1006A50C4 /* libPods-SimiCart.a */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				A4CF72E098CB05E8D33B5BBC /* libPods-SimiCart.a */,
+				8CE4E0B45126B3BDAACF8FEE /* libPods-SimiCart.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -766,7 +762,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				068EF1A32B504F8887E57621 /* Resources */,
 				50C582342147AB7C00A67432 /* Recovered References */,
-				FEEC4AC01E96340B15998886 /* Pods */,
+				CB285C03CC256BAD84E4183A /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -791,13 +787,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FEEC4AC01E96340B15998886 /* Pods */ = {
+		CB285C03CC256BAD84E4183A /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FCE83C692100F88328A0B5B7 /* Pods-SimiCart.debug.xcconfig */,
-				A112E8B6D0ACCF750B320112 /* Pods-SimiCart.release.xcconfig */,
+				8913ABEAAD41781CD09FA2F7 /* Pods-SimiCart.debug.xcconfig */,
+				5639EED779D69FA4D76EA5CF /* Pods-SimiCart.release.xcconfig */,
 			);
 			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -825,14 +822,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "SimiCart" */;
 			buildPhases = (
-				C39240CDA29F97B5977049A9 /* [CP] Check Pods Manifest.lock */,
+				A5A461680D68E334613E0437 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				E1E6F4C4C43CC7DB11049DBF /* [CP] Copy Pods Resources */,
 				508CD3492153512A006482FC /* Run Script */,
-				C8D89F444E3159FF36630A6A /* [CP] Embed Pods Frameworks */,
+				9521F6CC215CBBD189A200FE /* [CP] Embed Pods Frameworks */,
+				90159F52D96613EFB58287C3 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1278,51 +1275,7 @@
 			shellScript = "\"${PODS_ROOT}/Fabric/run\" e2841d7a32176e6836f057cfd9e9fb2b1eeef0a3 65173f7cfe9e31e546db23167badc621a5df84f57ad66bf962059d48cc5400ad\n";
 			showEnvVarsInLog = 0;
 		};
-		C39240CDA29F97B5977049A9 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-SimiCart-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C8D89F444E3159FF36630A6A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SimiCart/Pods-SimiCart-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit/FBAEMKit.framework/FBAEMKit",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework/FBSDKCoreKit",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics/FBSDKCoreKit_Basics.framework/FBSDKCoreKit_Basics",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework/FBSDKLoginKit",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit/FBSDKShareKit.framework/FBSDKShareKit",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBAEMKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit_Basics.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SimiCart/Pods-SimiCart-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E1E6F4C4C43CC7DB11049DBF /* [CP] Copy Pods Resources */ = {
+		90159F52D96613EFB58287C3 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1368,6 +1321,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SimiCart/Pods-SimiCart-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9521F6CC215CBBD189A200FE /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SimiCart/Pods-SimiCart-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit/FBAEMKit.framework/FBAEMKit",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework/FBSDKCoreKit",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics/FBSDKCoreKit_Basics.framework/FBSDKCoreKit_Basics",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework/FBSDKLoginKit",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit/FBSDKShareKit.framework/FBSDKShareKit",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBAEMKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit_Basics.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SimiCart/Pods-SimiCart-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A5A461680D68E334613E0437 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SimiCart-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1487,18 +1488,19 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FCE83C692100F88328A0B5B7 /* Pods-SimiCart.debug.xcconfig */;
+			baseConfigurationReference = 8913ABEAAD41781CD09FA2F7 /* Pods-SimiCart.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
@@ -1510,7 +1512,7 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.12;
+				MARKETING_VERSION = 1.0.15;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1525,23 +1527,25 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7s x86_64";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A112E8B6D0ACCF750B320112 /* Pods-SimiCart.release.xcconfig */;
+			baseConfigurationReference = 5639EED779D69FA4D76EA5CF /* Pods-SimiCart.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
@@ -1553,7 +1557,8 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.12;
+				MARKETING_VERSION = 1.0.15;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1567,6 +1572,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "SimiCart-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7s x86_64";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
