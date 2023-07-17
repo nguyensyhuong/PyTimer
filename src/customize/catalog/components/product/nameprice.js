@@ -7,7 +7,7 @@ import Identify from '../../../../core/helper/Identify';
 import { TouchableNativeFeedbackBase } from 'react-native';
 
 export default class ProductNamePriceComponent extends SimiComponent {
-    constructor(props){
+    constructor(props) {
         super(props)
         this.availableDate = '2/2/2023'
         this.preOrderMessage = 'This product is temporarily out of stock. You can pre order it to get 20% off!'
@@ -30,10 +30,10 @@ export default class ProductNamePriceComponent extends SimiComponent {
         return true;
     }
 
-    formatDate(date){
+    formatDate(date) {
         let tmp = ''
-        for(let i=0; i<date.length; i++){
-            if(date[i] != ' ') tmp += date[i]
+        for (let i = 0; i < date.length; i++) {
+            if (date[i] != ' ') tmp += date[i]
             else break;
         }
         return tmp;
@@ -50,28 +50,28 @@ export default class ProductNamePriceComponent extends SimiComponent {
         }
     }
     renderPreOrderDate() {
-        if(this.props.product.pre_order_from_date && this.props.product.pre_order_to_date) {
+        if (this.props.product.pre_order_from_date && this.props.product.pre_order_to_date) {
             return <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>{Identify.__('AVAILABILITY DATE')}: {Identify.__('from')} {this.formatDate(this.props.product.pre_order_from_date)} {Identify.__('to')} {this.formatDate(this.props.product.pre_order_to_date)}</Text>
         }
-        else if(this.props.product.pre_order_from_date){
+        else if (this.props.product.pre_order_from_date) {
             return <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>{Identify.__('AVAILABILITY DATE')}: {this.formatDate(this.props.product.pre_order_from_date)}</Text>
         }
-        else if(this.props.product.pre_order_to_date){
+        else if (this.props.product.pre_order_to_date) {
             return <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>{Identify.__('AVAILABILITY DATE')}: {this.formatDate(this.props.product.pre_order_to_date)}</Text>
         }
         else return null
     }
-    renderPreOrderMessage(){
-        if(this.props.product.pre_order_message)
+    renderPreOrderMessage() {
+        if (this.props.product.pre_order_message)
             return <Text>{Identify.__(this.props.product.pre_order_message)}</Text>
         else return <Text>{Identify.__(Identify.getMerchantConfig().storeview?.preOrder.message_products)}</Text>
     }
     renderPreOrderInfo() {
-        if(Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable){
-            if (this.props.product.pre_order_status && 
-                ((this.props.product.pre_order_status == '2' && !this.props.product.quantity_and_stock_status.is_in_stock) || this.props.product.pre_order_status == '1')){
+        if (Identify.getMerchantConfig().storeview?.preOrder && Identify.getMerchantConfig().storeview?.preOrder?.enable) {
+            if (this.props.product.pre_order_status &&
+                ((this.props.product.pre_order_status == '2' && !this.props.product?.quantity_and_stock_status?.is_in_stock) || this.props.product.pre_order_status == '1')) {
                 return (
-                    <View style={{ marginTop: 10}}>
+                    <View style={{ marginTop: 10 }}>
                         {this.renderPreOrderDate()}
                         {this.renderPreOrderMessage()}
                     </View>

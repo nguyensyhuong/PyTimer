@@ -31,7 +31,7 @@ class VerticalProductItem extends SimiComponent {
     }
 
     renderOutStock() {
-        if (this.props.product.quantity_and_stock_status && !this.props.product.quantity_and_stock_status.is_in_stock) {
+        if (this.props.product.quantity_and_stock_status && !this.props.product?.quantity_and_stock_status?.is_in_stock) {
             return <OutStockLabel />
         }
     }
@@ -121,7 +121,7 @@ class VerticalProductItem extends SimiComponent {
         if (this.props.showList) {
             let showButton = true;
             if (this.storeConfig && this.storeConfig.hasOwnProperty('is_show_price_for_guest') &&
-                this.storeConfig.is_show_price_for_guest == '0' && !Identify.getCustomerData()) {
+                this.storeConfig.is_show_price_for_guest == '0') {
                 showButton = false;
             }
             if (this.props.product.is_salable != '1' || !showButton) {

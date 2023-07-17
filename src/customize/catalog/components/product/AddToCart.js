@@ -15,6 +15,7 @@ import AppStorage from '@helper/storage';
 class AddToCart extends SimiComponent {
 
     constructor(props) {
+        console.log("constructor in addToCart");
         super(props);
         this.state = {
             ... this.state,
@@ -98,20 +99,22 @@ class AddToCart extends SimiComponent {
     render() {
         let showButton = true;
         if (this.storeConfig && this.storeConfig.hasOwnProperty('is_show_price_for_guest') &&
-            this.storeConfig.is_show_price_for_guest == '0' && !Identify.getCustomerData()) {
+            this.storeConfig.is_show_price_for_guest == '0') {
             showButton = false;
         }
-        if (!this.props.parent.product || this.props.product.is_salable != '1' || !showButton) {
-            return (null);
-        }
+        // if (!this.props.parent.product || this.props.product.is_salable != '1' || !showButton) {
+        //     return (null);
+        // }
         let text_button = 'Add To Cart'
         if (Identify.getMerchantConfig().storeview?.preOrder &&
             Identify.getMerchantConfig().storeview.preOrder.enable) {
             if (this.props.product.pre_order_status &&
-                ((this.props.product.pre_order_status == '2' && !this.props.product.quantity_and_stock_status.is_in_stock) || this.props.product.pre_order_status == '1')) {
+                ((this.props.product.pre_order_status == '2' && !this.props.product?.quantity_and_stock_status?.is_in_stock) || this.props.product.pre_order_status == '1')) {
                 text_button = Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
             }
         }
+        console.log("text_button: ", text_button)
+        console.log("showButton: ", showButton)
         return (
             <View style={styles.addToCart}>
                 <Quantity onRef={ref => (this.qty = ref)} />

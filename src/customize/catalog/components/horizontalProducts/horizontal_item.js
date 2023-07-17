@@ -14,7 +14,7 @@ import SpecialOrderLabel from '../specialOrder';
 import OutStockLabel from '@screens/catalog/components/product/outStockLabel';
 
 const HorizontalItem = (props) => {
-    
+
     function openProduct(item) {
         NavigationManager.openPage(props.navigation, 'ProductDetail', {
             productId: item.entity_id,
@@ -29,11 +29,12 @@ const HorizontalItem = (props) => {
         }
         else return renderOutStock()
     }
- 
+
     function renderOutStock() {
-        if (props.item.quantity_and_stock_status && !props.item.quantity_and_stock_status.is_in_stock) {
+        if (props.item.quantity_and_stock_status && props.item.quantity_and_stock_status != "1") {
             return <OutStockLabel />
         }
+        return null
     }
 
     function renderSpecialPriceLabel() {
@@ -75,6 +76,7 @@ const HorizontalItem = (props) => {
         }
     }
     function renderImage(item) {
+
         let source = (item.images && item.images.length > 0) ? { uri: item.images[0].url } : require('@media/logo.png');
         return (
             <View style={[styles.imageListItem, { borderWidth: 0.5, borderColor: material.imageBorderColor }]}>

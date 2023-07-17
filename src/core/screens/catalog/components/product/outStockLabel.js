@@ -17,6 +17,9 @@ const styles = StyleSheet.create({
 })
 
 const OutStockLabel = (props) => {
+    if (Identify.getMerchantConfig().storeview.preOrder && Identify.getMerchantConfig().storeview.preOrder?.enable) {
+        return null;
+    }
     if (Events.events.out_stock_label.length > 0) {
         let item = []
         for (let i = 0; i < Events.events.out_stock_label.length; i++) {
@@ -28,7 +31,7 @@ const OutStockLabel = (props) => {
             }
         }
         return item;
-    } else return <Text style={[styles.outOfStock, Identify.isRtl() ? { left: 0 } : { right: 0 }, props.fontSize ? {fontSize: props.fontSize} : {}]}>{Identify.__('Out of stock')}</Text>
+    } else return <Text style={[styles.outOfStock, Identify.isRtl() ? { left: 0 } : { right: 0 }, props.fontSize ? { fontSize: props.fontSize } : {}]}>{Identify.__('Out of stock')}</Text>
 }
 
 export default OutStockLabel;

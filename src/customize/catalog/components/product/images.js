@@ -14,7 +14,7 @@ import OutStockLabel from '@screens/catalog/components/product/outStockLabel';
 import material from '@theme/variables/material';
 
 export default class ProductImagesComponent extends SimiComponent {
-    constructor(props){
+    constructor(props) {
         super(props)
         this.index = 0;
         this.state = {
@@ -23,8 +23,8 @@ export default class ProductImagesComponent extends SimiComponent {
         }
     }
 
-    componentWillMount(){
-        setTimeout(() => {this.setState({showSwiper:true})}, 500);
+    componentWillMount() {
+        setTimeout(() => { this.setState({ showSwiper: true }) }, 500);
     }
 
     tracking() {
@@ -64,23 +64,23 @@ export default class ProductImagesComponent extends SimiComponent {
             i++;
         }
         return images;
-    } 
+    }
 
     renderSpecialOrder() {
         if (this.props.product.special_order && this.props.product.special_order != '0') {
-            return <SpecialOrderLabel fontSize={18}/>
+            return <SpecialOrderLabel fontSize={18} />
         }
         else return this.renderOutStock()
     }
 
     renderOutStock() {
-        if (this.props.product.quantity_and_stock_status && !this.props.product.quantity_and_stock_status.is_in_stock) {
-            return <OutStockLabel  fontSize={18}/>
+        if (this.props.product.quantity_and_stock_status && !this.props.product?.quantity_and_stock_status?.is_in_stock) {
+            return <OutStockLabel fontSize={18} />
         }
     }
 
-    renderZoom(){
-        return(
+    renderZoom() {
+        return (
             <TouchableOpacity
                 onPress={() => { this.props.product ? this.onSelectImage(this.index + 1) : {} }}
                 style={{
@@ -92,12 +92,12 @@ export default class ProductImagesComponent extends SimiComponent {
                     height: '7%'
                 }}
             >
-                <Image style={{width: '100%', height: '100%', aspectRatio: 1, tintColor: '#b4b4b4'}} source={require('@media/scale-symbol.png')}/>
+                <Image style={{ width: '100%', height: '100%', aspectRatio: 1, tintColor: '#b4b4b4' }} source={require('@media/scale-symbol.png')} />
             </TouchableOpacity>
         )
     }
 
-    renderSpecialPriceLabel(){
+    renderSpecialPriceLabel() {
         let saleOff = null;
         let price = this.props.product.app_prices;
         if (price.has_special_price !== null && price.has_special_price === 1) {
@@ -110,8 +110,8 @@ export default class ProductImagesComponent extends SimiComponent {
             }
         }
         let showLabel = Identify.getMerchantConfig().storeview.catalog.frontend.show_discount_label_in_product;
-        if(saleOff){
-            if(showLabel && showLabel !== '1') {
+        if (saleOff) {
+            if (showLabel && showLabel !== '1') {
                 return null;
             }
             return (
@@ -130,7 +130,7 @@ export default class ProductImagesComponent extends SimiComponent {
                         padding: 5
                     }}
                 >
-                    <Text style={{color: Identify.theme.button_background, fontFamily: material.fontBold, textAlign: 'center'}}>{saleOff + '% ' + Identify.__('OFF')}</Text>
+                    <Text style={{ color: Identify.theme.button_background, fontFamily: material.fontBold, textAlign: 'center' }}>{saleOff + '% ' + Identify.__('OFF')}</Text>
                 </View>
             )
         }

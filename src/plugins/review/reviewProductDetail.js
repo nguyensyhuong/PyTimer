@@ -159,12 +159,17 @@ class Review extends SimiComponent {
     }
 
     calculateRating = () => {
-        if (this.state.data) {
-            const {count, total} = this.state.data;
-            return ((count['1_star'] + count['2_star']*2 + count['3_star']*3 + count['4_star']*4 + count['5_star']*5)/total).toFixed(2);
+        if (this.state.data?.total > 0) {
+            if (this.state.data) {
+                const { count, total } = this.state.data;
+                return ((count['1_star'] + count['2_star'] * 2 + count['3_star'] * 3 + count['4_star'] * 4 + count['5_star'] * 5) / total).toFixed(2);
+            } else {
+                return this.data.app_reviews.rate.toFixed(2);
+            }
         } else {
-            return this.data.app_reviews.rate.toFixed(2);
+            return 0;
         }
+
     }
 
     renderPhoneLayout() {

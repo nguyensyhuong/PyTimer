@@ -25,7 +25,7 @@ import * as Sentry from '@sentry/react-native';
 import { requestTrackingPermission, getTrackingStatus } from 'react-native-tracking-transparency';
 import compareVersions from 'compare-versions';
 
-Sentry.init({ 
+Sentry.init({
     dsn: 'https://34a08d6102a64b61a33561d73f59d874@sentry.io/1783442',
     enableNative: false
 });
@@ -88,7 +88,7 @@ export default class App extends React.Component {
 
     componentDidMount() {
         // this.initOneSginal();
-    	AppState.addEventListener('change', this._handleAppStateChange);
+        AppState.addEventListener('change', this._handleAppStateChange);
 
         if (Platform.OS === 'android') {
             DeviceEventEmitter.addListener('type_device_event', e => {
@@ -147,9 +147,9 @@ export default class App extends React.Component {
                 if (data.errors) {
                     console.log(data.errors)
                 } else if (data.results.length > 0 && this.isNeedUpdate(simicart.appVersion, data.results[0].version)) {
-                    setTimeout(
-                        () => { store.dispatch({ type: 'showUpdate', data: { show: true, urlApp: data.results[0].trackViewUrl } }) }, 7000
-                    )
+                    // setTimeout(
+                    //     () => { store.dispatch({ type: 'showUpdate', data: { show: true, urlApp: data.results[0].trackViewUrl } }) }, 7000
+                    // )
                 }
             }).catch(error => {
                 console.log(error)
@@ -207,7 +207,7 @@ export default class App extends React.Component {
         }
     }
     componentWillUnmount() {
-    	AppState.removeEventListener('change', this._handleAppStateChange);
+        AppState.removeEventListener('change', this._handleAppStateChange);
         // this.messageListener();
         // this.notificationListener();
         // OneSignal.removeEventListener('received', this.onReceived);
@@ -256,16 +256,16 @@ export default class App extends React.Component {
             }
         });
         this.notificationListener = firebase.notifications().onNotification((notification: Notification) => {
-        	if (notification && notification._data) {
-	            console.log('Notification Received');
-	            console.log(notification);
-	            let data = notification._data;
-	            if (data.show_popup) {
-	                store.dispatch({ type: 'showNotification', data: { show: true, data: data } });
-	            } else {
-	                this.pushNotiStatusBar(data);
-	            }
-        	}
+            if (notification && notification._data) {
+                console.log('Notification Received');
+                console.log(notification);
+                let data = notification._data;
+                if (data.show_popup) {
+                    store.dispatch({ type: 'showNotification', data: { show: true, data: data } });
+                } else {
+                    this.pushNotiStatusBar(data);
+                }
+            }
         });
         this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen: NotificationOpen) => {
             const notification: Notification = notificationOpen.notification;
