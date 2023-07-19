@@ -15,13 +15,24 @@ import AppStorage from '@helper/storage';
 class AddToCart extends SimiComponent {
 
     constructor(props) {
-        console.log("constructor in addToCart");
         super(props);
         this.state = {
             ... this.state,
+            text_button: 'Add To Cart',
             isSpecialOrder: props.product.special_order ? true : false
         }
         this.storeConfig = Identify.getMerchantConfig().storeview.base;
+    }
+
+    componentDidMount() {
+        if (this.props.onRef) {
+            this.props.onRef(this)
+        }
+    }
+    componentWillUnmount() {
+        if (this.props.onRef) {
+            this.props.onRef(undefined)
+        }
     }
 
     setData(data) {
@@ -105,24 +116,30 @@ class AddToCart extends SimiComponent {
         // if (!this.props.parent.product || this.props.product.is_salable != '1' || !showButton) {
         //     return (null);
         // }
-        let text_button = 'Add To Cart'
+
         if (Identify.getMerchantConfig().storeview?.preOrder &&
             Identify.getMerchantConfig().storeview.preOrder.enable) {
             if (this.props.product.pre_order_status &&
                 ((this.props.product.pre_order_status == '2' && !this.props.product?.quantity_and_stock_status?.is_in_stock) || this.props.product.pre_order_status == '1')) {
-                text_button = Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
+                this.setState({
+                    text_button: Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
+                })
             }
         }
-        console.log("text_button: ", text_button)
-        console.log("showButton: ", showButton)
         return (
             <View style={styles.addToCart}>
                 <Quantity onRef={ref => (this.qty = ref)} />
                 <Button full style={{ flex: 1, marginLeft: 10 }} onPress={() => { this.onClickAddToCart() }}>
-                    <Text>{Identify.__(text_button)}</Text>
+                    <Text onRef={ref => (this.buttonRef = ref)}>{Identify.__(this.state.text_button)}</Text>
                 </Button>
             </View>
         );
+    }
+
+    updateTextButton(text) {
+        this.setState({
+            text_button: text
+        })
     }
 }
 

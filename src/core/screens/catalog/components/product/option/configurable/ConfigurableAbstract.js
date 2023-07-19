@@ -15,15 +15,28 @@ class ConfigurableAbstract extends OptionAbstract {
         this.current_selected = {};
         this.state = { is_checked: true };
         this.shouldInitCanSelect = true;
+        this.childId = null;
     }
-    updateSelectedOptions(id, value, reset_other_options) {
+    updateSelectedOptions(id, value, reset_other_options, optionProductId = null) {
+        this.childId = optionProductId;
         if (this.can_select[id].indexOf(value) >= 0) {
+
             let options = this.selected_options;
             options[id] = value;
             this.selected_options = options;
             this.current_selected[id] = value;
             this.refreshOptionWhenSelected(id, value);
             this.updatePrices();
+            if (this.props.parent.product.type_id == 'configurable') {
+                let values = this.props.parent.product?.app_options?.configurable_options?.pre_order_status?.child;
+                if (values && values[optionProductId] && !values[optionProductId].stock_status) {
+
+                    this.parentObj.updateTextButton(values[optionProductId].button);
+                } else {
+                    this.parentObj.updateTextButton('Add To Cart');
+                }
+            }
+
             this.setState(previousState => {
                 return { is_checked: !previousState.is_checked };
             });
@@ -203,6 +216,13 @@ class ConfigurableAbstract extends OptionAbstract {
             this.props.current_parent.option_custom.updatePrices(prices);
             return;
         } else {
+            let values = this.props.parent.product?.app_options?.configurable_options?.pre_order_status?.child;
+            if (values && values[optionProductId] && !values[optionProductId].stock_status) {
+
+                this.parentObj.updateTextButton(values[optionProductId].button);
+            } else {
+                this.parentObj.updateTextButton('Add To Cart');
+            }
             this.parentObj.updatePrices(prices);
         }
     }
@@ -238,19 +258,49 @@ class ConfigurableAbstract extends OptionAbstract {
                 prices.price_including_tax.price = optionPrice.finalPrice.amount;
             }
         }
-        if(optionPrice.tierPrices && optionPrice.tierPrices.length > 0){
+        if (optionPrice.tierPrices && optionPrice.tierPrices.length > 0) {
             prices.tierPrices = optionPrice.tierPrices
         }
-        if (optionPrice.oldPrice && parseFloat(optionPrice.oldPrice.amount) > parseFloat(optionPrice.finalPrice.amount)){
+        if (optionPrice.oldPrice && parseFloat(optionPrice.oldPrice.amount) > parseFloat(optionPrice.finalPrice.amount)) {
             prices.has_special_price = 1;
-        }else{
+        } else {
             prices.has_special_price = 0;
         }
         if (this.props.current_parent.option_custom) {
-            this.props.current_parent.option_custom.updatePrices(prices);
+            console.log("22")
+            if (this.props.parent.product.type_id == 'configurable') {
+                console.log("33")
+                console.log("this.childId: ", this.childId)
+                if (this.childId) {
+                    console.log("44")
+                    let values = this.props.parent.product?.app_options?.configurable_options?.pre_order_status?.child;
+                    console.log("values: ", values)
+                    if (values && values[this.childId] && !values[this.childId].stock_status) {
+                        this.parentObj.updatePrices(prices, true);
+                    } else {
+                        this.parentObj.updatePrices(prices, false);
+                    }
+                }
+            } else {
+                this.props.current_parent.option_custom.updatePrices(prices, false);
+            }
         } else {
-            this.parentObj.updatePrices(prices);
+            console.log("280")
+            if (this.props.parent.product.type_id == 'configurable') {
+                console.log("274")
+                let values = this.props.parent.product?.app_options?.configurable_options?.pre_order_status?.child;
+                if (values && values[optionProductId] && !values[optionProductId].stock_status) {
+                    this.parentObj.updatePrices(prices, true);
+                } else {
+                    this.parentObj.updatePrices(prices, false);
+                }
+
+            } else {
+                this.parentObj.updatePrices(prices, false);
+            }
+
         }
+        console.log("287")
     }
 }
 

@@ -9,6 +9,9 @@ import { TouchableNativeFeedbackBase } from 'react-native';
 export default class ProductNamePriceComponent extends SimiComponent {
     constructor(props) {
         super(props)
+        this.state = {
+            check: false
+        }
         this.availableDate = '2/2/2023'
         this.preOrderMessage = 'This product is temporarily out of stock. You can pre order it to get 20% off!'
     }
@@ -76,6 +79,13 @@ export default class ProductNamePriceComponent extends SimiComponent {
                         {this.renderPreOrderMessage()}
                     </View>
                 )
+            } else if (this.state.check) {
+                return (
+                    <View style={{ marginTop: 10 }}>
+                        {this.renderPreOrderDate()}
+                        {this.renderPreOrderMessage()}
+                    </View>
+                )
             }
             else return null
         }
@@ -88,13 +98,18 @@ export default class ProductNamePriceComponent extends SimiComponent {
         return (
             <Card style={styles.card}>
                 <H3 style={{ textAlign: 'left' }}>{this.props.product.name}</H3>
-                {this.renderPrice()}
-                {this.renderPreOrderInfo()}
+                <View style={{ marginTop: 7 }}>
+                    {this.renderPrice()}
+                    {this.renderPreOrderInfo()}
+                </View>
             </Card>
         );
     }
 
-    updatePrices(newPrices) {
+    updatePrices(newPrices, check = false) {
+        this.setState({
+            check: check
+        });
         this.prices.updatePrices(newPrices);
     }
 }

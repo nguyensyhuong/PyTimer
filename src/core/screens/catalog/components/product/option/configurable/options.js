@@ -22,7 +22,7 @@ class Options extends Abstract {
     }
 
     updateCheck = (index, val) => {
-        this.parent.updateSelectedOptions(this.attribute_id, val);
+        this.parent.updateSelectedOptions(this.attribute_id, val, null, this.props.data.options[index]?.products[0]);
         //this.updateSelected(this.key,val);
     };
 

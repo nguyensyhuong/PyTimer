@@ -25,7 +25,8 @@ class Product extends SimiPageComponent {
         this.state = {
             ...this.state,
             active: false,
-            reRender: false
+            reRender: false,
+            button: 'Add To Cart'
         };
         this.paddingInput = new Animated.Value(0);
     }
@@ -92,6 +93,8 @@ class Product extends SimiPageComponent {
                 return ref => (this.namePrices = ref);
             case 'default_option':
                 return ref => (this.options = ref);
+            case 'default_add_to_cart':
+                return ref => (this.buttonRef = ref);
             default:
                 return undefined;
         }
@@ -237,8 +240,12 @@ class Product extends SimiPageComponent {
         return null;
     }
 
-    updatePrices(newPrices) {
-        this.namePrices.updatePrices(newPrices);
+    updateTextButton(text) {
+        this.buttonRef.updateTextButton(text);
+    }
+
+    updatePrices(newPrices, check) {
+        this.namePrices.updatePrices(newPrices, check);
     }
 }
 
