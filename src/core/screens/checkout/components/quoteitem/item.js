@@ -131,7 +131,7 @@ const QuoteItem = (props) => {
                 <View style={{ paddingTop: 5 }}>
                     {renderImageItem()}
                 </View>
-                <View style={{ width: Dimensions.get("window").width * 0.6 }}>
+                <View style={{ width: Dimensions.get("window").width * 0.5 }}>
                     {renderItemContent()}
                 </View>
             </Body>
