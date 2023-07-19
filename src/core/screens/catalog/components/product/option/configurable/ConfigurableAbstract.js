@@ -267,14 +267,9 @@ class ConfigurableAbstract extends OptionAbstract {
             prices.has_special_price = 0;
         }
         if (this.props.current_parent.option_custom) {
-            console.log("22")
             if (this.props.parent.product.type_id == 'configurable') {
-                console.log("33")
-                console.log("this.childId: ", this.childId)
                 if (this.childId) {
-                    console.log("44")
                     let values = this.props.parent.product?.app_options?.configurable_options?.pre_order_status?.child;
-                    console.log("values: ", values)
                     if (values && values[this.childId] && !values[this.childId].stock_status) {
                         this.parentObj.updatePrices(prices, true);
                     } else {
@@ -285,9 +280,7 @@ class ConfigurableAbstract extends OptionAbstract {
                 this.props.current_parent.option_custom.updatePrices(prices, false);
             }
         } else {
-            console.log("280")
             if (this.props.parent.product.type_id == 'configurable') {
-                console.log("274")
                 let values = this.props.parent.product?.app_options?.configurable_options?.pre_order_status?.child;
                 if (values && values[optionProductId] && !values[optionProductId].stock_status) {
                     this.parentObj.updatePrices(prices, true);
@@ -300,7 +293,6 @@ class ConfigurableAbstract extends OptionAbstract {
             }
 
         }
-        console.log("287")
     }
 }
 

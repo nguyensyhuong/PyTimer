@@ -209,9 +209,11 @@
   <com.google.android.libraries.identity.googleid/>
   <com.google.android.libraries.maps/>
   <com.google.android.libraries.mapsplatform.secrets-gradle-plugin/>
+  <com.google.android.libraries.mapsplatform.transportation/>
   <com.google.android.libraries.navigation/>
   <com.google.android.libraries.places/>
   <com.google.android.libraries.play.games/>
+  <com.google.android.libraries.sdkcoroutines/>
   <com.google.android.livesharing/>
   <com.google.android.material/>
   <com.google.android.mediahome/>

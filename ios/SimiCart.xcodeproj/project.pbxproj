@@ -28,8 +28,8 @@
 		606E1C7EA09445FFBA789228 /* Default-667h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CB1B5DE3565E4DA0B25D3A61 /* Default-667h@2x.png */; };
 		63ACAABB30204BCD8B0A93CA /* UniversNextArabic-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D380A6C4CA2C45F0A03A8DB5 /* UniversNextArabic-Regular.ttf */; };
 		813B862A63A54474A8344B3C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 47DBC7D1AEFE4178BAEAAA68 /* Default@2x.png */; };
-		817AA3142A655B4000B24653 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 81E054442A5E924C00354582 /* assets */; };
-		817AA3152A655B4400B24653 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
+		8168DDED2A680C7F00FE74E9 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 81E054442A5E924C00354582 /* assets */; };
+		8168DDEE2A680C8400FE74E9 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		8579D95AA27D47CFB1A74319 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02B5DA372AEF48749A2C52C9 /* logo@2x.png */; };
 		89EF9E68EAE94583A6A04764 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42FBB913A7C5484DAD69D3E3 /* Roboto-Bold.ttf */; };
 		8AA3354651D24290B074FE68 /* 29LTZeynTRIAL-RegularTRIAL.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8A076D162038490CB1918A43 /* 29LTZeynTRIAL-RegularTRIAL.otf */; };
@@ -1210,8 +1210,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				817AA3152A655B4400B24653 /* main.jsbundle in Resources */,
-				817AA3142A655B4000B24653 /* assets in Resources */,
+				8168DDEE2A680C8400FE74E9 /* main.jsbundle in Resources */,
+				8168DDED2A680C7F00FE74E9 /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				89EF9E68EAE94583A6A04764 /* Roboto-Bold.ttf in Resources */,
@@ -1500,7 +1500,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
@@ -1546,7 +1546,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;
