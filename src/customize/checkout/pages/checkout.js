@@ -158,7 +158,6 @@ class Checkout extends SimiPageComponent {
                         return response.json();
                     }
                 }).then(data => {
-                    console.log(data)
                     this.processAfterPayResult(data);
                 }).catch(err => {
                     this.props.storeData('showLoading', { type: 'none' });
@@ -183,7 +182,7 @@ class Checkout extends SimiPageComponent {
                     s_address: this.shippingAddressParams
                 }
             }
-            if(this.selectedPayment.payment_method.toUpperCase() == 'CREDIT_CARD' && Identify.getCreditCardData()) {
+            if (this.selectedPayment.payment_method.toUpperCase() == 'CREDIT_CARD' && Identify.getCreditCardData()) {
                 params = {
                     ...params,
                     payment: Identify.getCreditCardData()

@@ -21,6 +21,7 @@ class VerticalProductItem extends SimiComponent {
     constructor(props) {
         super(props)
         this.storeConfig = Identify.getMerchantConfig().storeview.base;
+        this.storeview = Identify.getMerchantConfig().storeview;
     }
 
     renderSpecialOrder() {
@@ -103,6 +104,7 @@ class VerticalProductItem extends SimiComponent {
     }
 
     renderPrice() {
+
         if (this.checkTypeIdAndPrice()) {
             return (
                 <View style={{ flexGrow: 6 }}>
@@ -113,26 +115,36 @@ class VerticalProductItem extends SimiComponent {
                         styleDiscount={{ fontSize: 1, fontWeight: '100' }}
                         navigation={this.props.navigation}
                     />
+                    {this.props.showList && this.storeview?.preOrder?.enable && this.props.product?.is_salable == "0" && <Text>{this.storeview?.preOrder?.message_products}</Text>}
                 </View>
             );
         }
     }
     renderAddBtn() {
+        let BtnText = 'Add To Cart';
+
         if (this.props.showList) {
             let showButton = true;
             if (this.storeConfig && this.storeConfig.hasOwnProperty('is_show_price_for_guest') &&
                 this.storeConfig.is_show_price_for_guest == '0') {
                 showButton = false;
             }
-            if (this.props.product.is_salable != '1' || !showButton) {
-                return (null);
+            if (!this.storeview?.preOrder?.enable) {
+                if (this.props.product.is_salable != '1' || !showButton) {
+                    return (null);
+                }
+            } else {
+                if (this.props.product?.is_salable == "0") {
+                    BtnText = this.storeview?.preOrder?.preorder_text_button;
+                }
             }
+
             return (
                 <Button
                     style={{ flexGrow: 1, justifyContent: 'center' }}
                     onPress={() => { this.onAddToCart() }}
                 >
-                    <Text style={{ fontSize: 14, textAlign: 'center', fontFamily: material.fontBold }}>{Identify.__('Add To Cart')}</Text>
+                    <Text style={{ fontSize: 14, textAlign: 'center', fontFamily: material.fontBold }}>{Identify.__(BtnText)}</Text>
                 </Button>
             )
         }

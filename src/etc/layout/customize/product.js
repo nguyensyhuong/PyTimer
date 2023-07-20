@@ -41,7 +41,7 @@ export default {
             data: {
                 api: products,
                 param: {
-                    limit : 10,
+                    limit: 10,
                     offset: 0,
                 },
                 type: {
@@ -50,7 +50,7 @@ export default {
                 },
                 redux_action: 'add_products_data',
                 redux_data_key: 'products_data',
-                idName : 'productId',
+                idName: 'productId',
                 show_as_card: true,
                 title: 'Related Products'
             },

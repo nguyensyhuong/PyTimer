@@ -121,9 +121,10 @@ class AddToCart extends SimiComponent {
             Identify.getMerchantConfig().storeview.preOrder.enable) {
             if (this.props.product.pre_order_status &&
                 ((this.props.product.pre_order_status == '2' && !this.props.product?.quantity_and_stock_status?.is_in_stock) || this.props.product.pre_order_status == '1')) {
-                this.setState({
-                    text_button: Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
-                })
+                // this.setState({
+                //     text_button: Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
+                // })
+                this.state.text_button = Identify.getMerchantConfig().storeview.preOrder.preorder_text_button
             }
         }
         return (
