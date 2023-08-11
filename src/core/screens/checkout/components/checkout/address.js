@@ -125,7 +125,9 @@ const AddressCheckout = (props) => {
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: material.sectionColor, paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 10 }}>
                 <Text style={{ fontFamily: material.fontBold, flex: 1, textAlign: 'left' }}>{Identify.__(title)}</Text>
                 {checkShowEdit() && <Icon style={{ marginLeft: 5, fontSize: 20 }} name="md-settings" onPress={() => {
-                    onEditAddress(data);
+                    if(!props.parent.state.iframe_order) { 
+                        onEditAddress(data);
+                    }
                 }} />}
             </View>
             {renderAddressItem("md-person", [data.firstname, data.lastname])}

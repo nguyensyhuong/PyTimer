@@ -17,7 +17,8 @@ class Checkout extends SimiPageComponent {
     constructor(props) {
         super(props);
         this.state = {
-            ...this.state
+            ...this.state,
+            iframe_order: false
         };
         this.isFirstRequest = true;
         this.isPlace = false;
@@ -170,28 +171,34 @@ class Checkout extends SimiPageComponent {
     }
     onPlaceOrder(params = null) {
         if (this.isCanPlaceOrder() && !this.dispatchOnPlaceOrder() && !this.processCustomizePayment()) {
-            this.isPlace = true;
-            this.props.storeData('showLoading', { type: 'dialog' });
-
-            newConnection = new NewConnection();
-            newConnection.init(onepage, 'place_order', this, 'POST');
-            if (Identify.TRUE(Identify.getMerchantConfig().storeview.checkout.enable_address_params)) {
-                params = {
-                    ...params,
-                    b_address: this.billingAddressParams,
-                    s_address: this.shippingAddressParams
+            if(this.selectedPayment.payment_method.toUpperCase() == 'WINDCAVE_PXPAY2_IFRAME') {
+                this.setState({
+                    iframe_order: true
+                })
+            } else {
+                this.isPlace = true;
+                this.props.storeData('showLoading', { type: 'dialog' });
+    
+                newConnection = new NewConnection();
+                newConnection.init(onepage, 'place_order', this, 'POST');
+                if (Identify.TRUE(Identify.getMerchantConfig().storeview.checkout.enable_address_params)) {
+                    params = {
+                        ...params,
+                        b_address: this.billingAddressParams,
+                        s_address: this.shippingAddressParams
+                    }
                 }
-            }
-            if (this.selectedPayment.payment_method.toUpperCase() == 'CREDIT_CARD' && Identify.getCreditCardData()) {
-                params = {
-                    ...params,
-                    payment: Identify.getCreditCardData()
+                if (this.selectedPayment.payment_method.toUpperCase() == 'CREDIT_CARD' && Identify.getCreditCardData()) {
+                    params = {
+                        ...params,
+                        payment: Identify.getCreditCardData()
+                    }
                 }
+                if (params) {
+                    newConnection.addBodyData(params);
+                }
+                newConnection.connect();
             }
-            if (params) {
-                newConnection.addBodyData(params);
-            }
-            newConnection.connect();
         }
     }
     componentDidMount() {

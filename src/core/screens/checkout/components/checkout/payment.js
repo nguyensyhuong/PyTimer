@@ -1,17 +1,23 @@
 import React from 'react';
-import { Text, Icon } from 'native-base';
+import { Text, Icon, Toast } from 'native-base';
 import { TouchableOpacity, View, findNodeHandle } from 'react-native';
 import Identify from '@helper/Identify';
 import material from '@theme/variables/material';
 import SimiComponent from '@base/components/SimiComponent';
 import Events from '@helper/config/events';
 import NavigationManager from '@helper/NavigationManager';
+import WebView from 'react-native-webview';
 
 class PaymentMethod extends SimiComponent {
 
     constructor(props) {
         super(props);
         this.selectedPayment = null;
+    }
+
+    webView = {
+        canGoBack: false,
+        ref: null,
     }
 
     componentDidMount() {
@@ -89,13 +95,16 @@ class PaymentMethod extends SimiComponent {
     }
 
     renderPaymentItem(paymentMethod) {
+        console.log('ầdffs', paymentMethod)
         if (paymentMethod.show_type == '1') {
             return (this.renderCreditCard(paymentMethod));
         }
         let showContent = (paymentMethod.hasOwnProperty('content') && paymentMethod.content && paymentMethod.p_method_selected) ? true : false;
         return (
-            <TouchableOpacity key={paymentMethod.payment_method} onPress={() => {
-                this.onSelectPayment(paymentMethod)
+            <TouchableOpacity activeOpacity={1} key={paymentMethod.payment_method} onPress={() => {
+                if(!this.props.parent.state.iframe_order) { 
+                    this.onSelectPayment(paymentMethod)
+                }
             }}>
                 <View style={{ borderBottomWidth: 0.5, borderBottomColor: '#EDEDED', flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 }}>
                     <Icon name={paymentMethod.p_method_selected ? 'ios-checkmark-circle-outline' : 'ios-radio-button-off'} />
@@ -104,8 +113,30 @@ class PaymentMethod extends SimiComponent {
                         {showContent && <Text style={{ fontSize: material.textSizeTiny }}>{paymentMethod.content}</Text>}
                     </View>
                 </View>
+                {this.props.parent.state.iframe_order && paymentMethod.url_iframe && 
+                    <WebView 
+                        source={{uri: paymentMethod.url_iframe}} 
+                        style={{flex: 1, height: 850}}
+                        startInLoadingState={true}
+                        originWhitelist={['*']}
+                        ref={(webView) => { this.webView.ref = webView; }}
+                        onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+                    />}
             </TouchableOpacity>
         )
+    }
+
+    _onNavigationStateChange(webViewState) {
+        // console.log('ssss', webViewState.url)
+        if(webViewState.url && webViewState.url.includes('/checkout/cart/')) {
+            this.webView.ref.stopLoading();
+            Toast.show({
+                text: 'Payment failed',
+                type: 'danger',
+                duration: 3000, textStyle: { fontFamily: material.fontFamily }
+            });
+            NavigationManager.openPage(this.props.navigation, 'Cart')
+        }
     }
 
     createItems() {

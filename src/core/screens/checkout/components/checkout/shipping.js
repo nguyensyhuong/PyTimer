@@ -58,7 +58,9 @@ class ShippingMethod extends SimiComponent {
         return (
             <View style={{borderBottomWidth: 0.5, borderBottomColor: '#EDEDED', paddingBottom: 10, paddingTop: 10, paddingLeft: 15, paddingRight: 15}}>
                 <TouchableOpacity key={shippingMethod.s_method_code} onPress={() => {
-                    this.onSelectShippingMethod(shippingMethod)
+                    if(!this.props.parent.state.iframe_order) {
+                        this.onSelectShippingMethod(shippingMethod)
+                    }
                 }}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                         <Icon style={{ marginTop: 2 }} name={shippingMethod.s_method_selected ? 'ios-checkmark-circle-outline' : 'ios-radio-button-off'} />
