@@ -13,6 +13,7 @@ class PaymentMethod extends SimiComponent {
     constructor(props) {
         super(props);
         this.selectedPayment = null;
+        this.count = 1;
     }
 
     webView = {
@@ -127,9 +128,17 @@ class PaymentMethod extends SimiComponent {
     }
 
     _onNavigationStateChange(webViewState) {
-        // console.log('ssss', webViewState.url)
-        if(webViewState.url && webViewState.url.includes('/checkout/cart/')) {
+        if(webViewState.url && webViewState.url.includes('https://sec.windcave.com')) {
+            this.count = this.count + 1;
+        }
+        console.log('ssss', this.count, webViewState.url)
+        if(webViewState.url && webViewState.url.includes('pxpay2/pxpay2iframe/redirectback')) {
             this.webView.ref.stopLoading();
+            if(this.count > 7) {
+                this.props.parent.setState({iframe_order: false});
+                this.props.parent.onPlaceOrderAfterPayIframe();
+            }
+        } else if(webViewState.url && webViewState.url.includes('/checkout/cart/')) {
             Toast.show({
                 text: 'Payment failed',
                 type: 'danger',

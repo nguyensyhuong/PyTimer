@@ -201,6 +201,24 @@ class Checkout extends SimiPageComponent {
             }
         }
     }
+    onPlaceOrderAfterPayIframe(params = null) {
+        this.isPlace = true;
+        this.props.storeData('showLoading', { type: 'dialog' });
+
+        newConnection = new NewConnection();
+        newConnection.init(onepage, 'place_order', this, 'POST');
+        if (Identify.TRUE(Identify.getMerchantConfig().storeview.checkout.enable_address_params)) {
+            params = {
+                ...params,
+                b_address: this.billingAddressParams,
+                s_address: this.shippingAddressParams
+            }
+        }
+        if (params) {
+            newConnection.addBodyData(params);
+        }
+        newConnection.connect();
+    }
     componentDidMount() {
         super.componentDidMount();
         this.quoteId = this.props.quoteitems.quote_id;
@@ -216,7 +234,15 @@ class Checkout extends SimiPageComponent {
         Events.dispatchEventAction(data, this);
         switch (this.selectedPayment.show_type) {
             case 3:
-                this.processPaymentWebView(order);
+                if(this.selectedPayment.payment_method != 'WINDCAVE_PXPAY2_IFRAME') {
+                    this.processPaymentWebView(order);
+                } else {
+                    AppStorage.saveData('quote_id', '');
+                        NavigationManager.clearStackAndOpenPage(this.props.navigation, 'Thankyou', {
+                            invoice: order.invoice_number,
+                            mode: this.mode,
+                        });
+                }
                 break;
             default:
                 let checkCustomPayment = this.processCustomPayment(order);
