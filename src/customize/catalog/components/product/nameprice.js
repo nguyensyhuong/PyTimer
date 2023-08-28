@@ -27,9 +27,9 @@ export default class ProductNamePriceComponent extends SimiComponent {
     }
 
     checkTypeIdAndPrice() {
-        if (this.props.product.type_id === 'configurable' && this.props.product.app_prices && this.props.product.app_prices.price == 0) {
-            return false;
-        }
+        // if (this.props.product.type_id === 'configurable' && this.props.product.app_prices && this.props.product.app_prices.price == 0) {
+        //     return false;
+        // }
         return true;
     }
 
@@ -110,6 +110,8 @@ export default class ProductNamePriceComponent extends SimiComponent {
         this.setState({
             check: check
         });
-        this.prices.updatePrices(newPrices);
+        if(this.prices) {
+            this.prices.updatePrices(newPrices);
+        }
     }
 }

@@ -97,9 +97,9 @@ class VerticalProductItem extends SimiComponent {
     }
 
     checkTypeIdAndPrice() {
-        if (this.props.product.type_id === 'configurable' && this.props.product.app_prices && this.props.product.app_prices.price == 0) {
-            return false;
-        }
+        // if (this.props.product.type_id === 'configurable' && this.props.product.app_prices && this.props.product.app_prices.price == 0) {
+        //     return false;
+        // }
         return true;
     }
 
