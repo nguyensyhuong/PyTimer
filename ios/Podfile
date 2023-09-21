@@ -43,6 +43,7 @@ target 'SimiCart' do
 
   pod 'Fabric'
   pod 'Crashlytics'
+  pod 'GoogleDataTransport'
   
   pod 'FBSDKCoreKit', '~> 12.2.1'
   pod 'FBSDKLoginKit', '~> 12.2.1'
