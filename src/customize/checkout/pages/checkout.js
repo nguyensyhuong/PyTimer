@@ -18,7 +18,9 @@ class Checkout extends SimiPageComponent {
         super(props);
         this.state = {
             ...this.state,
-            iframe_order: false
+            iframe_order: false,
+            iframe_url: null,
+            order: null
         };
         this.isFirstRequest = true;
         this.isPlace = false;
@@ -171,53 +173,36 @@ class Checkout extends SimiPageComponent {
     }
     onPlaceOrder(params = null) {
         if (this.isCanPlaceOrder() && !this.dispatchOnPlaceOrder() && !this.processCustomizePayment()) {
-            if(this.selectedPayment.payment_method.toUpperCase() == 'WINDCAVE_PXPAY2_IFRAME') {
-                this.setState({
-                    iframe_order: true
-                })
-            } else {
-                this.isPlace = true;
-                this.props.storeData('showLoading', { type: 'dialog' });
-    
-                newConnection = new NewConnection();
-                newConnection.init(onepage, 'place_order', this, 'POST');
-                if (Identify.TRUE(Identify.getMerchantConfig().storeview.checkout.enable_address_params)) {
-                    params = {
-                        ...params,
-                        b_address: this.billingAddressParams,
-                        s_address: this.shippingAddressParams
-                    }
+            this.isPlace = true;
+            this.props.storeData('showLoading', { type: 'dialog' });
+
+            newConnection = new NewConnection();
+            newConnection.init(onepage, 'place_order', this, 'POST');
+            if (Identify.TRUE(Identify.getMerchantConfig().storeview.checkout.enable_address_params)) {
+                params = {
+                    ...params,
+                    b_address: this.billingAddressParams,
+                    s_address: this.shippingAddressParams
                 }
-                if (this.selectedPayment.payment_method.toUpperCase() == 'CREDIT_CARD' && Identify.getCreditCardData()) {
-                    params = {
-                        ...params,
-                        payment: Identify.getCreditCardData()
-                    }
-                }
-                if (params) {
-                    newConnection.addBodyData(params);
-                }
-                newConnection.connect();
             }
+            if (this.selectedPayment.payment_method.toUpperCase() == 'CREDIT_CARD' && Identify.getCreditCardData()) {
+                params = {
+                    ...params,
+                    payment: Identify.getCreditCardData()
+                }
+            }
+            if (params) {
+                newConnection.addBodyData(params);
+            }
+            newConnection.connect();
         }
     }
     onPlaceOrderAfterPayIframe(params = null) {
-        this.isPlace = true;
-        this.props.storeData('showLoading', { type: 'dialog' });
-
-        newConnection = new NewConnection();
-        newConnection.init(onepage, 'place_order', this, 'POST');
-        if (Identify.TRUE(Identify.getMerchantConfig().storeview.checkout.enable_address_params)) {
-            params = {
-                ...params,
-                b_address: this.billingAddressParams,
-                s_address: this.shippingAddressParams
-            }
-        }
-        if (params) {
-            newConnection.addBodyData(params);
-        }
-        newConnection.connect();
+        AppStorage.saveData('quote_id', '');
+        NavigationManager.clearStackAndOpenPage(this.props.navigation, 'Thankyou', {
+            invoice: this.state.order.invoice_number,
+            mode: this.mode,
+        });
     }
     componentDidMount() {
         super.componentDidMount();
@@ -237,11 +222,10 @@ class Checkout extends SimiPageComponent {
                 if(this.selectedPayment.payment_method != 'WINDCAVE_PXPAY2_IFRAME') {
                     this.processPaymentWebView(order);
                 } else {
-                    AppStorage.saveData('quote_id', '');
-                        NavigationManager.clearStackAndOpenPage(this.props.navigation, 'Thankyou', {
-                            invoice: order.invoice_number,
-                            mode: this.mode,
-                        });
+                    this.setState({
+                        iframe_order: true,
+                        iframe_url: order.url_action
+                    })
                 }
                 break;
             default:
@@ -329,12 +313,19 @@ class Checkout extends SimiPageComponent {
             return;
         }
         if (this.isPlace) {
-            this.props.storeData('actions', [
-                { type: 'showLoading', data: { type: 'none' } },
-                { type: 'quoteitems', data: {} }
-            ]);
+            if(this.selectedPayment.payment_method.toUpperCase() == 'WINDCAVE_PXPAY2_IFRAME') {
+                this.props.storeData('actions', [
+                    { type: 'showLoading', data: { type: 'none' } },
+                ]);
+            } else {
+                this.props.storeData('actions', [
+                    { type: 'showLoading', data: { type: 'none' } },
+                    { type: 'quoteitems', data: {} }
+                ]);
+            }
             Identify.saveCreditCardData(null);
             if (data.order) {
+                this.setState({order: data.order})
                 this.onPlaceOrderSuccess(data.order);
             } else {
                 AppStorage.removeAllSavedInfo();
@@ -346,7 +337,7 @@ class Checkout extends SimiPageComponent {
                 { type: 'showLoading', data: { type: 'none' } },
                 { type: 'order_review_data', data: data }
             ]);
-            this.scrollToSection();
+            // this.scrollToSection();
         }
         if (data.message || data.order.message) {
             let messages = data.message ? data.message : data.order.message;

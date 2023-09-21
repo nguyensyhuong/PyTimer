@@ -76,6 +76,7 @@ class Cart extends SimiPageComponent {
         return components;
     }
     componentWillMount() {
+        this.requestCart()
         if (this.props.loading.type === 'none') {
             if (Identify.isEmpty(this.props.data) || Identify.TRUE(this.props.data.reload_data)) {
                 this.props.storeData('showLoading', { type: 'full' });

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Text, Icon, Toast } from 'native-base';
-import { TouchableOpacity, View, findNodeHandle } from 'react-native';
+import { TouchableOpacity, View, findNodeHandle, Platform, Alert } from 'react-native';
 import Identify from '@helper/Identify';
 import material from '@theme/variables/material';
 import SimiComponent from '@base/components/SimiComponent';
 import Events from '@helper/config/events';
 import NavigationManager from '@helper/NavigationManager';
 import WebView from 'react-native-webview';
+import AppStorage from '@helper/storage';
 
 class PaymentMethod extends SimiComponent {
 
@@ -14,6 +15,7 @@ class PaymentMethod extends SimiComponent {
         super(props);
         this.selectedPayment = null;
         this.count = 1;
+        this.url_iframe_test = '';
     }
 
     webView = {
@@ -46,6 +48,7 @@ class PaymentMethod extends SimiComponent {
     }
 
     onSelectPayment(paymentMethod, data) {
+        console.log('aaaa', paymentMethod)
         this.tracking();
         this.props.parent.onSaveMethod({
             p_method: {
@@ -96,56 +99,63 @@ class PaymentMethod extends SimiComponent {
     }
 
     renderPaymentItem(paymentMethod) {
-        console.log('ầdffs', paymentMethod)
+        // console.log('ầdffs', paymentMethod)
         if (paymentMethod.show_type == '1') {
             return (this.renderCreditCard(paymentMethod));
         }
         let showContent = (paymentMethod.hasOwnProperty('content') && paymentMethod.content && paymentMethod.p_method_selected) ? true : false;
         return (
-            <TouchableOpacity activeOpacity={1} key={paymentMethod.payment_method} onPress={() => {
-                if(!this.props.parent.state.iframe_order) { 
-                    this.onSelectPayment(paymentMethod)
-                }
-            }}>
-                <View style={{ borderBottomWidth: 0.5, borderBottomColor: '#EDEDED', flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 }}>
-                    <Icon name={paymentMethod.p_method_selected ? 'ios-checkmark-circle-outline' : 'ios-radio-button-off'} />
-                    <View style={{ marginLeft: 10 }}>
-                        <Text>{Identify.__(paymentMethod.title)}</Text>
-                        {showContent && <Text style={{ fontSize: material.textSizeTiny }}>{paymentMethod.content}</Text>}
-                    </View>
-                </View>
-                {this.props.parent.state.iframe_order && paymentMethod.url_iframe && 
-                    <WebView 
-                        source={{uri: paymentMethod.url_iframe}} 
-                        style={{flex: 1, height: 850}}
-                        startInLoadingState={true}
-                        originWhitelist={['*']}
-                        ref={(webView) => { this.webView.ref = webView; }}
-                        onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-                    />}
-            </TouchableOpacity>
+            <View>
+                <TouchableOpacity key={paymentMethod.payment_method}>
+                    <TouchableOpacity activeOpacity={1} onPress={() => {
+                        if(!this.props.parent.state.iframe_order) { 
+                            this.onSelectPayment(paymentMethod)
+                        }
+                    }}>
+                        <View style={{ borderBottomWidth: 0.5, borderBottomColor: '#EDEDED', flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 }}>
+                            <Icon name={paymentMethod.p_method_selected ? 'ios-checkmark-circle-outline' : 'ios-radio-button-off'} />
+                            <View style={{ marginLeft: 10 }}>
+                                <Text>{Identify.__(paymentMethod.title)}</Text>
+                                {showContent && <Text style={{ fontSize: material.textSizeTiny }}>{paymentMethod.content}</Text>}
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                </TouchableOpacity>
+                {paymentMethod.payment_method == 'WINDCAVE_PXPAY2_IFRAME' && this.props.parent.state.iframe_order && this.props.parent.state.iframe_url && 
+                    <View style={{zIndex: 9999, activeOpacity: 0.99, height: Platform.OS == 'ios' ? 850 : 1100}}>
+                        <WebView 
+                            source={{uri: this.props.parent.state.iframe_url}} 
+                            style={{flex: 1, activeOpacity: 0.99, overflow: 'hidden'}}
+                            startInLoadingState={true}
+                            javaScriptEnabled={true}
+                            androidHardwareAccelerationDisabled
+                            androidLayerType={'hardware'}
+                            ref={(webView) => { this.webView.ref = webView; }}
+                            autoFocus={true}
+                            onNavigationStateChange={(webViewState) => {
+                                console.log('sssđf', webViewState)
+                                if(webViewState.url && webViewState.url.includes('https://sec.windcave.com')) {
+                                    this.count = this.count + 1;
+                                }
+                                if(webViewState.url && webViewState.url.includes('pxpay2/pxpay2iframe/redirectback')) {
+                                    this.webView.ref.stopLoading();
+                                    if(this.count > 7 || (this.count > 2 && webViewState.navigationType != 'formsubmit')) {
+                                        this.props.parent.setState({iframe_order: false});
+                                        this.props.parent.onPlaceOrderAfterPayIframe();
+                                    } else {
+                                        Toast.show({
+                                            text: 'Payment failed',
+                                            type: 'danger',
+                                            duration: 3000, textStyle: { fontFamily: material.fontFamily }
+                                        });
+                                        NavigationManager.clearStackAndOpenPage(this.props.navigation, 'Cart')
+                                    }
+                                }
+                            }}
+                        />
+                    </View>}
+            </View>
         )
-    }
-
-    _onNavigationStateChange(webViewState) {
-        if(webViewState.url && webViewState.url.includes('https://sec.windcave.com')) {
-            this.count = this.count + 1;
-        }
-        console.log('ssss', this.count, webViewState.url)
-        if(webViewState.url && webViewState.url.includes('pxpay2/pxpay2iframe/redirectback')) {
-            this.webView.ref.stopLoading();
-            if(this.count > 7) {
-                this.props.parent.setState({iframe_order: false});
-                this.props.parent.onPlaceOrderAfterPayIframe();
-            }
-        } else if(webViewState.url && webViewState.url.includes('/checkout/cart/')) {
-            Toast.show({
-                text: 'Payment failed',
-                type: 'danger',
-                duration: 3000, textStyle: { fontFamily: material.fontFamily }
-            });
-            NavigationManager.openPage(this.props.navigation, 'Cart')
-        }
     }
 
     createItems() {

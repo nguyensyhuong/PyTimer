@@ -89,9 +89,9 @@ const HorizontalItem = (props) => {
     }
 
     function checkTypeIdAndPrice(item) {
-        if (item.type_id === 'configurable' && item.app_prices && item.app_prices.price == 0) {
-            return false;
-        }
+        // if (item.type_id === 'configurable' && item.app_prices && item.app_prices.price == 0) {
+        //     return false;
+        // }
         return true;
     }
 
