@@ -6,15 +6,16 @@ import Layout from '@helper/config/layout';
 import Events from '@helper/config/events';
 import AppStorage from "@helper/storage";
 import simicart from '@helper/simicart';
+import { app_configs } from "@helper/constants";
 
 class Dashboard extends React.Component {
 
     componentDidMount() {
         new NewConnection()
-            .init(simicart.simicart_url + 'bear_token/' + simicart.simicart_authorization, 'get_dashboard_config', this)
-            .setCustomURL(true)
-            .setShowErrorAlert(false)
-            .connect();
+      .init(app_configs, "get_dashboard_config", this)
+      .addGetData({ cache: Math.random() })
+      .setShowErrorAlert(false)
+      .connect();
     }
 
     setData(data, requestID) {
@@ -33,10 +34,153 @@ class Dashboard extends React.Component {
     saveAppConfig(data, shouldSaveToStorage = true) {
         Identify.setAppConfig(data['app-configs'][0]);
 
-        Layout.plugins = data['app-configs'][0]['site_plugins'] || [];
+        data["app-configs"][0]["site_plugins"] = [
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_simicontact_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_appwishlist_40"
+            },
+            {
+                "config": {
+                    "enable": "0",
+                    "config_values": ""
+                },
+                "sku": "simi_simibarcode_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "magestore_productlabel_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_simivideo_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_paypalexpress_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_simicustompayment_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "checkout_management_40"
+            },
+            {
+                "config": {
+                    "enable": "0",
+                    "config_values": ""
+                },
+                "sku": "simi_simimixpanel_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_simiproductreview_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_simisocialshare_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_simicouponcode_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_searchvoice_40"
+            },
+            {
+                "config": {
+                    "enable": "0",
+                    "config_values": ""
+                },
+                "sku": "simi_instant_purchase_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": ""
+                },
+                "sku": "simi_customchat_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": "{\"default\":{\"facebook_key\":\"779292439417440\",\"facebook_name\":\"PY Timber Warehouse\",\"mobile_platform\":\"1\"}}"
+                },
+                "sku": "simi_fblogin_40"
+            },
+            {
+                "config": {
+                    "enable": "1",
+                    "config_values": "{\"default\":{\"google_plist_iso\":\"simicart\\/appdashboard\\/ios\\/plist\\/f97d42753192664120c3ba57b59c161d.plist\",\"mobile_platform\":\"1\"}}"
+                },
+                "sku": "simi_firebase_analytics_40"
+            },
+            {
+                "config": {
+                    "enable": "0",
+                    "config_values": ""
+                },
+                "sku": "simi_paypalmobile_40"
+            },
+            {
+                "config": {
+                    "enable": "0",
+                    "config_values": ""
+                },
+                "sku": "simi_simibraintree_40"
+            },
+            {
+                "config": {
+                    "enable": "0",
+                    "config_values": ""
+                },
+                "sku": "simi_addressautofill_40"
+            }
+        ],
+
+        Layout.plugins = data['app-configs'][0]['site_plugins'];
         Layout.initAppLayout();
 
-        Events.plugins = data['app-configs'][0]['site_plugins'] || [];
+        Events.plugins = data['app-configs'][0]['site_plugins'];
         Events.initAppEvents();
 
         this.props.storeData(data);

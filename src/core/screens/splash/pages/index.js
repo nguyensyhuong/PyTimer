@@ -176,13 +176,13 @@ class Splash extends SimiPageComponent {
             this.autoLogin();
         }
         this.dispatchSplashCompleted();
-        if (this.props.dashboard_configs['app-configs'][0]) {
-            if (!this.props.dashboard_configs['app-configs'][0].is_active) {
-                SplashScreen.hide();
-                NavigationManager.openRootPage(this.props.navigation, 'Maintain');
-                return null;
-            }
-        }
+        // if (this.props.dashboard_configs['app-configs'][0]) {
+        //     if (!this.props.dashboard_configs['app-configs'][0].is_active) {
+        //         SplashScreen.hide();
+        //         NavigationManager.openRootPage(this.props.navigation, 'Maintain');
+        //         return null;
+        //     }
+        // }
 
         return (
             <Redirect navigation={this.props.navigation} />

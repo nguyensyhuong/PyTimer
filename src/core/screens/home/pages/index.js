@@ -80,7 +80,8 @@ class Home extends SimiPageComponent {
             HomeContent = require('./zara').default;
             return <HomeContent navigation={this.props.navigation} />
         } else {
-            return null;
+            HomeContent = require('./default').default;
+            return <HomeContent navigation={this.props.navigation} />
         }
     }
 

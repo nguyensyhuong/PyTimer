@@ -15,6 +15,7 @@ export const onepage = 'simiconnector/rest/v2/orders/onepage';
 export const storeviews = 'simiconnector/rest/v2/storeviews';
 export const devices = 'simiconnector/rest/v2/devices';
 export const notifications_history = 'simiconnector/rest/v2/notifications';
+export const app_configs = "simiconnector/rest/v2/app_configs";
 
 export const customizepayments = 'simiconnector/rest/v2/customizepayments';
 
