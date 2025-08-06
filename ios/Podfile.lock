@@ -250,6 +250,7 @@ DEPENDENCIES:
   - Firebase/Messaging (~> 6.13.0)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - GoogleDataTransport
   - RCTRestart (from `../node_modules/react-native-restart/ios`)
   - React (from `../node_modules/react-native/`)
   - React-Core (from `../node_modules/react-native/React`)
@@ -427,7 +428,7 @@ SPEC CHECKSUMS:
   OneSignal: fa98eaa90372bb367b6a4a1c1622ffb9832c7600
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   Protobuf: f4128517d7a42302e106cc3afe614ee3a7513e94
-  RCTRestart: e8e3868a71dbec2cf8055fc2c0635db23c8c4479
+  RCTRestart: dd19aab87fc1118e05b6b5b91b959105647f56b4
   React: 53c53c4d99097af47cf60594b8706b4e3321e722
   React-Core: ba421f6b4f4cbe2fb17c0b6fc675f87622e78a64
   React-cxxreact: 8384287780c4999351ad9b6e7a149d9ed10a2395
@@ -437,14 +438,14 @@ SPEC CHECKSUMS:
   React-jsinspector: e08662d1bf5b129a3d556eb9ea343a3f40353ae4
   react-native-cookies: ce50e42ace7cf0dd47769260ca5bbe8eee607e4e
   react-native-fbsdk-next: 3a9545d174f16ec343e7bcaf12f970fdc82feed2
-  react-native-geolocation: 205c5f619aea7bd54067b7b51e0781cae2f37151
-  react-native-image-picker: 3637d63fef7e32a230141ab4660d3ceb773c824f
-  react-native-netinfo: 3dd993921571d01b78a8f91f1caaffcab7a1e1c7
-  react-native-onesignal: ece470306f7486853454793e954ac00eaa28f2dd
+  react-native-geolocation: 69f4fd37650b8e7fee91816d395e62dd16f5ab8d
+  react-native-image-picker: 7a85cf7b0a53845f03ae52fb4592a2748ded069b
+  react-native-netinfo: ddaca8bbb9e6e914b1a23787ccb879bc642931c9
+  react-native-onesignal: 417b2ae5c3148a47a6ef70b6af443186048b2022
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
-  react-native-tracking-transparency: acdce044563616b4ffcf41f3138e0fa1781310b3
-  react-native-voice: 0355d771838b00acfb4b112b2c496c2653e2f8c8
-  react-native-webview: 711cef318a554093b09a5b871894011435d87a8d
+  react-native-tracking-transparency: 25ff1ff866e338c137c818bdec20526bb05ffcc1
+  react-native-voice: eb6b7c7f752310f72a6f4d64c2fba6ee724d6604
+  react-native-webview: db4682f1698ab4b17a5e88f951031d203ff8aea8
   React-RCTActionSheet: b0f1ea83f4bf75fb966eae9bfc47b78c8d3efd90
   React-RCTAnimation: 359ba1b5690b1e87cc173558a78e82d35919333e
   React-RCTBlob: 5e2b55f76e9a1c7ae52b826923502ddc3238df24
@@ -455,16 +456,16 @@ SPEC CHECKSUMS:
   React-RCTText: b074d89033583d4f2eb5faf7ea2db3a13c7553a2
   React-RCTVibration: 2105b2e0e2b66a6408fc69a46c8a7fb5b2fdade0
   React-RCTWebSocket: cd932a16b7214898b6b7f788c8bddb3637246ac4
-  RNAwesomeCardIO: f4cb74c4e09062276afec559a2e329a2562ee586
-  RNCAsyncStorage: cb9a623793918c6699586281f0b51cbc38f046f9
-  RNCPushNotificationIOS: eaf01f848a0b872b194d31bcad94bb864299e01e
-  RNDeviceInfo: af47a7d1a09d64c8cbb8b0c883db9bca422a9813
+  RNAwesomeCardIO: 14d78f3e76abaf503068c9f4513ff6c4a516d958
+  RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
+  RNCPushNotificationIOS: 988c26325d0b7e7b54f818db35b8313d3a125f0c
+  RNDeviceInfo: aad3c663b25752a52bf8fce93f2354001dd185aa
   RNFirebase: 37daa9a346d070f9f6ee1f3b4aaf4c8e3b1d5d1c
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNReanimated: 7de2dca51deacff78bb880f63c1389a24311b376
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   yoga: 312528f5bbbba37b4dcea5ef00e8b4033fdd9411
 
-PODFILE CHECKSUM: c66cef7419c5e94ce67f4cf3752986e613ad932a
+PODFILE CHECKSUM: 2926bbe0db970d0c640de7a9b22f6f918b8fd988
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.16.2

@@ -71,6 +71,7 @@ export default class CountryStateFields extends React.Component {
                 break;
             }
         }
+        console.log('sdgdgfd', this.allowedStates);
     }
 
     updateCountry(countryId) {
@@ -133,6 +134,12 @@ export default class CountryStateFields extends React.Component {
     }
 
     createStateInput() {
+        this.allowedStates = [{ 
+            state_id: '571',
+            state_name: 'Victoria',
+            state_code: 'VIC',
+            searchStr: 'Victoria' 
+        }]
         if (this.allowedStates.length > 0) {
             return (<PickerInput
                 ref={(node) => {this.statePickerInput = node}}

@@ -15,7 +15,7 @@ class Home extends SimiPageComponent {
     constructor(props) {
         super(props);
         let appConfig = this.props.dashboard['app-configs'][0];
-        this.layout = appConfig.home;
+        this.layout = appConfig?.theme?.theme_selected;
         this.isBack = false;
         this.test = true;
     }

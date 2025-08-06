@@ -27,9 +27,9 @@
 		5B2B514A6A8642139E74D29D /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4DE56DD519BC4261A8E78202 /* Roboto.ttf */; };
 		606E1C7EA09445FFBA789228 /* Default-667h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CB1B5DE3565E4DA0B25D3A61 /* Default-667h@2x.png */; };
 		63ACAABB30204BCD8B0A93CA /* UniversNextArabic-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D380A6C4CA2C45F0A03A8DB5 /* UniversNextArabic-Regular.ttf */; };
+		7CD377B82E2105FD00BF2688 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 7CD0159E2DDACFD60051B841 /* main.jsbundle */; };
 		813B862A63A54474A8344B3C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 47DBC7D1AEFE4178BAEAAA68 /* Default@2x.png */; };
 		8168DDED2A680C7F00FE74E9 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 81E054442A5E924C00354582 /* assets */; };
-		8168DDEE2A680C8400FE74E9 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		8579D95AA27D47CFB1A74319 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02B5DA372AEF48749A2C52C9 /* logo@2x.png */; };
 		89EF9E68EAE94583A6A04764 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42FBB913A7C5484DAD69D3E3 /* Roboto-Bold.ttf */; };
 		8AA3354651D24290B074FE68 /* 29LTZeynTRIAL-RegularTRIAL.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8A076D162038490CB1918A43 /* 29LTZeynTRIAL-RegularTRIAL.otf */; };
@@ -404,6 +404,7 @@
 		74799CA2B8324E8D9A0C5C4F /* Default-812h@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Default-812h@3x.png"; path = "../media/Images/Default-812h@3x.png"; sourceTree = "<group>"; };
 		75F93D8DAAB0401FA2451EED /* libRNReactNativeBraintree.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNReactNativeBraintree.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
+		7CD0159E2DDACFD60051B841 /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		7F8F32F9E7B24C379088149E /* Default~ipad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Default~ipad.png"; path = "../media/Images/Default~ipad.png"; sourceTree = "<group>"; };
 		802645EA165047BCBA3412E1 /* DidotLTStd-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DidotLTStd-Bold.otf"; path = "../assets/fonts/DidotLTStd-Bold.otf"; sourceTree = "<group>"; };
 		81E054442A5E924C00354582 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
@@ -758,6 +759,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				7CD0159E2DDACFD60051B841 /* main.jsbundle */,
 				81E054442A5E924C00354582 /* assets */,
 				13B07FAE1A68108700A75B9A /* SimiCart */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -1210,7 +1212,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8168DDEE2A680C8400FE74E9 /* main.jsbundle in Resources */,
+				7CD377B82E2105FD00BF2688 /* main.jsbundle in Resources */,
 				8168DDED2A680C7F00FE74E9 /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
@@ -1260,7 +1262,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=/usr/local/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "export NODE_BINARY=/Users/syhuong/.nvm/versions/node/v16.20.2/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		508CD3492153512A006482FC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1500,7 +1502,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
@@ -1517,7 +1519,7 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.15;
+				MARKETING_VERSION = 1.1.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1546,7 +1548,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;
@@ -1562,7 +1564,7 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.15;
+				MARKETING_VERSION = 1.1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

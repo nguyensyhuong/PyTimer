@@ -1,13 +1,13 @@
 import React from 'react';
 
 class SimiCart {
-  // static merchant_url = "https://pytimberwarehouse.com.au/";
-  static merchant_url = "https://ma51.devm2.bsscommerce.com/";
+  static merchant_url = "https://pytimberwarehouse.com.au/";
+  // static merchant_url = "https://ma51.devm2.bsscommerce.com/";
   static merchant_authorization = "J3COeZtmHvOkTrXgdGYyaucB5y38bD";
   static simicart_url = "https://www.simicart.com/index.php/appdashboard/rest/app_configs/";
   static simicart_authorization = "5ValhIOlcIzC32N35OQIiUXLibY5cdzPQhrPNkc";
   static isDemo = "0";
-  static appVersion = "1.1.2";
+  static appVersion = "1.1.3";
   static appID = "com.pytimberwarehouse.app";
   static fullSplash = "0";
   static colorSplash = "#FFFFFF";
