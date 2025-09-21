@@ -5,7 +5,7 @@ import reducers from './reducers';
 import AppRouter from './router/navigation';
 import { Root } from 'native-base';
 import Spinner from '@base/components/spinner';
-import { I18nManager, Platform, DeviceEventEmitter, TouchableOpacity, NativeModules, AppState } from 'react-native';
+import { I18nManager, Platform, DeviceEventEmitter, TouchableOpacity, NativeModules, AppState, Dimensions, StatusBar, View  } from 'react-native';
 import type { Notification, RemoteMessage, NotificationOpen } from 'react-native-firebase';
 import firebase from 'react-native-firebase';
 import Connection from '@base/network/Connection';
@@ -13,7 +13,6 @@ import AppStorage from '@helper/storage';
 import { devices } from '@helper/constants';
 import NotificationPopup from '@base/components/notification';
 import VersionUpdate from '@base/components/versionUpdate'
-import VersionCheck from 'react-native-version-check';
 import simicart from '@helper/simicart';
 import Device from '@helper/device';
 import Identify from '@helper/Identify';
@@ -30,9 +29,109 @@ Sentry.init({
     enableNative: false
 });
 
+const PLAY_EXTRACTORS = [
+  // 1) schema.org (có thể đã đổi, nhưng cứ thử)
+  /itemprop=\"softwareVersion\"[^>]*>([^<]+)</i,
+  // 2) JSON nhúng trong HTML (AF_initDataCallback): tìm chuỗi có dạng "x.y.z"
+  /\[\[\[\s*\"(\d+(?:\\.\d+){1,3})\"\s*\]\]\]/,
+  // 3) Gần cụm "Current Version" (khi hl=en)
+  /Current Version[\s\S]{0,200}?([0-9]+(?:\.[0-9]+){1,3})/i,
+];
+
+// timeout đơn giản cho fetch
+function fetchWithTimeout(resource, options = {}) {
+  const { timeout = 10000, ...rest } = options;
+  return Promise.race([
+    fetch(resource, rest),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
+  ]);
+}
+
+async function fetchPlayStoreVersion(packageName, { hl = 'en', gl = 'US', timeout = 10000 } = {}) {
+  const url = `https://play.google.com/store/apps/details?id=${encodeURIComponent(packageName)}&hl=${hl}&gl=${gl}`;
+  try {
+    const res = await fetchWithTimeout(url, {
+      timeout,
+      headers: {
+        // UA desktop để nhận HTML đầy đủ
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122 Safari/537.36',
+      },
+    });
+    const html = await res.text();
+    for (const rx of PLAY_EXTRACTORS) {
+      const m = rx.exec(html);
+      if (m && m[1]) {
+        const raw = String(m[1]).trim();
+        const ver = raw.replace(/[^0-9.]/g, ''); // lọc kí tự lạ
+        if (ver) return ver;
+      }
+    }
+  } catch (e) {
+    // không lấy được => null
+  }
+  return null;
+}
+
+function getPlayUrls(appId) {
+  return {
+    marketUrl: `market://details?id=${appId}`,
+    webUrl: `https://play.google.com/store/apps/details?id=${appId}`,
+  };
+}
+
 const store = createStore(reducers);
 
 const NativeMethod = Platform.OS === 'ios' ? NativeModules.NativeMethod : NativeModules.NativeMethodModule;
+
+const isAndroid15 = Platform.OS === 'android' && Number(Platform.Version) === 35;
+
+const getAndroidSystemBars = () => {
+    if (!isAndroid15) return { top: 0, bottom: 0 };
+    const screen = Dimensions.get('screen');
+    const window = Dimensions.get('window');
+
+    const status = Math.max(0, StatusBar?.currentHeight || 0);
+    const totalDiffH = Math.max(0, (screen?.height || 0) - (window?.height || 0));
+    const nav = Math.max(0, totalDiffH - status);
+
+    return { top: status, bottom: nav };
+};
+
+const AndroidSystemPadding = ({ children, style, ...rest }) => {
+    if (!isAndroid15) {
+        return (
+            <View style={[{ flex: 1 }, style]} {...rest}>
+                {children}
+            </View>
+        );
+    }
+
+    const [insets, setInsets] = React.useState(getAndroidSystemBars());
+
+    React.useEffect(() => {
+        const onChange = () => setInsets(getAndroidSystemBars());
+
+        // RN >= 0.65
+        const sub = Dimensions.addEventListener ? Dimensions.addEventListener('change', onChange) : null;
+
+        // Gọi 1 lần ban đầu
+        onChange();
+
+        return () => {
+            if (sub && typeof sub.remove === 'function') sub.remove();
+            // Fallback RN cũ
+            if (!sub && Dimensions.removeEventListener) {
+                try { Dimensions.removeEventListener('change', onChange); } catch (e) { }
+            }
+        };
+    }, []);
+
+    return (
+        <View style={[{ flex: 1, paddingTop: insets.top, paddingBottom: 50 }, style]} {...rest}>
+            {children}
+        </View>
+    );
+};
 
 export default class App extends React.Component {
     constructor(props) {
@@ -155,20 +254,36 @@ export default class App extends React.Component {
                 console.log(error)
             })
     }
-    getAppInforAndroid() {
-        VersionCheck.needUpdate()
-            .then(async res => {
-                if (res && res.isNeeded) {
-                    VersionCheck.getPlayStoreUrl().then(url => {
-                        setTimeout(
-                            () => { store.dispatch({ type: 'showUpdate', data: { show: true, urlApp: url } }) }, 7000
-                        )
-                    })
-                }
-            }).catch((error) => {
-                console.log(error);
-            });
+    async getAppInforAndroid() {
+    try {
+        // Lấy version mới nhất từ Play theo appID bạn đang dùng
+        const latest = await fetchPlayStoreVersion(simicart.appID);
+        if (!latest) {
+            // Không lấy được version Play => bỏ qua (fail-open)
+            return;
+        }
+        // current version đang dùng trong code iOS của bạn là simicart.appVersion
+        const current = simicart.appVersionAndroid;
+        console.log(`Version data: ${latest}, ${current}`);
+        
+        if (this.isNeedUpdate(current, latest)) {
+            const { marketUrl, webUrl } = getPlayUrls(simicart.appID);
+            setTimeout(() => {
+                store.dispatch({
+                    type: 'showUpdate',
+                    data: {
+                        show: true,
+                        urlApp: webUrl,     // fallback web
+                        marketUrl: marketUrl, // ưu tiên mở market:// trong component VersionUpdate
+                        latestVersion: latest,
+                    }
+                })
+            }, 7000);
+        }
+    } catch (e) {
+        console.log('getAppInforAndroid error', e);
     }
+}
     isNeedUpdate(currentVersion, appVersion) {
         return compareVersions(currentVersion, appVersion) == -1;
     }
@@ -217,12 +332,24 @@ export default class App extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <Root>
-                    <AppRouter />
-                    <Spinner />
-                    <NotificationPopup />
-                    <VersionUpdate />
-                </Root>
+{Platform.OS === 'android' ? (
+                    <AndroidSystemPadding>
+                        <Root>
+                            <AppRouter />
+                            <Spinner />
+                            <NotificationPopup />
+                            <VersionUpdate />
+                        </Root>
+                    </AndroidSystemPadding>
+                ) : (
+                        <Root>
+                            <AppRouter />
+                            <Spinner />
+                            <NotificationPopup />
+                            <VersionUpdate />
+                        </Root>
+                )}
+
             </Provider>
         );
     }
