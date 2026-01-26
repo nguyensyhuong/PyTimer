@@ -146,14 +146,17 @@ android {
         applicationId "com.pytimberwarehouse.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "1.1.4"
+        versionCode 20
+        versionName "1.1.5"
         // ndk {
         //     abiFilters "armeabi-v7a", "x86"
         // }
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         missingDimensionStrategy 'react-native-camera', 'mlkit'
+    }
+    lintOptions {
+        checkReleaseBuilds false
     }
     signingConfigs {
         release {
@@ -235,6 +238,8 @@ dependencies {
     // implementation(project(":react-native-firebase"))
 
     implementation project(':react-native-firebase')
+    implementation 'com.facebook.soloader:soloader:0.12.1'
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
     //implementation project(':react-native-maps')
@@ -252,14 +257,14 @@ dependencies {
     implementation 'com.facebook.android:facebook-login:12.1.0'
     implementation 'com.facebook.android:facebook-share:12.1.0'
     
-    compile 'com.facebook.fresco:fresco:1.+'
+//    compile 'com.facebook.fresco:fresco:1.+'
 
     // For animated GIF support
-    compile 'com.facebook.fresco:animated-gif:1.+'
+//    compile 'com.facebook.fresco:animated-gif:1.+'
 
     // For WebP support, including animated WebP
-    compile 'com.facebook.fresco:animated-webp:1.+'
-    compile 'com.facebook.fresco:webpsupport:1.+'
+//    compile 'com.facebook.fresco:animated-webp:1.+'
+//    compile 'com.facebook.fresco:webpsupport:1.+'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
         transitive = true;
@@ -267,6 +272,8 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+
+    implementation "androidx.work:work-runtime:2.7.1"
 
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermes-engine/android/";

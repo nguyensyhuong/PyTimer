@@ -20,6 +20,7 @@ class Identify {
     static customerData = null;
     static creditCardData = null;
     static initialNotificationOpened = false;
+    static notificationLaunchUrl = null;
     static isOpenShareFB = false;
     static isRunInitDeepLink = false;
     static merchantConfig = null;
@@ -310,6 +311,14 @@ class Identify {
 
     static isInitNotiOpened() {
         return this.initialNotificationOpened;
+    }
+
+    static saveNotificationLaunchUrl(url) {
+        this.notificationLaunchUrl = url || null;
+    }
+
+    static getNotificationLaunchUrl() {
+        return this.notificationLaunchUrl;
     }
 
     static saveIsOpenShareFB(isOpenShareFB) {

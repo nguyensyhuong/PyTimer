@@ -107,7 +107,16 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
-  - OneSignal (2.13.1)
+  - OneSignalXCFramework (3.12.10):
+    - OneSignalXCFramework/OneSignalCore (= 3.12.10)
+    - OneSignalXCFramework/OneSignalExtension (= 3.12.10)
+    - OneSignalXCFramework/OneSignalOutcomes (= 3.12.10)
+  - OneSignalXCFramework/OneSignalCore (3.12.10)
+  - OneSignalXCFramework/OneSignalExtension (3.12.10):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalOutcomes
+  - OneSignalXCFramework/OneSignalOutcomes (3.12.10):
+    - OneSignalXCFramework/OneSignalCore
   - PromisesObjC (1.2.12)
   - Protobuf (3.21.7)
   - RCTRestart (0.0.13):
@@ -179,8 +188,8 @@ PODS:
     - React
   - react-native-netinfo (4.7.0):
     - React
-  - react-native-onesignal (3.7.3):
-    - OneSignal (= 2.13.1)
+  - react-native-onesignal (4.5.4):
+    - OneSignalXCFramework (= 3.12.10)
     - React (< 1.0.0, >= 0.13.0)
   - react-native-splash-screen (3.3.0):
     - React-Core
@@ -313,7 +322,7 @@ SPEC REPOS:
     - GoogleDataTransportCCTSupport
     - GoogleUtilities
     - nanopb
-    - OneSignal
+    - OneSignalXCFramework
     - PromisesObjC
     - Protobuf
 
@@ -425,7 +434,7 @@ SPEC CHECKSUMS:
   GoogleDataTransportCCTSupport: 0f39025e8cf51f168711bd3fb773938d7e62ddb5
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
-  OneSignal: fa98eaa90372bb367b6a4a1c1622ffb9832c7600
+  OneSignalXCFramework: e458f7a374192598a1d66418e1b61481c3cdf0e9
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   Protobuf: f4128517d7a42302e106cc3afe614ee3a7513e94
   RCTRestart: dd19aab87fc1118e05b6b5b91b959105647f56b4
@@ -441,7 +450,7 @@ SPEC CHECKSUMS:
   react-native-geolocation: 69f4fd37650b8e7fee91816d395e62dd16f5ab8d
   react-native-image-picker: 7a85cf7b0a53845f03ae52fb4592a2748ded069b
   react-native-netinfo: ddaca8bbb9e6e914b1a23787ccb879bc642931c9
-  react-native-onesignal: 417b2ae5c3148a47a6ef70b6af443186048b2022
+  react-native-onesignal: 8d8f7d5e2cc44239fc0ec72fe9c6d27b939870fc
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-tracking-transparency: 25ff1ff866e338c137c818bdec20526bb05ffcc1
   react-native-voice: eb6b7c7f752310f72a6f4d64c2fba6ee724d6604
@@ -466,6 +475,6 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   yoga: 312528f5bbbba37b4dcea5ef00e8b4033fdd9411
 
-PODFILE CHECKSUM: 2926bbe0db970d0c640de7a9b22f6f918b8fd988
+PODFILE CHECKSUM: 8f3f3b7bac252f43350e2d56bbd4f187930d60d8
 
 COCOAPODS: 1.16.2

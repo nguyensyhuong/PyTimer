@@ -18,9 +18,33 @@ class Notification extends React.Component {
             let routeName = '';
             let url = '';
             let params = {}
+            const cartUrlSuffix = '/cart_page.html';
 
-            if (notification.payload.additionalData) {
+            const payload = notification.payload || {};
+            const rawPayload = payload.rawPayload;
+            let launchUrl = payload.launchURL || payload.launchUrl;
+
+            if (!launchUrl && rawPayload) {
+                try {
+                    const raw = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload;
+                    if (raw && raw.custom) {
+                        const custom = typeof raw.custom === 'string' ? JSON.parse(raw.custom) : raw.custom;
+                        launchUrl = custom && custom.u ? custom.u : launchUrl;
+                    }
+                } catch (err) {
+                    // Ignore malformed payloads; fallback to other routing data.
+                }
+            }
+
+            if (launchUrl && launchUrl.indexOf(cartUrlSuffix) !== -1) {
+                routeName = 'Cart';
+            } else if (launchUrl) {
+                routeName = 'WebViewPage';
+                url = launchUrl;
+                params = { uri: launchUrl };
+            } else if (payload.additionalData) {
                 let additionalData = notification.payload.additionalData;
+                const additionalUrl = additionalData.url_link || additionalData.url;
 
                 if (additionalData.category_id) {
                     if (additionalData.has_child) {
@@ -41,11 +65,16 @@ class Notification extends React.Component {
                     params = {
                         productId: additionalData.product_id,
                     };
-                } else if (additionalData.url) {
-                    routeName = 'WebViewPage';
-                    params = {
-                        uri: additionalData.url,
-                    };
+                } else if (additionalUrl) {
+                    if (additionalUrl.indexOf(cartUrlSuffix) !== -1) {
+                        routeName = 'Cart';
+                    } else {
+                        routeName = 'WebViewPage';
+                        url = additionalUrl;
+                        params = {
+                            uri: additionalUrl,
+                        };
+                    }
                 }
             }
 
@@ -60,6 +89,7 @@ class Notification extends React.Component {
             let type = notification.type;
             let routeName = '';
             let url = '';
+            let params = {};
             switch (type) {
                 case '1':
                     let productID = notification.productID ? notification.productID : notification.product_id;

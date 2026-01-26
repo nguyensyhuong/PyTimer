@@ -86,7 +86,10 @@ export default class Redirect extends React.Component {
         if (!Identify.isRunInitDeepLink) {
             Identify.isRunInitDeepLink = true;
             Linking.getInitialURL().then((url) => {
-                this.processAppLinkUrl(url);
+                // Delay to allow notification-open handler to set flags on cold start.
+                setTimeout(() => {
+                    this.processAppLinkUrl(url);
+                }, 600);
             }).catch(err => {
                 console.log('App link error occurred: ' + err);
             });
@@ -94,6 +97,39 @@ export default class Redirect extends React.Component {
     }
 
     processAppLinkUrl(url) {
+        // Deep link handling disabled to avoid auto-opening web views on app launch.
+        return;
+        if (Identify.isInitNotiOpened && Identify.isInitNotiOpened()) {
+            Identify.saveInitNotiOpened(false);
+            Identify.saveNotificationLaunchUrl(null);
+            return;
+        }
+        const notiLaunchUrl = Identify.getNotificationLaunchUrl
+            ? Identify.getNotificationLaunchUrl()
+            : null;
+        const normalizeUrl = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            let normalized = value.split('#')[0].split('?')[0];
+            if (normalized.endsWith('/')) normalized = normalized.slice(0, -1);
+            return normalized;
+        };
+        const shouldIgnoreLaunchUrl = (incoming, launchUrl) => {
+            const a = normalizeUrl(incoming);
+            const b = normalizeUrl(launchUrl);
+            if (!a || !b) return false;
+            return a === b || a.indexOf(b) !== -1 || b.indexOf(a) !== -1;
+        };
+        if (
+            Identify.isInitNotiOpened &&
+            Identify.isInitNotiOpened() &&
+            url &&
+            notiLaunchUrl &&
+            shouldIgnoreLaunchUrl(url, notiLaunchUrl)
+        ) {
+            Identify.saveInitNotiOpened(false);
+            Identify.saveNotificationLaunchUrl(null);
+            return;
+        }
         if (url && url.startsWith('http') && !url.includes('page.link')) {
             if (!this.dispatchProcessAppLink(url, this.props.navigation)) {
                 this.requestGetDataFromURL(url);

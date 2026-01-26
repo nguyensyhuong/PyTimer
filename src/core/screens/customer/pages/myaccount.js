@@ -11,6 +11,7 @@ import SimiPageComponent from '@base/components/SimiPageComponent';
 import variable from '@theme/variables/material';
 import Identify from '@helper/Identify';
 import Events from '@helper/config/events';
+import OneSignal from 'react-native-onesignal';
 
 class MyAccountPage extends SimiPageComponent {
 
@@ -37,6 +38,7 @@ class MyAccountPage extends SimiPageComponent {
                 { type: 'showLoading', data: { type: 'none' } },
                 { type: 'clear_all_data', data: null },
             ]);
+            OneSignal.setExternalUserId("0");
             Identify.setCustomerData(null);
             Identify.setCustomerParams(null);
             Connection.setCustomer(null);

@@ -14,6 +14,7 @@ import Identify from '@helper/Identify';
 import Events from '@helper/config/events';
 import SplashScreen from 'react-native-splash-screen'
 import material from "@theme/variables/material";
+import OneSignal from 'react-native-onesignal';
 import { requestTrackingPermission, getTrackingStatus } from 'react-native-tracking-transparency';
 
 class LoginPage extends SimiPageComponent {
@@ -72,6 +73,95 @@ class LoginPage extends SimiPageComponent {
             console.log(e.message);
         }
     }
+    sendAPITracking(customerId, playerId) {
+        console.log('sendAPITracking', { customerId, playerId });
+        try {
+            new NewConnection()
+                .init("simiconnector/rest/v2/customers/subscriber", "track_user_notification", this)
+                .addGetData({ user_id: customerId, status: 1, player_id: playerId })
+                .setShowErrorAlert(false)
+                .connect();
+        } catch (e) {
+            console.log('sendAPITracking error', e);
+        }
+    }
+    
+    async trackingUserByNoti() {
+        console.log('trackingUserByNoti start');
+        const userInfo = Identify.getCustomerData();
+        const customerId = userInfo?.entity_id || "0";
+        if (customerId != "0") {
+            await OneSignal.setExternalUserId(customerId);
+        }
+    
+        // 1) Thử lấy deviceState ngay
+        try {
+            const ds = await OneSignal.getDeviceState();
+            const playerId = ds?.userId;
+            console.log('OneSignal.getDeviceState immediate ->', ds);
+            if (playerId) {
+                this.sendAPITracking(customerId, playerId);
+                return;
+            }
+        } catch (e) {
+            console.log('OneSignal.getDeviceState error', e);
+        }
+    
+        // 2) Poll trong vòng ~8 giây (8 lần x 1s)
+        for (let i = 0; i < 8; i++) {
+            try {
+                const ds = await OneSignal.getDeviceState();
+                const playerId = ds?.userId;
+                console.log(`trackingUserByNoti poll ${i} -> playerId`, playerId);
+                if (playerId) {
+                    this.sendAPITracking(customerId, playerId);
+                    return;
+                }
+            } catch (e) {
+                console.log('poll getDeviceState error', e);
+            }
+            // sleep 1s
+            await new Promise(res => setTimeout(res, 1000));
+        }
+    
+        // 3) Nếu vẫn chưa có, đăng ký observer 1 lần để xử lý khi OneSignal ready
+        console.log('trackingUserByNoti: register subscription observer as fallback');
+        this._oneSignalObserver = event => {
+            try {
+                console.log('OneSignal subscription observer event:', event);
+                const playerId = event.to?.userId || event.from?.userId;
+                if (playerId) {
+                    const userInfo2 = Identify.getCustomerData();
+                    const customerId2 = userInfo2?.entity_id || "0";
+                    this.sendAPITracking(customerId2, playerId);
+                    // unregister observer sau khi thành công
+                    if (OneSignal && OneSignal.removeSubscriptionObserver) {
+                        OneSignal.removeSubscriptionObserver(this._oneSignalObserver);
+                        this._oneSignalObserver = null;
+                    }
+                }
+            } catch (e) {
+                console.log('observer handler error', e);
+            }
+        };
+        if (OneSignal && OneSignal.addSubscriptionObserver) {
+            OneSignal.addSubscriptionObserver(this._oneSignalObserver);
+        } else {
+            console.log('OneSignal observer APIs not available on this version');
+        }
+    }
+
+    componentWillUnmount() {
+        // nếu bạn đã register observer thì remove
+        if (OneSignal && OneSignal.removeSubscriptionObserver && this._oneSignalObserver) {
+            try {
+                OneSignal.removeSubscriptionObserver(this._oneSignalObserver);
+                this._oneSignalObserver = null;
+            } catch (e) {}
+        }
+        // nếu SimiPageComponent có componentWillUnmount, gọi super
+        if (super.componentWillUnmount) super.componentWillUnmount();
+    }
 
     setData(data, requestID) {
         if (requestID == 'customer_login') {
@@ -80,6 +170,8 @@ class LoginPage extends SimiPageComponent {
             this.saveCustomerData();
             this.getQuoteItems();
             this.tracking();
+            this.trackingUserByNoti();
+
             AppStorage.saveData('quote_id', '');
         } else if (requestID == 'get_quoteitems') {
             if (!this.isCheckout) {

@@ -99,7 +99,7 @@ class PaymentMethod extends SimiComponent {
     }
 
     renderPaymentItem(paymentMethod) {
-        // console.log('ầdffs', paymentMethod)
+        console.log('ầdffs', this.props.parent.state.iframe_url)
         if (paymentMethod.show_type == '1') {
             return (this.renderCreditCard(paymentMethod));
         }
@@ -128,8 +128,8 @@ class PaymentMethod extends SimiComponent {
                             style={{flex: 1, activeOpacity: 0.99, overflow: 'hidden'}}
                             startInLoadingState={true}
                             javaScriptEnabled={true}
-                            androidHardwareAccelerationDisabled
-                            androidLayerType={'hardware'}
+                            // androidHardwareAccelerationDisabled
+                            // androidLayerType={'hardware'}
                             ref={(webView) => { this.webView.ref = webView; }}
                             autoFocus={true}
                             onNavigationStateChange={(webViewState) => {
