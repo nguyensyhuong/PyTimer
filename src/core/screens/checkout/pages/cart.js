@@ -19,6 +19,8 @@ class Cart extends SimiPageComponent {
         this.state = {
             ...this.state,
             refreshing: false,
+            isFetchingCart: false,
+            cartLoaded: !Identify.isEmpty(this.props.data),
         };
         this.list = null;
         this.totals = null;
@@ -76,7 +78,6 @@ class Cart extends SimiPageComponent {
         return components;
     }
     componentWillMount() {
-        this.requestCart()
         if (this.props.loading.type === 'none') {
             if (Identify.isEmpty(this.props.data) || Identify.TRUE(this.props.data.reload_data)) {
                 this.props.storeData('showLoading', { type: 'full' });
@@ -93,9 +94,8 @@ class Cart extends SimiPageComponent {
     }
     componentDidMount() {
         super.componentDidMount();
-        if (Identify.isEmpty(this.props.data) || Identify.TRUE(this.props.data.reload_data)) {
-            this.requestCart()
-        } else {
+        this.requestCart();
+        if (!Identify.isEmpty(this.props.data) && !Identify.TRUE(this.props.data.reload_data)) {
             if (this.props.data.message && !Identify.TRUE(this.props.data.is_can_checkout)) {
                 let messages = this.props.data.message;
                 let message = messages[0];
@@ -110,12 +110,19 @@ class Cart extends SimiPageComponent {
     }
 
     requestCart() {
+        this.setState({
+            isFetchingCart: true,
+        });
         newConnection = new NewConnection();
         newConnection.init(quoteitems, 'get_quoteitems', this);
         newConnection.connect();
     }
     setData(data) {
         data['reload_data'] = true;
+        this.setState({
+            isFetchingCart: false,
+            cartLoaded: true,
+        });
         this.dataTracking = {
             quoteitems: data
         }
@@ -132,6 +139,13 @@ class Cart extends SimiPageComponent {
                 duration: 3000
             });
         }
+    }
+    handleWhenRequestFail() {
+        this.setState({
+            isFetchingCart: false,
+            cartLoaded: true,
+        });
+        this.props.storeData('showLoading', { type: 'none' });
     }
     qtyHandle(e) { return; }
     updateCart(item_id, qty) {
@@ -176,7 +190,16 @@ class Cart extends SimiPageComponent {
         this.setState({ refreshing: false }); //Stop Rendering Spinner
     }
     renderPhoneLayout() {
-        if (Identify.isEmpty(this.props.data) || this.props.data.quoteitems.length <= 0) {
+        const isQuoteDataReady = !Identify.isEmpty(this.props.data) && Array.isArray(this.props.data.quoteitems);
+        const hasQuoteItems = isQuoteDataReady && this.props.data.quoteitems.length > 0;
+        if (!this.state.cartLoaded && this.state.isFetchingCart) {
+            return (
+                <Container style={{ backgroundColor: variable.appBackground }}>
+                    <Content refreshControl={this.refreshControl()} />
+                </Container>
+            );
+        }
+        if (!hasQuoteItems) {
             return (
                 <Container style={{ backgroundColor: variable.appBackground }}>
                     <Content refreshControl={this.refreshControl()}>
@@ -198,7 +221,16 @@ class Cart extends SimiPageComponent {
         )
     }
     renderTabletHorizontalLayout() {
-        if (Identify.isEmpty(this.props.data) || this.props.data.quoteitems.length <= 0) {
+        const isQuoteDataReady = !Identify.isEmpty(this.props.data) && Array.isArray(this.props.data.quoteitems);
+        const hasQuoteItems = isQuoteDataReady && this.props.data.quoteitems.length > 0;
+        if (!this.state.cartLoaded && this.state.isFetchingCart) {
+            return (
+                <Container style={{ backgroundColor: variable.appBackground }}>
+                    <Content refreshControl={this.refreshControl()} />
+                </Container>
+            );
+        }
+        if (!hasQuoteItems) {
             return (
                 <Container style={{ backgroundColor: variable.appBackground }}>
                     <Content refreshControl={this.refreshControl()}>

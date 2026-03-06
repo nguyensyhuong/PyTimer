@@ -27,7 +27,7 @@
 		5B2B514A6A8642139E74D29D /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4DE56DD519BC4261A8E78202 /* Roboto.ttf */; };
 		606E1C7EA09445FFBA789228 /* Default-667h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CB1B5DE3565E4DA0B25D3A61 /* Default-667h@2x.png */; };
 		63ACAABB30204BCD8B0A93CA /* UniversNextArabic-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D380A6C4CA2C45F0A03A8DB5 /* UniversNextArabic-Regular.ttf */; };
-		7C3F7E492F221CE400B14BF2 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 7CD0159E2DDACFD60051B841 /* main.jsbundle */; };
+		7CE410FF2F59E3F000B2C0DB /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 7CD0159E2DDACFD60051B841 /* main.jsbundle */; };
 		813B862A63A54474A8344B3C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 47DBC7D1AEFE4178BAEAAA68 /* Default@2x.png */; };
 		8168DDED2A680C7F00FE74E9 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 81E054442A5E924C00354582 /* assets */; };
 		8579D95AA27D47CFB1A74319 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02B5DA372AEF48749A2C52C9 /* logo@2x.png */; };
@@ -1212,7 +1212,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C3F7E492F221CE400B14BF2 /* main.jsbundle in Resources */,
+				7CE410FF2F59E3F000B2C0DB /* main.jsbundle in Resources */,
 				8168DDED2A680C7F00FE74E9 /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
@@ -1510,7 +1510,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
@@ -1556,7 +1556,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 5L748QCS32;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;

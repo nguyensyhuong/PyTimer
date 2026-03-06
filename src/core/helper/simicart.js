@@ -7,8 +7,8 @@ class SimiCart {
   static simicart_url = "https://www.simicart.com/index.php/appdashboard/rest/app_configs/";
   static simicart_authorization = "5ValhIOlcIzC32N35OQIiUXLibY5cdzPQhrPNkc";
   static isDemo = "0";
-  static appVersion = "1.1.3";
-  static appVersionAndroid = "1.1.4";
+  static appVersion = "1.1.5";
+  static appVersionAndroid = "1.1.6";
   static appID = "com.pytimberwarehouse.app";
   static fullSplash = "0";
   static colorSplash = "#FFFFFF";

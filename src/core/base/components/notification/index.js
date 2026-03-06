@@ -23,6 +23,8 @@ class Notification extends React.Component {
             const payload = notification.payload || {};
             const rawPayload = payload.rawPayload;
             let launchUrl = payload.launchURL || payload.launchUrl;
+            const additionalData = payload.additionalData || null;
+            const additionalUrl = additionalData ? additionalData.url_link || additionalData.url : '';
 
             if (!launchUrl && rawPayload) {
                 try {
@@ -36,53 +38,44 @@ class Notification extends React.Component {
                 }
             }
 
-            if (launchUrl && launchUrl.indexOf(cartUrlSuffix) !== -1) {
+            if (additionalData && additionalData.category_id) {
+                if (additionalData.has_child) {
+                    routeName = 'Category';
+                    params = {
+                        categoryId: additionalData.category_id,
+                        categoryName: additionalData.category_name ? additionalData.category_name : "",
+                    };
+                } else {
+                    routeName = 'Products';
+                    params = {
+                        categoryId: additionalData.category_id,
+                        categoryName: additionalData.category_name ? additionalData.category_name : "",
+                    };
+                }
+            } else if (additionalData && additionalData.product_id) {
+                routeName = 'ProductDetail';
+                params = {
+                    productId: additionalData.product_id,
+                };
+            } else if (additionalUrl && additionalUrl.indexOf(cartUrlSuffix) !== -1) {
+                routeName = 'Cart';
+            } else if (additionalUrl) {
+                routeName = 'WebViewPage';
+                url = additionalUrl;
+                params = { uri: additionalUrl };
+            } else if (launchUrl && launchUrl.indexOf(cartUrlSuffix) !== -1) {
                 routeName = 'Cart';
             } else if (launchUrl) {
                 routeName = 'WebViewPage';
                 url = launchUrl;
                 params = { uri: launchUrl };
-            } else if (payload.additionalData) {
-                let additionalData = notification.payload.additionalData;
-                const additionalUrl = additionalData.url_link || additionalData.url;
-
-                if (additionalData.category_id) {
-                    if (additionalData.has_child) {
-                        routeName = 'Category';
-                        params = {
-                            categoryId: additionalData.category_id,
-                            categoryName: additionalData.category_name ? additionalData.category_name : "",
-                        };
-                    } else {
-                        routeName = 'Products';
-                        params = {
-                            categoryId: additionalData.category_id,
-                            categoryName: additionalData.category_name ? additionalData.category_name : "",
-                        };
-                    }
-                } else if (additionalData.product_id) {
-                    routeName = 'ProductDetail';
-                    params = {
-                        productId: additionalData.product_id,
-                    };
-                } else if (additionalUrl) {
-                    if (additionalUrl.indexOf(cartUrlSuffix) !== -1) {
-                        routeName = 'Cart';
-                    } else {
-                        routeName = 'WebViewPage';
-                        url = additionalUrl;
-                        params = {
-                            uri: additionalUrl,
-                        };
-                    }
-                }
             }
 
             if (routeName != '') {
                 if (Identify.appConfig.app_settings && Identify.appConfig.app_settings.web_app && Identify.appConfig.app_settings.web_app == '1') {
                     this.props.storeData('currentURL', url);
                 } else {
-                    NavigationManager.openPage(null, routeName, params);
+                    NavigationManager.openRootPage(null, routeName, params);
                 }
             }
         } else {

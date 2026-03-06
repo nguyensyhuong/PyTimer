@@ -14,6 +14,23 @@ import Events from '@helper/config/events';
 import OneSignal from 'react-native-onesignal';
 
 class MyAccountPage extends SimiPageComponent {
+    clearOneSignalExternalId() {
+        try {
+            if (OneSignal && OneSignal.removeExternalUserId) {
+                OneSignal.removeExternalUserId();
+                return;
+            }
+        } catch (e) {
+            console.log('removeExternalUserId error', e);
+        }
+        try {
+            if (OneSignal && OneSignal.setExternalUserId) {
+                OneSignal.setExternalUserId('');
+            }
+        } catch (e) {
+            console.log('setExternalUserId fallback error', e);
+        }
+    }
 
     logout() {
         try {
@@ -38,7 +55,7 @@ class MyAccountPage extends SimiPageComponent {
                 { type: 'showLoading', data: { type: 'none' } },
                 { type: 'clear_all_data', data: null },
             ]);
-            OneSignal.setExternalUserId("0");
+            this.clearOneSignalExternalId();
             Identify.setCustomerData(null);
             Identify.setCustomerParams(null);
             Connection.setCustomer(null);
@@ -55,6 +72,7 @@ class MyAccountPage extends SimiPageComponent {
                 { type: 'showLoading', data: { type: 'none' } },
                 { type: 'clear_all_data', data: null },
             ]);
+            this.clearOneSignalExternalId();
             Identify.setCustomerData(null);
             Identify.setCustomerParams(null);
             Connection.setCustomer(null);

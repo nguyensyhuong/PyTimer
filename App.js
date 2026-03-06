@@ -96,7 +96,7 @@ const store = createStore(reducers);
 const NativeMethod =
     Platform.OS === 'ios' ? NativeModules.NativeMethod : NativeModules.NativeMethodModule;
 
-const isAndroid15 = Platform.OS === 'android' && Number(Platform.Version) === 35;
+const isAndroid15 = Platform.OS === 'android' && Number(Platform.Version) >= 35;
 
 const getAndroidSystemBars = () => {
     if (!isAndroid15) return { top: 0, bottom: 0 };
@@ -155,6 +155,14 @@ export default class App extends React.Component {
         I18nManager.forceRTL(I18nManager.isRTL);
         this.router = null;
         this.requestedRegisterDevice = false;
+        this.pendingOpen = null;
+        this.pendingOpenTimer = null;
+        this.pendingOpenRetries = 0;
+        this.lastNotiOpenAt = 0;
+        this.lastNotiOpenKey = null;
+        this.openOneSignalNotification = this.openOneSignalNotification.bind(this);
+        this.onReceived = this.onReceived.bind(this);
+        this.onOpened = this.onOpened.bind(this);
 
         // OneSignal classic init (the version bạn đang dùng có vẻ là API cũ)
         OneSignal.setAppId('9852516e-876e-4d44-b9b6-44975714c6f7');
@@ -497,10 +505,7 @@ export default class App extends React.Component {
                     }
                     console.log('Opened Received');
                     console.log(data);
-                    store.dispatch({
-                        type: 'showNotification',
-                        data: { show: true, data: data },
-                    });
+                    this.openNotification(data);
                 }
             });
 
@@ -533,10 +538,73 @@ export default class App extends React.Component {
         firebase.notifications().displayNotification(notification);
     }
 
+    isDuplicateOpen(key) {
+        const now = Date.now();
+        if (this.lastNotiOpenKey === key && now - this.lastNotiOpenAt < 1500) {
+            return true;
+        }
+        this.lastNotiOpenKey = key;
+        this.lastNotiOpenAt = now;
+        return false;
+    }
+
+    handleRouteOpen(routeName, params, url, useRoot = true) {
+        if (!routeName) return;
+        const key = `${routeName}|${JSON.stringify(params || {})}|${url || ''}`;
+        if (this.isDuplicateOpen(key)) return;
+
+        const appSettings =
+            Identify.appConfig && Identify.appConfig.app_settings
+                ? Identify.appConfig.app_settings
+                : null;
+        if (appSettings && appSettings.web_app && appSettings.web_app == '1') {
+            if (url) {
+                store.dispatch({ type: 'currentURL', data: url });
+            }
+            return;
+        }
+
+        if (NavigationManager.savedNavigation) {
+            if (useRoot) {
+                NavigationManager.openRootPage(null, routeName, params);
+            } else {
+                NavigationManager.openPage(null, routeName, params);
+            }
+            return;
+        }
+
+        this.pendingOpen = { routeName, params, url, useRoot };
+        if (!this.pendingOpenTimer) {
+            this.pendingOpenRetries = 0;
+            this.pendingOpenTimer = setInterval(() => {
+                if (NavigationManager.savedNavigation && this.pendingOpen) {
+                    const pending = this.pendingOpen;
+                    this.pendingOpen = null;
+                    clearInterval(this.pendingOpenTimer);
+                    this.pendingOpenTimer = null;
+                    this.handleRouteOpen(
+                        pending.routeName,
+                        pending.params,
+                        pending.url,
+                        pending.useRoot,
+                    );
+                    return;
+                }
+                this.pendingOpenRetries += 1;
+                if (this.pendingOpenRetries > 20) {
+                    clearInterval(this.pendingOpenTimer);
+                    this.pendingOpenTimer = null;
+                    this.pendingOpen = null;
+                }
+            }, 300);
+        }
+    }
+
     openNotification(notification) {
         const type = notification.type;
         let routeName = '';
         let params = {};
+        let url = '';
 
         switch (type) {
             case '1':
@@ -575,22 +643,82 @@ export default class App extends React.Component {
                 params = {
                     uri: notification.url ? notification.url : notification.notice_url,
                 };
+                url = notification.url ? notification.url : notification.notice_url;
                 break;
             default:
                 break;
         }
-        if (routeName !== '') {
-            NavigationManager.openRootPage(null, routeName, params);
+        this.handleRouteOpen(routeName, params, url, true);
+    }
+
+    openOneSignalNotification(notification) {
+        const payload = notification && notification.payload ? notification.payload : notification;
+        let routeName = '';
+        let url = '';
+        let params = {};
+        const cartUrlSuffix = '/cart_page.html';
+        const rawPayload = payload && payload.rawPayload ? payload.rawPayload : null;
+        let launchUrl = payload && (payload.launchURL || payload.launchUrl);
+        const additionalData = payload && payload.additionalData ? payload.additionalData : null;
+        const additionalUrl = additionalData ? additionalData.url_link || additionalData.url : '';
+
+        if (!launchUrl && rawPayload) {
+            try {
+                const raw = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload;
+                if (raw && raw.custom) {
+                    const custom = typeof raw.custom === 'string' ? JSON.parse(raw.custom) : raw.custom;
+                    launchUrl = custom && custom.u ? custom.u : launchUrl;
+                }
+            } catch (err) {
+                // Ignore malformed payloads; fallback to other routing data.
+            }
         }
+
+        if (additionalData && additionalData.category_id) {
+            if (additionalData.has_child) {
+                routeName = 'Category';
+                params = {
+                    categoryId: additionalData.category_id,
+                    categoryName: additionalData.category_name ? additionalData.category_name : '',
+                };
+            } else {
+                routeName = 'Products';
+                params = {
+                    categoryId: additionalData.category_id,
+                    categoryName: additionalData.category_name ? additionalData.category_name : '',
+                };
+            }
+        } else if (additionalData && additionalData.product_id) {
+            routeName = 'ProductDetail';
+            params = {
+                productId: additionalData.product_id,
+            };
+        } else if (additionalUrl && additionalUrl.indexOf(cartUrlSuffix) !== -1) {
+            routeName = 'Cart';
+        } else if (additionalUrl) {
+            routeName = 'WebViewPage';
+            url = additionalUrl;
+            params = {
+                uri: additionalUrl,
+            };
+        } else if (launchUrl && launchUrl.indexOf(cartUrlSuffix) !== -1) {
+            routeName = 'Cart';
+        } else if (launchUrl) {
+            routeName = 'WebViewPage';
+            url = launchUrl;
+            params = { uri: launchUrl };
+        }
+
+        this.handleRouteOpen(routeName, params, url, true);
     }
 
     onReceived(notification) {
         console.log("Notification received: ", notification);
         const payload = (notification && notification.payload) ? notification.payload : notification;
-        let notiData = {
+        const notiData = {
             payload,
+            is_onesignal: "1",
         };
-        notiData["is_onesignal"] = "1";
         store.dispatch({
             type: "showNotification",
             data: { show: true, data: notiData },
@@ -600,24 +728,7 @@ export default class App extends React.Component {
     onOpened(openResult) {
         console.log("Notification opened: ", openResult);
         const notification = openResult && openResult.notification ? openResult.notification : null;
-        const payload = (notification && notification.payload) ? notification.payload : notification;
-        let notiData = {
-            payload,
-        };
-        notiData["is_onesignal"] = "1";
-        const launchUrl =
-            (payload && (payload.launchURL || payload.launchUrl)) ||
-            (notification && (notification.launchURL || notification.launchUrl)) ||
-            null;
-        if (launchUrl) {
-            Identify.saveInitNotiOpened(true);
-            Identify.saveNotificationLaunchUrl(launchUrl);
-        }
-        setTimeout(() => {
-            store.dispatch({
-            type: "showNotification",
-            data: { show: true, data: notiData },
-        })}, 5000);
+        this.openOneSignalNotification(notification);
     }
     
 
