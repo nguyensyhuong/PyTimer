@@ -1,14 +1,14 @@
 import React from 'react';
 
 class SimiCart {
-  static merchant_url = "https://pytimberwarehouse.com.au/";
-  // static merchant_url = "https://magento-1244323-4452474.cloudwaysapps.com/";
+  // static merchant_url = "https://pytimberwarehouse.com.au/";
+  static merchant_url = "https://magento-1147495-6432828.cloudwaysapps.com";
   static merchant_authorization = "J3COeZtmHvOkTrXgdGYyaucB5y38bD";
   static simicart_url = "https://www.simicart.com/index.php/appdashboard/rest/app_configs/";
   static simicart_authorization = "5ValhIOlcIzC32N35OQIiUXLibY5cdzPQhrPNkc";
   static isDemo = "0";
-  static appVersion = "1.1.5";
-  static appVersionAndroid = "1.1.6";
+  static appVersion = "1.1.6";
+  static appVersionAndroid = "1.1.7";
   static appID = "com.pytimberwarehouse.app";
   static fullSplash = "0";
   static colorSplash = "#FFFFFF";

@@ -27,7 +27,7 @@
 		5B2B514A6A8642139E74D29D /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4DE56DD519BC4261A8E78202 /* Roboto.ttf */; };
 		606E1C7EA09445FFBA789228 /* Default-667h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CB1B5DE3565E4DA0B25D3A61 /* Default-667h@2x.png */; };
 		63ACAABB30204BCD8B0A93CA /* UniversNextArabic-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D380A6C4CA2C45F0A03A8DB5 /* UniversNextArabic-Regular.ttf */; };
-		7CE410FF2F59E3F000B2C0DB /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 7CD0159E2DDACFD60051B841 /* main.jsbundle */; };
+		7CE413BB2FC83AA400B2C0DB /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 7CD0159E2DDACFD60051B841 /* main.jsbundle */; };
 		813B862A63A54474A8344B3C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 47DBC7D1AEFE4178BAEAAA68 /* Default@2x.png */; };
 		8168DDED2A680C7F00FE74E9 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 81E054442A5E924C00354582 /* assets */; };
 		8579D95AA27D47CFB1A74319 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02B5DA372AEF48749A2C52C9 /* logo@2x.png */; };
@@ -1212,7 +1212,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7CE410FF2F59E3F000B2C0DB /* main.jsbundle in Resources */,
+				7CE413BB2FC83AA400B2C0DB /* main.jsbundle in Resources */,
 				8168DDED2A680C7F00FE74E9 /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
@@ -1508,11 +1508,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = 5L748QCS32;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1527,7 +1528,7 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.1.5;
+				MARKETING_VERSION = 1.1.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1536,8 +1537,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pytimberwarehouse.app;
 				PRODUCT_NAME = SimiCart;
 				PROVISIONING_PROFILE = "9ac6a725-345d-44d6-9aa1-39fba1503c6d";
-				PROVISIONING_PROFILE_SPECIFIER = wildcard_adhoc;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = pytimberwarehouse;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Timber_Live;
 				SWIFT_OBJC_BRIDGING_HEADER = "SimiCart-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1554,10 +1555,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SimiCart/SimiCart.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = 5L748QCS32;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JRTX64ZTY5;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1572,7 +1574,7 @@
 				INFOPLIST_FILE = SimiCart/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.1.5;
+				MARKETING_VERSION = 1.1.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1582,8 +1584,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pytimberwarehouse.app;
 				PRODUCT_NAME = SimiCart;
 				PROVISIONING_PROFILE = "42f71cc7-a7f0-4ab4-9c78-5aa5570f92b7";
-				PROVISIONING_PROFILE_SPECIFIER = wildcard_adhoc;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = pytimberwarehouse;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Timber_Live;
 				SWIFT_OBJC_BRIDGING_HEADER = "SimiCart-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -146,8 +146,8 @@ android {
         applicationId "com.pytimberwarehouse.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 21
-        versionName "1.1.6"
+        versionCode 22
+        versionName "1.1.7"
         // ndk {
         //     abiFilters "armeabi-v7a", "x86"
         // }
